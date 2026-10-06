@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ariel-sdd-weather-java
+    runtime: docker
+    plan: free
+    branch: backend-java
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: '8080'
