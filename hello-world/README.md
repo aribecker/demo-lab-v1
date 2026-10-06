@@ -12,7 +12,7 @@ bash scripts/setup.sh
 bash scripts/run.sh
 ```
 
-El servidor escucha en `127.0.0.1`, puerto `8080`. Abre esa dirección en un navegador cuando el entorno permita acceso local o reenvío de puertos. La pantalla incluye un botón que consulta `GET /api/hello` y muestra `Hello World!`.
+El servidor escucha en `127.0.0.1`, puerto `8080`. Abre esa dirección en un navegador cuando el entorno permita acceso local o reenvío de puertos. La pantalla incluye un botón que consulta `GET /api/hello` y muestra `Hello World!` junto a un timestamp UTC generado por el backend en cada petición.
 
 Configura otro puerto o interfaz con `PORT=9090 HOST=0.0.0.0 bash scripts/run.sh`. Detén el servidor con Ctrl+C. El script de arranque compila antes de ejecutar.
 
@@ -40,4 +40,4 @@ Para ampliar la aplicación, modifica primero la especificación y el plan, defi
 
 ## Resultado de validación
 
-Compilación Java 21 y seis pruebas automatizadas aprobadas en este entorno. La comprobación visual, la interacción completa en navegador y el lector de pantalla quedan como validaciones manuales; las pruebas del frontend verifican el controlador con objetos simulados.
+Compilación Java 21 y ocho pruebas automatizadas aprobadas en este entorno. La comprobación visual, la interacción completa en navegador y el lector de pantalla quedan como validaciones manuales; las pruebas del frontend verifican el controlador con objetos simulados.

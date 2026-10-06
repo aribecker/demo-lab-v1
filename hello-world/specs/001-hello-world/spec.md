@@ -5,8 +5,8 @@ Una aplicación web simple permite solicitar y visualizar un saludo obtenido des
 
 ## Historias y criterios de aceptación
 - AC1: al abrir `/`, el usuario ve una página con el título «Hello World», un botón «Obtener saludo» y un estado inicial que invita a solicitarlo.
-- AC2: `GET /api/hello` devuelve HTTP 200, `Content-Type: application/json` y exactamente `{"message":"Hello World!"}`.
-- AC3: al pulsar el botón, el frontend JavaScript muestra «Cargando…», desactiva el botón mientras espera y luego muestra el mensaje recibido, sin recargar la página.
+- AC2: `GET /api/hello` devuelve HTTP 200, `Content-Type: application/json` y un JSON con `message: "Hello World!"` y `timestamp` ISO 8601 en UTC, generado por el servidor para cada solicitud. La respuesta incluye `Cache-Control: no-store`.
+- AC3: al pulsar el botón, el frontend JavaScript muestra «Cargando…», desactiva el botón mientras espera y luego muestra el mensaje y el timestamp recibido (etiquetado UTC), sin recargar la página.
 - AC4: ante un error HTTP, de conexión o de formato, muestra un error comprensible y permite reintentar.
 - AC5: el servidor devuelve 404 para rutas desconocidas y 405 con `Allow: GET` para métodos no admitidos. No permite recorrer directorios mediante la URL.
 - AC6: la página usa controles nativos, estado anunciado con `aria-live` y diseño legible en móvil y escritorio.

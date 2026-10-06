@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.time.Instant;
 
 public final class HelloServer {
     private static final Map<String, String> ASSETS = Map.of(
@@ -34,7 +35,9 @@ public final class HelloServer {
             }
             String route = exchange.getRequestURI().getPath();
             if (route.equals("/api/hello")) {
-                send(exchange, 200, "application/json", "{\"message\":\"Hello World!\"}".getBytes(StandardCharsets.UTF_8));
+                exchange.getResponseHeaders().set("Cache-Control", "no-store");
+                String body = "{\"message\":\"Hello World!\",\"timestamp\":\"" + Instant.now() + "\"}";
+                send(exchange, 200, "application/json", body.getBytes(StandardCharsets.UTF_8));
                 return;
             }
             String asset = ASSETS.get(route);

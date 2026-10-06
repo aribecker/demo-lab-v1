@@ -4,11 +4,12 @@ export function createHelloController({ button, message, fetcher = globalThis.fe
     button.disabled = true;
     message.textContent = 'Cargando…';
     try {
-      const response = await fetcher('/api/hello', { signal: AbortSignal.timeout(10000) });
+      const response = await fetcher('/api/hello', { signal: AbortSignal.timeout(10000), cache: 'no-store' });
       if (!response.ok) throw new Error('HTTP error');
       const data = await response.json();
       if (typeof data.message !== 'string' || !data.message.trim()) throw new Error('Invalid response');
-      message.textContent = data.message;
+      if (typeof data.timestamp !== 'string' || !data.timestamp.endsWith('Z') || !Number.isFinite(Date.parse(data.timestamp))) throw new Error('Invalid timestamp');
+      message.textContent = `${data.message} · Timestamp (UTC): ${data.timestamp}`;
     } catch {
       message.textContent = 'No pudimos obtener el saludo. Inténtalo de nuevo.';
     } finally {
