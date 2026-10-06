@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: sdd-hello-world-java
+    runtime: docker
+    plan: free
+    branch: work
+    dockerContext: ./hello-world
+    dockerfilePath: ./hello-world/Dockerfile
+    healthCheckPath: /api/hello

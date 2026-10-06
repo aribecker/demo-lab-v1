@@ -26,6 +26,21 @@ bash scripts/test.sh
 
 La suite inicia y detiene un backend en un puerto libre; comprueba API, página, archivos estáticos, 404 y 405. Prueba el controlador JavaScript con éxito, espera, solicitudes duplicadas y errores HTTP, de conexión y de formato, incluyendo reintentos. Usa las herramientas de pruebas nativas de Node.js; no descarga paquetes.
 
+## Despliegue
+
+La imagen Docker sirve tanto el frontend como la API y escucha en `0.0.0.0`. Respeta el puerto `PORT` asignado por el hosting.
+
+Desde la raíz del repositorio:
+
+```bash
+docker build -t sdd-hello-world ./hello-world
+docker run --rm -p 8080:8080 sdd-hello-world
+```
+
+Para Render, conecta este repositorio y selecciona la rama `work`. Configura Docker como runtime, `./hello-world` como contexto, `./hello-world/Dockerfile` como Dockerfile y `/api/hello` como ruta de salud. El archivo `render-hello-world.yaml` documenta estas opciones; el `render.yaml` original corresponde a otra aplicación.
+
+Tras desplegar, comprueba la página principal y que dos peticiones a `/api/hello` devuelvan timestamps distintos. La publicación requiere una cuenta de hosting y acceso al repositorio desde ella.
+
 ## Estructura y SDD
 
 - `specs/001-hello-world/spec.md`: alcance y criterios AC1–AC6.
