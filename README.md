@@ -11,3 +11,5 @@ Render: select this branch from a connected Git repository, Docker runtime, Free
 Do not deploy this Java branch to Sites. Do not synchronize OneDrive until requested. Source specifications are in specs/002-java-backend/.
 
 Validation: Java compilation and deterministic HTTP integration tests passed. Live provider access from this workspace was unsuccessful; verify external connectivity on Render. Docker image build has not been run here because Docker is unavailable.
+
+GitHub browser transfer: source-snapshot.tar.gz contains the complete tracked source tree and SDD history. Render uses Render-Dockerfile to extract and build it. Sources remain editable in the primary workspace; regenerate the archive for updates.
