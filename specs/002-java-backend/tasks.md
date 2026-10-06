@@ -1,9 +1,10 @@
-# Tasks — Version 0.0.6
+# Tasks — Spring Boot REST version 0.0.7
 
-- [x] Archive previous specifications with a timestamp.
-- [x] Define English-only active application and documentation requirements.
-- [x] Set version and Maven/Docker artifact to 0.0.6.
-- [x] Translate frontend and API strings; preserve fixed loading slots.
-- [x] Update API integration assertions for English messages and version.
-- [x] Run Java compilation, integration tests and JavaScript syntax checks.
-- [ ] Commit to java-fuentes and verify Render deployment and English weather UI.
+- [x] Preserve prior SDD files with a timestamp.
+- [x] Define Spring Boot REST architecture and preserve JSON/UI contracts.
+- [x] Implement application, controller, service, DTOs, error advice and cache filter.
+- [x] Configure executable Spring Boot JAR, Render PORT and Docker test build.
+- [x] Update English UI to version 0.0.7 and Spring Boot REST labels.
+- [x] Run Spring HTTP integration tests locally (success, fallback, 502, 504, assets and methods).
+- [ ] Complete executable JAR package in Render; local plugin downloads were incomplete.
+- [ ] Commit, deploy and verify real weather and stable loading.

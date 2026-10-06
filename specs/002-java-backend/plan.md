@@ -1,11 +1,17 @@
-# Implementation plan — Version 0.0.6
+# Implementation plan — Spring Boot REST, 0.0.7
 
-1. Archive the previous spec, plan and tasks under a timestamped history directory.
-2. Set APP_VERSION and the Maven/Docker artifact to 0.0.6.
-3. Translate all active frontend copy, statuses, date formatting, API success/error messages and forecast descriptions into English. Set the HTML language to en. Keep Buenos Aires as the location and timezone.
-4. Preserve the half-size title, fixed result slots, animated skeletons, accessibility and reduced-motion support from version 005.
-5. Update deterministic Java HTTP tests for the exact English message, version and forecast description. Check frontend JavaScript syntax.
-6. Commit specifications, source and documentation together to java-fuentes using a guarded branch update. Let Render Auto-Deploy build and activate the commit.
-7. Verify the deployed English UI, a real weather response and unchanged result/card/button geometry during another request.
+1. Archive the previous SDD documents with a timestamp.
+2. Replace manual HttpServer routing with Spring Boot 3.5.16 / Spring MVC on Java 17.
+3. Extract asynchronous provider logic into @Service WeatherService. Keep Java HttpClient.sendAsync, fallback and the 10-second deadline.
+4. Define typed records for weather and API response. Expose GET /api/hello and /health through @RestController with constructor injection. Serialize through Spring's Jackson integration.
+5. Map provider failures through @RestControllerAdvice and apply no-store via a servlet filter. Configure Render PORT, static assets and bounded Tomcat worker threads.
+6. Keep the English interface and skeleton geometry, update version and Spring Boot labels.
+7. Run @SpringBootTest integration tests with local provider fixtures, including provider timeout and static assets; package with the Spring Boot Maven plugin.
+8. Commit source, SDD and deployment configuration to java-fuentes with a guarded branch update. Render Auto-Deploy rebuilds and tests the container.
+9. Verify the service is Live, Spring Boot starts, and weather and stable loading work in the browser.
 
-The primary workspace is /workspace/sites/ssd-full-stack-java. Source files are stored individually in GitHub. Existing historical files retain their original language and version for auditability.
+Official references:
+- https://spring.io/guides/gs/rest-service/
+- https://docs.spring.io/spring-boot/3.5/system-requirements.html
+
+The primary workspace remains /workspace/sites/ssd-full-stack-java. Keep the previous releases in git/history; do not modify the original hosted Sites app.

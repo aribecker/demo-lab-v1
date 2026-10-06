@@ -1,16 +1,17 @@
-# SDD Feature 002: Java weather application — Version 0.0.6
+# SDD Feature 002 — Spring Boot REST weather application, version 0.0.7
 
-## Scope and language
-All active application UI, API messages, source comments, specifications, and project documentation must be in English. Use the exact version string `0.0.6` in the Java API and frontend badge. Keep historical snapshots unchanged. Preserve the original hosted version 002 and its archived source.
+## Architecture and language
+Use Java 17, Spring Boot 3.5.16 and Spring MVC REST, with embedded Tomcat. All active UI, API strings, specifications and source documentation remain in English. Preserve historical snapshots and the original Sites version. Identify the application as 0.0.7.
 
-## Weather contract
-Java 17 serves the frontend and GET `/api/hello`. Every accepted click initiates an asynchronous HttpClient request to Open-Meteo with MET Norway fallback. The entire operation has a 10-second deadline. A successful JSON response contains `version: "0.0.6"`, `message: "Hello World · Version 0.0.6"`, weather, timestamp, and architecture. Weather includes location, temperature, apparent temperature, humidity, wind speed, units, provider attribution, timezone, and data timestamp. MET Norway data is described as `Forecast for the nearest hour`. Return 502 for provider/format failures and 504 for timeouts, with the English error `Unable to retrieve the weather. Please try again.` Clear stale values and allow retry.
+Separate WeatherApplication (startup), WeatherController (HTTP endpoints), WeatherService (asynchronous provider calls and normalization), WeatherData/WeatherResponse (typed JSON DTOs), WeatherErrorHandler (provider failures) and NoCacheFilter (HTTP cache policy). Use constructor injection and Spring-managed @Service and @RestController components. Serve frontend assets from classpath:/public/.
 
-## Stable interface
-Use `Weather, full stack.` as the heading, retaining `clamp(1.5rem, 4.5vw, 3.25rem)`. Reserve exactly two lines for the Hello World/weather heading and two for weather details; reserve one line each for architecture and timestamps. Keep slot dimensions, spacing, card and button positions stable across initial loading, repeated requests, success and failure. Show grey shimmer skeletons with two/two/one/one bars during loading. Use aria-busy and a polite English status, hide decorative skeletons from assistive technology, and respect reduced-motion preferences. Narrow-screen overflow may scroll inside its fixed slot.
+## REST contract
+GET /api/hello returns JSON with version 0.0.7, message Hello World · Version 0.0.7, weather, timestamp and architecture. Preserve all weather fields, null values, units, provider attribution and Buenos Aires timezone. Each accepted request independently queries Open-Meteo asynchronously using Java HttpClient, with MET Norway fallback. Use a total 10-second deadline and a 12-second Spring MVC async timeout. Report nearest-hour forecasts accurately. Return 502 for provider/format failures and 504 for provider deadlines, with an English error and Cache-Control: no-store. GET /health returns ok. Unknown routes return 404; unsupported POST /api/hello returns 405.
 
-## Runtime and deployment
-Serve GET `/health`; return 404 for unknown routes and 405 for unsupported methods. Bind to 0.0.0.0 and use Render PORT. Build Maven artifact `weather-java-0.0.6.jar` in Docker. Deploy the private repository branch `java-fuentes` to the existing Render Free service using `Render-Dockerfile` and Auto-Deploy. Do not copy to OneDrive during iterations or modify the original Sites app.
+## Interface
+Keep the English Weather, full stack. title and its half-size responsive font. Keep two reserved lines each for the message and weather details, one each for architecture and timestamps, grey animated loading skeletons, stable card/button positions, aria-busy, polite loading status and reduced-motion support. Show Spring Boot REST API in the request path and technology footer.
 
-## Acceptance
-Compile Java and test success, exact version/message, English forecast attribution, fallback, unit conversion, errors, assets, health and methods. Verify English content and a real weather response on Render, and check that loading geometry remains stable. Archive prior active SDD documents with a timestamp before modifying them.
+## Deployment and acceptance
+Build an executable weather-java-0.0.7.jar with the Spring Boot Maven plugin. Docker must run the integration tests during package and start the executable JAR on Render PORT. Limit Tomcat worker threads for the Free instance. Deploy java-fuentes to the existing Render Free service. Do not synchronize OneDrive during iterations.
+
+Verify the real Spring application with deterministic HTTP fixtures: repeated successful calls, exact version/message/JSON, fallback, wind conversion, English descriptions, null fields, 502, 504, static assets, health, 404 and 405. After deploying, verify Spring Boot startup, English UI and real weather, and unchanged loading geometry. Archive previous spec/plan/tasks with a timestamp.
