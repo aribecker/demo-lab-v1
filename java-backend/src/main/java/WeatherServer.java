@@ -8,6 +8,7 @@ import java.time.*;
 import java.util.concurrent.*;
 
 public class WeatherServer {
+ static final String APP_VERSION = "003";
  static final Gson JSON=new GsonBuilder().serializeNulls().create();
  static final String PRIMARY="https://api.open-meteo.com/v1/forecast?latitude=-34.6037&longitude=-58.3816&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires";
  static final String SECONDARY="https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-34.6037&lon=-58.3816";
@@ -49,7 +50,7 @@ public class WeatherServer {
    String path=ex.getRequestURI().getPath();
    if(path.equals("/health")){send(ex,200,"text/plain","ok".getBytes(StandardCharsets.UTF_8));return;}
    if(path.equals("/api/hello")){
-    service.weather().whenComplete((weather,error)->{if(error!=null){Throwable cause=error;while(cause.getCause()!=null)cause=cause.getCause();System.err.println("Weather provider failure: "+cause.getClass().getSimpleName()+": "+cause.getMessage());JsonObject err=new JsonObject();err.addProperty("error","No se pudo consultar el clima. Volvé a intentar.");json(ex,cause instanceof TimeoutException||cause instanceof HttpTimeoutException?504:502,err);}else{JsonObject response=new JsonObject();response.addProperty("message","Clima en Buenos Aires");response.add("weather",weather);response.addProperty("timestamp",Instant.now().toString());response.addProperty("architecture","Browser → Java API → "+weather.get("source").getAsString()+" → JSON → Browser");json(ex,200,response);}});return;
+    service.weather().whenComplete((weather,error)->{if(error!=null){Throwable cause=error;while(cause.getCause()!=null)cause=cause.getCause();System.err.println("Weather provider failure: "+cause.getClass().getSimpleName()+": "+cause.getMessage());JsonObject err=new JsonObject();err.addProperty("error","No se pudo consultar el clima. Volvé a intentar.");json(ex,cause instanceof TimeoutException||cause instanceof HttpTimeoutException?504:502,err);}else{JsonObject response=new JsonObject();response.addProperty("message","Hello World · Versión "+APP_VERSION);response.addProperty("version",APP_VERSION);response.add("weather",weather);response.addProperty("timestamp",Instant.now().toString());response.addProperty("architecture","Browser → Java API → "+weather.get("source").getAsString()+" → JSON → Browser");json(ex,200,response);}});return;
    }
    String file=switch(path){case "/"->"index.html";case "/app.js"->"app.js";case "/styles.css"->"styles.css";default->null;};
    if(file==null){send(ex,404,"text/plain","Not found".getBytes(StandardCharsets.UTF_8));return;}

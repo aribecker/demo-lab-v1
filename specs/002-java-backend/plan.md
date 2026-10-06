@@ -10,3 +10,7 @@ GitHub browser upload preserves the complete source tree in source-snapshot.tar.
 ## Fuentes individuales — 20261006-014037-ART
 
 Nueva rama java-fuentes con fuentes normales y Docker build directo de java-backend. Sustituye la transferencia comprimida. Render usará esta rama con Auto-Deploy para probar cambios manuales de GitHub.
+
+## Versioned message — 20261006-014414-ART
+
+Define APP_VERSION in Java, return version and Hello World message in successful API JSON. Display the returned message in the weather heading. Assert exact version and message in HTTP fixture tests, then commit to java-fuentes and verify Render Auto-Deploy.

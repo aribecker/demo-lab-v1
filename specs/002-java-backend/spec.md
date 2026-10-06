@@ -5,3 +5,7 @@ Keep hosted version 002 intact and develop on backend-java in a separate workspa
 Display Version 003 · Java. Provide GET /health. Respond 404 to unknown routes and 405 to unsupported methods. Bind 0.0.0.0 and use Render PORT. Build an executable JAR in Docker and deploy only Render Free. Do not update OneDrive during iterations. Do not overwrite the existing Sites application. Do not publish sources or weaken access permissions without user authorization.
 
 Acceptance: compile Java, test response and static assets, test repeated calls, fallback and failures with fixtures, prepare Docker build inputs and separate Render deployment. Deployment requires an accessible connected repository or container registry.
+
+## Versioned Hello World response
+
+GET /api/hello MUST return `version: "003"` and `message: "Hello World · Versión 003"` alongside the weather contract. The browser MUST display this backend message with the weather result on initial load and every successful click. Keep the version at 003.

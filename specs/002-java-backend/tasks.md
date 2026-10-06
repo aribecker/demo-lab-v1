@@ -12,3 +12,7 @@
 ## Deployment verification — 20261006-013758-ART
 
 Render Free service `ariel-sdd-weather-java` is Live from GitHub commit `75b34332cdf2f2a69019efad7dd30448b93490a5`, branch `backend-java`. Maven/Docker build succeeded. Public URL: https://ariel-sdd-weather-java.onrender.com/ . Browser displayed version 003 / Java 17 and a real MET Norway response (15 °C, humidity 73.9%, wind 16.6 km/h). Render health check configured at `/health`; direct browser navigation to that endpoint was blocked by the browser client.
+
+- [x] Define versioned Hello World JSON and browser display.
+- [x] Implement APP_VERSION and assertions for version/message.
+- [ ] Verify versioned message deployment on Render.
