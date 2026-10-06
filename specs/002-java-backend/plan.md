@@ -18,3 +18,7 @@ Define APP_VERSION in Java, return version and Hello World message in successful
 ## Version 004 — 20261006-014722-ART
 
 Halve all three h1 clamp values. Update Java APP_VERSION, frontend badge, API fixture expectation and Maven artifact to 0.4.0; preserve prior SDD files. Commit and deploy on java-fuentes.
+
+## Version 005 — 20261006-015238-ART
+
+Use permanent result slots with fixed line-height-based block sizes and stable margins; text children and decorative skeleton overlays share each slot. Toggle loading class and aria-busy around every async request. Clear all previous result values at start and keep the slots present on errors. Verify slot/card/button rectangles in the deployed browser before, during and after a real click; confirm two/two/one/one placeholders and version 005 weather result.

@@ -1,1 +1,40 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SDD Full Stack Hello</title><link rel="stylesheet" href="/styles.css"></head><body><main><div class="badge">SPEC-DRIVEN DEVELOPMENT</div><p class="badge" aria-label="Versión 004 · Java">🔖 Versión 004 · Java</p><h1>Clima, full stack.</h1><p class="lead">Cada consulta recorre el frontend, el backend y un servicio meteorológico asincrónico.</p><section><div class="label">CLIMA EN BUENOS AIRES</div><div id="status">Consultando…</div><h2 id="message"></h2><p id="weather" aria-live="polite"></p><code id="architecture"></code><small id="timestamp"></small><button id="call">Consultar clima</button></section><footer>Frontend · HTTP API · Java 17 · HttpClient asincrónico · Datos de <a href="https://open-meteo.com/" style="color:inherit">Open-Meteo</a> / <a href="https://www.met.no/" style="color:inherit">MET Norway</a></footer></main><script src="/app.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SDD Full Stack Hello</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main>
+  <div class="badge">SPEC-DRIVEN DEVELOPMENT</div>
+  <p class="badge" aria-label="Versión 005 · Java">🔖 Versión 005 · Java</p>
+  <h1>Clima, full stack.</h1>
+  <p class="lead">Cada consulta recorre el frontend, el backend y un servicio meteorológico asincrónico.</p>
+  <section id="weather-card" class="is-loading" aria-busy="true">
+    <div class="label">CLIMA EN BUENOS AIRES</div>
+    <div id="status" role="status" aria-live="polite">Consultando clima…</div>
+    <h2 id="message" class="result-slot two-lines">
+      <span class="slot-text"></span>
+      <span class="skeleton-lines" aria-hidden="true"><span></span><span></span></span>
+    </h2>
+    <p id="weather" class="result-slot two-lines">
+      <span class="slot-text"></span>
+      <span class="skeleton-lines" aria-hidden="true"><span></span><span></span></span>
+    </p>
+    <code id="architecture" class="result-slot one-line">
+      <span class="slot-text"></span>
+      <span class="skeleton-lines" aria-hidden="true"><span></span></span>
+    </code>
+    <small id="timestamp" class="result-slot one-line">
+      <span class="slot-text"></span>
+      <span class="skeleton-lines" aria-hidden="true"><span></span></span>
+    </small>
+    <button id="call" disabled>Consultar clima</button>
+  </section>
+  <footer>Frontend · HTTP API · Java 17 · HttpClient asincrónico · Datos de <a href="https://open-meteo.com/">Open-Meteo</a> / <a href="https://www.met.no/">MET Norway</a></footer>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

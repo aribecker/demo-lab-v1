@@ -18,4 +18,8 @@ Render Free service `ariel-sdd-weather-java` is Live from GitHub commit `75b3433
 - [x] Verify versioned message deployment on Render (003 verified before this change).
 
 - [x] Set version 004 and halve responsive title size.
-- [ ] Verify version 004 deployment on Render.
+- [x] Verify version 004 deployment on Render.
+
+- [x] Define version 005 reserved line counts and accessible shimmer states.
+- [x] Implement fixed result slots, skeleton overlays and loading lifecycle.
+- [ ] Verify version 005 deployment and stable loading geometry.

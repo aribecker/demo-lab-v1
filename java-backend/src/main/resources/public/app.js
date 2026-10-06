@@ -1,3 +1,42 @@
-const statusEl=document.querySelector('#status'), message=document.querySelector('#message'), architecture=document.querySelector('#architecture'), timestamp=document.querySelector('#timestamp'), button=document.querySelector('#call'), details=document.querySelector('#weather');
-async function callApi(){statusEl.textContent='Consultando clima…';button.disabled=true;message.textContent='';details.textContent='';timestamp.textContent='';try{const r=await fetch('/api/hello',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);const w=d.weather;statusEl.textContent='✓ Clima actualizado';message.textContent=`${d.message} · ${w.temperature} °C · ${w.location}`;details.textContent=`${w.apparentTemperature === null ? '' : 'Sensación térmica: '+w.apparentTemperature+' °C · '}Humedad: ${w.humidity}% · Viento: ${w.windSpeed} km/h · Fuente: ${w.source}${w.dataKind ? ' · '+w.dataKind : ''}`;architecture.textContent=d.architecture;timestamp.textContent=`Datos: ${(w.observedAt.endsWith('Z') ? new Date(w.observedAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hourCycle:'h23'}) : w.observedAt.replace('T',' '))} (Buenos Aires) · Consulta: ${new Date(d.timestamp).toLocaleTimeString('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hourCycle:'h23'})}`;}catch(e){statusEl.textContent=`✕ ${e.message}`;architecture.textContent='Podés volver a intentar con el botón.';}finally{button.disabled=false;}}
-button.addEventListener('click',callApi);callApi();
+const card = document.querySelector('#weather-card');
+const statusEl = document.querySelector('#status');
+const message = document.querySelector('#message .slot-text');
+const architecture = document.querySelector('#architecture .slot-text');
+const timestamp = document.querySelector('#timestamp .slot-text');
+const button = document.querySelector('#call');
+const details = document.querySelector('#weather .slot-text');
+
+async function callApi() {
+  if (card.dataset.requestActive === 'true') return;
+  card.dataset.requestActive = 'true';
+  statusEl.textContent = 'Consultando clima…';
+  button.disabled = true;
+  for (const slot of [message, details, architecture, timestamp]) slot.textContent = '';
+  card.classList.add('is-loading');
+  card.setAttribute('aria-busy', 'true');
+  try {
+    const response = await fetch('/api/hello', { cache: 'no-store' });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    const weather = data.weather;
+    statusEl.textContent = '✓ Clima actualizado';
+    message.textContent = `${data.message} · ${weather.temperature} °C · ${weather.location}`;
+    details.textContent = `${weather.apparentTemperature === null ? '' : 'Sensación térmica: ' + weather.apparentTemperature + ' °C · '}Humedad: ${weather.humidity}% · Viento: ${weather.windSpeed} km/h · Fuente: ${weather.source}${weather.dataKind ? ' · ' + weather.dataKind : ''}`;
+    architecture.textContent = data.architecture;
+    const observed = weather.observedAt.endsWith('Z')
+      ? new Date(weather.observedAt).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hourCycle: 'h23' })
+      : weather.observedAt.replace('T', ' ');
+    const queried = new Date(data.timestamp).toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hourCycle: 'h23' });
+    timestamp.textContent = `Datos: ${observed} (Buenos Aires) · Consulta: ${queried}`;
+  } catch (error) {
+    statusEl.textContent = `✕ ${error.message}`;
+    architecture.textContent = 'Podés volver a intentar con el botón.';
+  } finally {
+    card.classList.remove('is-loading');
+    card.setAttribute('aria-busy', 'false');
+    card.dataset.requestActive = 'false';
+    button.disabled = false;
+  }
+}
+button.addEventListener('click', callApi);
+callApi();

@@ -1,4 +1,4 @@
-# Aplicación clima — versión 004 / Java 17
+# Aplicación clima — versión 005 / Java 17
 
 Fuentes individuales, sin archivo comprimido.
 
@@ -6,7 +6,7 @@ Fuentes individuales, sin archivo comprimido.
 - Frontend: `java-backend/src/main/resources/public/`
 - SDD: `specs/002-java-backend/`; versiones previas en `history/`.
 - Build local: `cd java-backend && mvn package`
-- Ejecutar: `java -jar target/weather-java-0.4.0.jar`
+- Ejecutar: `java -jar target/weather-java-0.5.0.jar`
 - Render: rama `java-fuentes`, Dockerfile `./Render-Dockerfile`, plan Free, health `/health`.
 
 ## Prueba manual desde GitHub
