@@ -18,7 +18,7 @@ public class WeatherController {
   return service.weather().thenApply(weather -> new WeatherResponse(
       "Hello World · Version " + WeatherApplication.APP_VERSION,
       WeatherApplication.APP_VERSION, weather, Instant.now().toString(),
-      "Browser → Spring Boot REST API → " + weather.source() + " → JSON → Browser"));
+      "Browser → Spring Boot API → Weather microservice → " + weather.source() + " → JSON → Browser"));
  }
 
  @GetMapping(value = "/health", produces = MediaType.TEXT_PLAIN_VALUE)

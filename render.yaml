@@ -1,5 +1,15 @@
 services:
   - type: web
+    name: ariel-sdd-weather-microservice
+    runtime: docker
+    plan: free
+    branch: java-fuentes
+    dockerfilePath: ./Weather-Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: '8080'
+  - type: web
     name: ariel-sdd-weather-java
     runtime: docker
     plan: free
@@ -9,3 +19,5 @@ services:
     envVars:
       - key: PORT
         value: '8080'
+      - key: WEATHER_SERVICE_URL
+        sync: false

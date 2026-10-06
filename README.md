@@ -1,24 +1,17 @@
-# Weather application — 0.0.7 / Spring Boot REST
+# Java REST microservices — 0.0.8
 
-Java 17, Spring Boot 3.5.16, Spring MVC REST and embedded Tomcat. English interface with asynchronous provider calls and stable shimmer loading placeholders.
+Java 17, Spring Boot 3.5.16, Maven and two independent executable JARs.
 
-## Source map
+- java-backend: public frontend and GET /api/hello; asynchronous REST client.
+- weather-service: GET /api/weather; asynchronous provider requests and fallback.
+- Both: GET /health, typed WeatherData, English errors, no-store responses.
 
-- `java-backend/src/main/java/ariel/sdd/weather/WeatherApplication.java`: Spring Boot startup and application version.
-- `WeatherController.java` in the same package: REST endpoints `/api/hello` and `/health`.
-- `WeatherService.java`: async Open-Meteo request, MET Norway fallback and weather normalization.
-- `WeatherData.java` / `WeatherResponse.java`: typed JSON records.
-- `WeatherErrorHandler.java`: 502/504 provider errors.
-- `NoCacheFilter.java`: no-store responses.
-- `java-backend/src/main/resources/public/`: frontend.
-- `java-backend/src/main/resources/application.properties`: runtime/provider configuration.
-- `java-backend/src/test/java/ariel/sdd/weather/WeatherIntegrationTest.java`: actual Spring HTTP integration tests against local fixtures.
-- `specs/002-java-backend/`: active SDD; `history/`: timestamped earlier specifications.
+Build each module with `mvn -B package`. Start weather-service with `PORT=8081 java -jar weather-service/target/weather-service-0.0.8.jar`, then API with `java -jar java-backend/target/weather-java-0.0.8.jar`. Override WEATHER_SERVICE_URL with a complete URL ending in /api/weather for remote deployments.
 
-## Build and deploy
+Render-Dockerfile builds the API; Weather-Dockerfile builds the weather service. render.yaml documents two Free deployments. Free cold starts may take about a minute; the API allows 90 seconds for the downstream call. No database or credentials are needed. Integration fixtures test boundaries without external provider access.
 
-Run `cd java-backend && mvn package`, then `java -jar target/weather-java-0.0.7.jar`. Maven executes deterministic integration tests and builds an executable Spring Boot JAR. Docker uses `Render-Dockerfile` and also executes tests before packaging.
+SDD: specs/002-java-backend. Timestamped prior specifications: history/.
 
-Render Free builds branch `java-fuentes` automatically on commit, exposes PORT and checks `/health`. Application URL: https://ariel-sdd-weather-java.onrender.com/ .
+Run `python scripts/smoke-microservices.py` after building both JARs to test real cross-process REST calls with a deterministic local provider.
 
-For a manual GitHub UI change, edit `java-backend/src/main/resources/public/index.html`, commit directly to `java-fuentes`, wait for Render Live and reload the app. Preserve SDD history before specification changes. Do not copy iterative updates to OneDrive or deploy this variant to the original Sites application.
+Release branch: microservices-v008. Promotion to java-fuentes and Render deployment await restoration of the Render session. Both modules passed integration tests and executable-JAR packaging.

@@ -1,17 +1,19 @@
-# SDD Feature 002 — Spring Boot REST weather application, version 0.0.7
+# SDD Feature 002 — REST microservices, version 0.0.8
 
-## Architecture and language
-Use Java 17, Spring Boot 3.5.16 and Spring MVC REST, with embedded Tomcat. All active UI, API strings, specifications and source documentation remain in English. Preserve historical snapshots and the original Sites version. Identify the application as 0.0.7.
+## Requirements
+Keep Java 17 and Spring Boot 3.5.16. All active source documentation, UI and API messages remain English. Archive previous specifications with a timestamp. Workspace and GitHub remain the primary sources; do not sync OneDrive during iterations.
 
-Separate WeatherApplication (startup), WeatherController (HTTP endpoints), WeatherService (asynchronous provider calls and normalization), WeatherData/WeatherResponse (typed JSON DTOs), WeatherErrorHandler (provider failures) and NoCacheFilter (HTTP cache policy). Use constructor injection and Spring-managed @Service and @RestController components. Serve frontend assets from classpath:/public/.
+## Independently deployable services
+The main API in java-backend serves the frontend and GET /api/hello. It must call the weather-service REST endpoint GET /api/weather asynchronously, and must never directly call weather providers. The weather-service independently queries Open-Meteo, falls back to MET Norway, normalizes typed WeatherData JSON, and applies its existing 10-second provider deadline. Both services provide GET /health and Cache-Control: no-store. Independent Dockerfiles, executable JARs and deployment configuration are required. No credentials or user data are exposed by the public weather demonstration endpoint.
 
-## REST contract
-GET /api/hello returns JSON with version 0.0.7, message Hello World · Version 0.0.7, weather, timestamp and architecture. Preserve all weather fields, null values, units, provider attribution and Buenos Aires timezone. Each accepted request independently queries Open-Meteo asynchronously using Java HttpClient, with MET Norway fallback. Use a total 10-second deadline and a 12-second Spring MVC async timeout. Report nearest-hour forecasts accurately. Return 502 for provider/format failures and 504 for provider deadlines, with an English error and Cache-Control: no-store. GET /health returns ok. Unknown routes return 404; unsupported POST /api/hello returns 405.
+## Contract and resilience
+GET /api/hello retains message, version, weather, timestamp and architecture. Version and greeting identify 0.0.8. Architecture identifies both Spring Boot API and Weather microservice. WEATHER_SERVICE_URL configures the full downstream endpoint, defaulting to localhost:8081/api/weather for local development. Use a 90-second downstream request timeout and 95-second MVC timeout to tolerate Render Free cold starts. Return English 502 errors for downstream failures/invalid responses and 504 for downstream timeouts. Health is independent of downstream availability. Preserve original provider attribution, units and forecast labeling.
 
-## Interface
-Keep the English Weather, full stack. title and its half-size responsive font. Keep two reserved lines each for the message and weather details, one each for architecture and timestamps, grey animated loading skeletons, stable card/button positions, aria-busy, polite loading status and reduced-motion support. Show Spring Boot REST API in the request path and technology footer.
+## UI
+Preserve the half-size title, two-line message and weather slots, single-line architecture and timestamp slots, animated grey skeletons, accessibility and stable layout. Keep the refresh button disabled during a request. Identify REST microservices in the technology footer.
 
-## Deployment and acceptance
-Build an executable weather-java-0.0.7.jar with the Spring Boot Maven plugin. Docker must run the integration tests during package and start the executable JAR on Render PORT. Limit Tomcat worker threads for the Free instance. Deploy java-fuentes to the existing Render Free service. Do not synchronize OneDrive during iterations.
+## Acceptance
+Run deterministic HTTP integration tests for both service boundaries, provider fallback, deadlines, downstream failures, static resources and HTTP methods. Build two executable JARs. Commit source and SDD changes to java-fuentes. Deploy two Render Free services and verify a real weather request through both. Record exact deployment URLs and commit in the release report. Render Free hours are shared and services can sleep after inactivity.
 
-Verify the real Spring application with deterministic HTTP fixtures: repeated successful calls, exact version/message/JSON, fallback, wind conversion, English descriptions, null fields, 502, 504, static assets, health, 404 and 405. After deploying, verify Spring Boot startup, English UI and real weather, and unchanged loading geometry. Archive previous spec/plan/tasks with a timestamp.
+## Deployment checkpoint
+Stage the tested release on microservices-v008 while Render authentication is unavailable. Promote to java-fuentes only after the weather service exists and WEATHER_SERVICE_URL is configured, preserving the working 0.0.7 deployment during setup.
