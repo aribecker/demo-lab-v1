@@ -1,24 +1,11 @@
-# Technical plan
+# Implementation plan — Version 0.0.6
 
-Use Java 17 built-in HttpServer and HttpClient.sendAsync, CompletableFuture composition and a bounded deadline. Gson 2.11.0 validates/parses external JSON. Maven Shade packages runnable JAR. Preserve vanilla HTML/CSS/JS and API schema. Container: Maven/Temurin build stage, Temurin JRE runtime. Configure Java heap for 512 MB instance. Render Free service uses /health and backend-java branch. Original v002 tagged locally, original Site remains deployed.
+1. Archive the previous spec, plan and tasks under a timestamped history directory.
+2. Set APP_VERSION and the Maven/Docker artifact to 0.0.6.
+3. Translate all active frontend copy, statuses, date formatting, API success/error messages and forecast descriptions into English. Set the HTML language to en. Keep Buenos Aires as the location and timezone.
+4. Preserve the half-size title, fixed result slots, animated skeletons, accessibility and reduced-motion support from version 005.
+5. Update deterministic Java HTTP tests for the exact English message, version and forecast description. Check frontend JavaScript syntax.
+6. Commit specifications, source and documentation together to java-fuentes using a guarded branch update. Let Render Auto-Deploy build and activate the commit.
+7. Verify the deployed English UI, a real weather response and unchanged result/card/button geometry during another request.
 
-Workspace is the primary source; Git branch preserves this experiment. Render requires Git provider repository access or a prebuilt image; the Sites Git remote cannot be assumed accessible to Render. Connection remains a separate prerequisite.
-
-## Render transfer, 20261006-010419-ART
-GitHub browser upload preserves the complete source tree in source-snapshot.tar.gz. Render-Dockerfile extracts that snapshot and builds java-backend with Maven. The normal Dockerfile remains available within the source tree for a future full Git push. Repository: aribecker/0080-prueba-SDD-full-stack, private, branch backend-java. Public service creation is pending explicit confirmation.
-
-## Fuentes individuales — 20261006-014037-ART
-
-Nueva rama java-fuentes con fuentes normales y Docker build directo de java-backend. Sustituye la transferencia comprimida. Render usará esta rama con Auto-Deploy para probar cambios manuales de GitHub.
-
-## Versioned message — 20261006-014414-ART
-
-Define APP_VERSION in Java, return version and Hello World message in successful API JSON. Display the returned message in the weather heading. Assert exact version and message in HTTP fixture tests, then commit to java-fuentes and verify Render Auto-Deploy.
-
-## Version 004 — 20261006-014722-ART
-
-Halve all three h1 clamp values. Update Java APP_VERSION, frontend badge, API fixture expectation and Maven artifact to 0.4.0; preserve prior SDD files. Commit and deploy on java-fuentes.
-
-## Version 005 — 20261006-015238-ART
-
-Use permanent result slots with fixed line-height-based block sizes and stable margins; text children and decorative skeleton overlays share each slot. Toggle loading class and aria-busy around every async request. Clear all previous result values at start and keep the slots present on errors. Verify slot/card/button rectangles in the deployed browser before, during and after a real click; confirm two/two/one/one placeholders and version 005 weather result.
+The primary workspace is /workspace/sites/ssd-full-stack-java. Source files are stored individually in GitHub. Existing historical files retain their original language and version for auditability.

@@ -1,19 +1,20 @@
-# Aplicación clima — versión 005 / Java 17
+# Weather application — Version 0.0.6 / Java 17
 
-Fuentes individuales, sin archivo comprimido.
+English UI, API messages, source code and active SDD specifications. Sources are individual files; historical snapshots retain their original content.
 
 - Backend: `java-backend/src/main/java/WeatherServer.java`
 - Frontend: `java-backend/src/main/resources/public/`
-- SDD: `specs/002-java-backend/`; versiones previas en `history/`.
-- Build local: `cd java-backend && mvn package`
-- Ejecutar: `java -jar target/weather-java-0.5.0.jar`
-- Render: rama `java-fuentes`, Dockerfile `./Render-Dockerfile`, plan Free, health `/health`.
+- Specifications: `specs/002-java-backend/`; earlier versions: `history/`
+- Build: `cd java-backend && mvn package`
+- Run: `java -jar target/weather-java-0.0.6.jar`
+- Docker: `docker build -t sdd-weather-java .`
+- Render: branch `java-fuentes`, `./Render-Dockerfile`, Free plan, health check `/health`, Auto-Deploy on commit.
 
-## Prueba manual desde GitHub
+## Manual GitHub change and deployment
 
-1. En la rama `java-fuentes`, abrir `java-backend/src/main/resources/public/index.html`.
-2. Pulsar el lápiz y cambiar un texto visible, por ejemplo `Clima, full stack.`.
-3. Guardar con **Commit changes** directamente en `java-fuentes`.
-4. Render con Auto-Deploy despliega el nuevo commit. Esperar estado Live y recargar https://ariel-sdd-weather-java.onrender.com/ .
+1. Open `java-backend/src/main/resources/public/index.html` on `java-fuentes`.
+2. Click the pencil and edit a visible English label, such as `Weather, full stack.`.
+3. Save with **Commit changes** directly on `java-fuentes`.
+4. Wait for Render to show **Live**, then reload https://ariel-sdd-weather-java.onrender.com/ .
 
-Para probar un cambio en el backend, editar `WeatherServer.java` y compilar antes de confirmar. Cada consulta pide clima asincrónicamente; MET Norway es el proveedor alternativo.
+For a backend change, edit `WeatherServer.java` and compile before committing. Each request fetches weather asynchronously; MET Norway is the fallback provider. Two/two/one/one fixed result lines and animated skeletons prevent layout jumps. Honor reduced-motion preferences. Do not copy iterative changes to OneDrive or deploy this Java branch to the original Sites app.

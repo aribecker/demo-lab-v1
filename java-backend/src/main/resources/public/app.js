@@ -9,7 +9,7 @@ const details = document.querySelector('#weather .slot-text');
 async function callApi() {
   if (card.dataset.requestActive === 'true') return;
   card.dataset.requestActive = 'true';
-  statusEl.textContent = 'Consultando clima…';
+  statusEl.textContent = 'Fetching weather…';
   button.disabled = true;
   for (const slot of [message, details, architecture, timestamp]) slot.textContent = '';
   card.classList.add('is-loading');
@@ -19,18 +19,18 @@ async function callApi() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
     const weather = data.weather;
-    statusEl.textContent = '✓ Clima actualizado';
+    statusEl.textContent = '✓ Weather updated';
     message.textContent = `${data.message} · ${weather.temperature} °C · ${weather.location}`;
-    details.textContent = `${weather.apparentTemperature === null ? '' : 'Sensación térmica: ' + weather.apparentTemperature + ' °C · '}Humedad: ${weather.humidity}% · Viento: ${weather.windSpeed} km/h · Fuente: ${weather.source}${weather.dataKind ? ' · ' + weather.dataKind : ''}`;
+    details.textContent = `${weather.apparentTemperature === null ? '' : 'Feels like: ' + weather.apparentTemperature + ' °C · '}Humidity: ${weather.humidity}% · Wind: ${weather.windSpeed} km/h · Source: ${weather.source}${weather.dataKind ? ' · ' + weather.dataKind : ''}`;
     architecture.textContent = data.architecture;
     const observed = weather.observedAt.endsWith('Z')
-      ? new Date(weather.observedAt).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hourCycle: 'h23' })
+      ? new Date(weather.observedAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires', hourCycle: 'h23' })
       : weather.observedAt.replace('T', ' ');
-    const queried = new Date(data.timestamp).toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hourCycle: 'h23' });
-    timestamp.textContent = `Datos: ${observed} (Buenos Aires) · Consulta: ${queried}`;
+    const queried = new Date(data.timestamp).toLocaleTimeString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires', hourCycle: 'h23' });
+    timestamp.textContent = `Data: ${observed} (Buenos Aires) · Requested: ${queried}`;
   } catch (error) {
     statusEl.textContent = `✕ ${error.message}`;
-    architecture.textContent = 'Podés volver a intentar con el botón.';
+    architecture.textContent = 'Use the button to try again.';
   } finally {
     card.classList.remove('is-loading');
     card.setAttribute('aria-busy', 'false');

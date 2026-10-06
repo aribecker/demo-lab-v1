@@ -8,7 +8,7 @@ import java.time.*;
 import java.util.concurrent.*;
 
 public class WeatherServer {
- static final String APP_VERSION = "005";
+ static final String APP_VERSION = "0.0.6";
  static final Gson JSON=new GsonBuilder().serializeNulls().create();
  static final String PRIMARY="https://api.open-meteo.com/v1/forecast?latitude=-34.6037&longitude=-58.3816&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires";
  static final String SECONDARY="https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-34.6037&lon=-58.3816";
@@ -17,7 +17,7 @@ public class WeatherServer {
   final String primary,secondary;
   WeatherService(String p,String s){primary=p;secondary=s;}
   CompletableFuture<JsonObject> request(String url){
-   HttpRequest req=HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(5)).header("User-Agent","Ariel-SDD-Weather/0.3 https://ariel-ssd-full-stack-0080.aribecker2.chatgpt.site").header("Cache-Control","no-cache").GET().build();
+   HttpRequest req=HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(5)).header("User-Agent","Ariel-SDD-Weather/0.0.6 https://ariel-sdd-weather-java.onrender.com/").header("Cache-Control","no-cache").GET().build();
    return CLIENT.sendAsync(req,HttpResponse.BodyHandlers.ofString()).thenApply(r->{if(r.statusCode()!=200)throw new CompletionException(new IOException("Provider HTTP "+r.statusCode()));return JsonParser.parseString(r.body()).getAsJsonObject();});
   }
   CompletableFuture<JsonObject> weather(){
@@ -39,7 +39,7 @@ public class WeatherServer {
   for(JsonElement entry:times){JsonObject point=entry.getAsJsonObject();long d=Math.abs(Instant.parse(point.get("time").getAsString()).toEpochMilli()-now);if(d<distance){distance=d;nearest=point;}}
   if(nearest==null)throw new IllegalArgumentException("No forecast");
   JsonObject c=nearest.getAsJsonObject("data").getAsJsonObject("instant").getAsJsonObject("details"),w=base("MET Norway","https://www.met.no/");
-  w.addProperty("temperature",number(c,"air_temperature"));w.addProperty("humidity",number(c,"relative_humidity"));w.addProperty("windSpeed",Math.round(number(c,"wind_speed")*36)/10.0);w.add("apparentTemperature",JsonNull.INSTANCE);w.add("weatherCode",JsonNull.INSTANCE);w.addProperty("observedAt",nearest.get("time").getAsString());w.addProperty("dataKind","Pronóstico para la hora más cercana");return w;
+  w.addProperty("temperature",number(c,"air_temperature"));w.addProperty("humidity",number(c,"relative_humidity"));w.addProperty("windSpeed",Math.round(number(c,"wind_speed")*36)/10.0);w.add("apparentTemperature",JsonNull.INSTANCE);w.add("weatherCode",JsonNull.INSTANCE);w.addProperty("observedAt",nearest.get("time").getAsString());w.addProperty("dataKind","Forecast for the nearest hour");return w;
  }
  static void send(HttpExchange ex,int status,String type,byte[] body){try{ex.getResponseHeaders().set("Content-Type",type);ex.getResponseHeaders().set("Cache-Control","no-store");ex.sendResponseHeaders(status,body.length);ex.getResponseBody().write(body);}catch(IOException ignored){}finally{ex.close();}}
  static void json(HttpExchange ex,int status,JsonObject data){send(ex,status,"application/json; charset=utf-8",JSON.toJson(data).getBytes(StandardCharsets.UTF_8));}
@@ -50,7 +50,7 @@ public class WeatherServer {
    String path=ex.getRequestURI().getPath();
    if(path.equals("/health")){send(ex,200,"text/plain","ok".getBytes(StandardCharsets.UTF_8));return;}
    if(path.equals("/api/hello")){
-    service.weather().whenComplete((weather,error)->{if(error!=null){Throwable cause=error;while(cause.getCause()!=null)cause=cause.getCause();System.err.println("Weather provider failure: "+cause.getClass().getSimpleName()+": "+cause.getMessage());JsonObject err=new JsonObject();err.addProperty("error","No se pudo consultar el clima. Volvé a intentar.");json(ex,cause instanceof TimeoutException||cause instanceof HttpTimeoutException?504:502,err);}else{JsonObject response=new JsonObject();response.addProperty("message","Hello World · Versión "+APP_VERSION);response.addProperty("version",APP_VERSION);response.add("weather",weather);response.addProperty("timestamp",Instant.now().toString());response.addProperty("architecture","Browser → Java API → "+weather.get("source").getAsString()+" → JSON → Browser");json(ex,200,response);}});return;
+    service.weather().whenComplete((weather,error)->{if(error!=null){Throwable cause=error;while(cause.getCause()!=null)cause=cause.getCause();System.err.println("Weather provider failure: "+cause.getClass().getSimpleName()+": "+cause.getMessage());JsonObject err=new JsonObject();err.addProperty("error","Unable to retrieve the weather. Please try again.");json(ex,cause instanceof TimeoutException||cause instanceof HttpTimeoutException?504:502,err);}else{JsonObject response=new JsonObject();response.addProperty("message","Hello World · Version "+APP_VERSION);response.addProperty("version",APP_VERSION);response.add("weather",weather);response.addProperty("timestamp",Instant.now().toString());response.addProperty("architecture","Browser → Java API → "+weather.get("source").getAsString()+" → JSON → Browser");json(ex,200,response);}});return;
    }
    String file=switch(path){case "/"->"index.html";case "/app.js"->"app.js";case "/styles.css"->"styles.css";default->null;};
    if(file==null){send(ex,404,"text/plain","Not found".getBytes(StandardCharsets.UTF_8));return;}
