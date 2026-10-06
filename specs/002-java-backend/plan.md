@@ -14,3 +14,7 @@ Nueva rama java-fuentes con fuentes normales y Docker build directo de java-back
 ## Versioned message — 20261006-014414-ART
 
 Define APP_VERSION in Java, return version and Hello World message in successful API JSON. Display the returned message in the weather heading. Assert exact version and message in HTTP fixture tests, then commit to java-fuentes and verify Render Auto-Deploy.
+
+## Version 004 — 20261006-014722-ART
+
+Halve all three h1 clamp values. Update Java APP_VERSION, frontend badge, API fixture expectation and Maven artifact to 0.4.0; preserve prior SDD files. Commit and deploy on java-fuentes.

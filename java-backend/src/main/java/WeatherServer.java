@@ -8,7 +8,7 @@ import java.time.*;
 import java.util.concurrent.*;
 
 public class WeatherServer {
- static final String APP_VERSION = "003";
+ static final String APP_VERSION = "004";
  static final Gson JSON=new GsonBuilder().serializeNulls().create();
  static final String PRIMARY="https://api.open-meteo.com/v1/forecast?latitude=-34.6037&longitude=-58.3816&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires";
  static final String SECONDARY="https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-34.6037&lon=-58.3816";
