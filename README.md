@@ -1,15 +1,19 @@
-# Java test variant — SDD
+# Aplicación clima — versión 003 / Java 17
 
-Main project: /workspace/sites/ssd-full-stack-ariel (v002, existing Site).
-Java variant: /workspace/sites/ssd-full-stack-java, branch backend-java.
+Fuentes individuales, sin archivo comprimido.
 
-Build: `cd java-backend && mvn package`.
-Run: `java -jar target/weather-java-0.3.0.jar` (PORT defaults to 8080).
-Docker: `docker build -t sdd-weather-java .` then `docker run --rm -p 8080:8080 sdd-weather-java`.
-Render: select this branch from a connected Git repository, Docker runtime, Free instance and health path /health. render.yaml records settings. The Render URL is public unless application access control is added; obtain user approval before deploying with broader access than the existing private Site.
+- Backend: `java-backend/src/main/java/WeatherServer.java`
+- Frontend: `java-backend/src/main/resources/public/`
+- SDD: `specs/002-java-backend/`; versiones previas en `history/`.
+- Build local: `cd java-backend && mvn package`
+- Ejecutar: `java -jar target/weather-java-0.3.0.jar`
+- Render: rama `java-fuentes`, Dockerfile `./Render-Dockerfile`, plan Free, health `/health`.
 
-Do not deploy this Java branch to Sites. Do not synchronize OneDrive until requested. Source specifications are in specs/002-java-backend/.
+## Prueba manual desde GitHub
 
-Validation: Java compilation and deterministic HTTP integration tests passed. Live provider access from this workspace was unsuccessful; verify external connectivity on Render. Docker image build has not been run here because Docker is unavailable.
+1. En la rama `java-fuentes`, abrir `java-backend/src/main/resources/public/index.html`.
+2. Pulsar el lápiz y cambiar un texto visible, por ejemplo `Clima, full stack.`.
+3. Guardar con **Commit changes** directamente en `java-fuentes`.
+4. Render con Auto-Deploy despliega el nuevo commit. Esperar estado Live y recargar https://ariel-sdd-weather-java.onrender.com/ .
 
-GitHub browser transfer: source-snapshot.tar.gz contains the complete tracked source tree and SDD history. Render uses Render-Dockerfile to extract and build it. Sources remain editable in the primary workspace; regenerate the archive for updates.
+Para probar un cambio en el backend, editar `WeatherServer.java` y compilar antes de confirmar. Cada consulta pide clima asincrónicamente; MET Norway es el proveedor alternativo.

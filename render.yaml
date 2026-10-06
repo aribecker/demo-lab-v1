@@ -3,7 +3,7 @@ services:
     name: ariel-sdd-weather-java
     runtime: docker
     plan: free
-    branch: backend-java
+    branch: java-fuentes
     dockerfilePath: ./Render-Dockerfile
     healthCheckPath: /health
     envVars:

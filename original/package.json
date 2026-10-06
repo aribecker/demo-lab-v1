@@ -1,0 +1,1 @@
+{"name":"sdd-full-stack-hello","version":"1.0.0","private":true,"scripts":{"start":"node src/server.js","build":"node test/build-check.js","test":"node test/api-test.js"},"engines":{"node":">=18"}}
