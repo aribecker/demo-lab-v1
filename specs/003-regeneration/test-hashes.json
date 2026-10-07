@@ -1,0 +1,11 @@
+{
+  "java-backend/src/test/java/ariel/sdd/weather/WeatherIntegrationTest.java": "05be8f19204ec14f948f4ca66f547cba80da092cb20edc87464e582c9f863abd",
+  "java-backend/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker": "8eca853a5a457f17e0479b71dfbe95f2a13aff9eeff250261ecdc8ca9b847a6a",
+  "original/test/api-test.js": "d6d36c40eb0441cb5d2fbe040e74d148a352f886852450d81684cfa267d4949c",
+  "original/test/build-check.js": "9ca6d52a2808a5c95f0832361b9562d0a6b3365a3050c83605087933b58f35f1",
+  "scripts/smoke-microservices.py": "fb7c9629380981ae137f4394da03cd12934e10e9717ac95040d78042a692ebc3",
+  "scripts/test-worker.mjs": "a3f8573c2073cb10fe93b4b361bf5e2988fae56424463737f7f61a7b8f4b6724",
+  "scripts/validate-artifact.mjs": "39d9df53ac2461962466d5965c5f4d06f08024ceca40605952d8b753b88d41fd",
+  "weather-service/src/test/java/ariel/sdd/weather/WeatherIntegrationTest.java": "859b890ad5ef13b641226beacef7225f13168c84b27f2c9b4733eb1e42f9e494",
+  "weather-service/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker": "8eca853a5a457f17e0479b71dfbe95f2a13aff9eeff250261ecdc8ca9b847a6a"
+}

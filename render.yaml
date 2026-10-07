@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: ariel-sdd-test-java-weather
+    runtime: docker
+    plan: free
+    branch: test-java-fuentes
+    dockerfilePath: ./Weather-Dockerfile
+    healthCheckPath: /health
+    buildFilter:
+      paths: [weather-service/**, Weather-Dockerfile]
+  - type: web
+    name: ariel-sdd-test-java-app
+    runtime: docker
+    plan: free
+    branch: test-java-fuentes
+    dockerfilePath: ./Render-Dockerfile
+    healthCheckPath: /health
+    buildFilter:
+      paths: [java-backend/**, Render-Dockerfile]
+    envVars:
+      - key: WEATHER_SERVICE_URL
+        sync: false
