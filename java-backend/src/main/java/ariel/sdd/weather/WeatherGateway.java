@@ -9,10 +9,11 @@ import java.io.IOException;
 import java.util.concurrent.*;
 @Service
 public class WeatherGateway {
- private final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+ private final HttpClient http;
  private final ObjectMapper json; private final String endpoint; private final long timeout;
  public WeatherGateway(ObjectMapper json,@Value("${weather.service-url}") String endpoint,@Value("${weather.client-timeout-seconds}") long timeout) {
   this.json=json;this.endpoint=endpoint;this.timeout=timeout;
+  this.http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(timeout)).build();
  }
  public CompletableFuture<WeatherData> fetch() {
   var request=HttpRequest.newBuilder(URI.create(endpoint)).timeout(Duration.ofSeconds(timeout)).header("Accept","application/json").GET().build();
