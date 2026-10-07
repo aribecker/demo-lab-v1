@@ -1,0 +1,9 @@
+# Experiment 003 — clean regeneration from SDD and frozen tests
+
+On branch test-java-fuentes, delete all production source, UI styles/assets, build configuration, deployment files and generated output. Retain only specifications (including history/constitution) and existing test sources. Record this deletion as a separate commit before regeneration.
+
+Reconstruct the current 0.0.8 two-service Java 17 / Spring Boot 3.5.16 application from retained specifications. Do not read, restore, copy or reuse deleted production files. Use current specifications as canonical, consulting historical specifications for inherited UI/contract details. Keep all preserved test sources byte-for-byte unchanged. Keep the version 0.0.8 because the frozen contract tests assert it.
+
+Regenerate Maven and Docker builds, controller/service DTOs, asynchronous REST and provider clients, frontend HTML/CSS/JS and operational documentation. Rebuild the English responsive interface from text requirements, including half-size heading clamp(1.5rem,4.5vw,3.25rem), two/two/one/one result lines, grey animated skeletons and reduced-motion support. The specifications do not fully define pixel styling; record this limitation rather than claim pixel-identical reconstruction.
+
+Acceptance: both unchanged Java integration test suites pass; the unchanged packaged two-process Python smoke test passes; test file SHA-256 hashes match the pre-deletion manifest. Historical Node/Sites tests remain archived unchanged, outside the active Java test suite. Only after acceptance, create independent Render Free experimental main/weather services from this branch and verify real weather and stable loading geometry. Existing live services/branches remain unchanged. Record cleanup/regeneration/acceptance/deployment commits and exact URLs.
