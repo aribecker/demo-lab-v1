@@ -3,7 +3,7 @@ services:
     name: ariel-sdd-weather-microservice
     runtime: docker
     plan: free
-    branch: java-fuentes
+    branch: microservices-v008
     dockerfilePath: ./Weather-Dockerfile
     healthCheckPath: /health
     envVars:
@@ -20,4 +20,4 @@ services:
       - key: PORT
         value: '8080'
       - key: WEATHER_SERVICE_URL
-        sync: false
+        value: https://ariel-sdd-weather-microservice.onrender.com/api/weather

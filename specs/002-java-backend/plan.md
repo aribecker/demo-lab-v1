@@ -11,5 +11,5 @@
 
 Use two public Free web services for the demonstration because Free services cannot receive private network traffic. Keep provider timeouts separate from cold-start timeout. Each service can be deployed independently from the same repository.
 
-## Deployment checkpoint
-Stage the tested release on microservices-v008 while Render authentication is unavailable. Promote to java-fuentes only after the weather service exists and WEATHER_SERVICE_URL is configured, preserving the working 0.0.7 deployment during setup.
+## Deployment configuration
+The weather microservice deploys microservices-v008 through Weather-Dockerfile. The existing main API deploys java-fuentes through Render-Dockerfile. WEATHER_SERVICE_URL points to https://ariel-sdd-weather-microservice.onrender.com/api/weather. Each service uses a build filter for its module and Dockerfile, allowing independent deployment without rebuilding on documentation-only changes.

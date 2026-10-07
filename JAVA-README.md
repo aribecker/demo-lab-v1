@@ -14,4 +14,9 @@ SDD: specs/002-java-backend. Timestamped prior specifications: history/.
 
 Run `python scripts/smoke-microservices.py` after building both JARs to test real cross-process REST calls with a deterministic local provider.
 
-Release branch: microservices-v008. Promotion to java-fuentes and Render deployment await restoration of the Render session. Both modules passed integration tests and executable-JAR packaging.
+Release branches: main API on java-fuentes; weather service on microservices-v008. Both use verified application commit 0656f3a8eca05daff97a776376b3daa4f3d3ae70. Render build filters deploy only changes to the respective module or Dockerfile.
+
+Application: https://ariel-sdd-weather-java.onrender.com/
+Weather REST endpoint: https://ariel-sdd-weather-microservice.onrender.com/api/weather
+
+Render administration uses its REST API. Credentials are kept outside the repository; no Render API key is included in the application or documentation.

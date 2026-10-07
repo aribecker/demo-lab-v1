@@ -1,15 +1,18 @@
-# Release 0.0.8 — deployment checkpoint
+# Release 0.0.8 — completed
 
-Implemented and verified: separate Spring Boot REST main API and weather microservice, preserved frontend, timestamped SDD history, independent Docker builds, integration tests for both services, executable JAR builds, and real two-process REST smoke test with two fresh provider queries.
+Application commit: 0656f3a8eca05daff97a776376b3daa4f3d3ae70.
 
-Pending: Render deployment. The current browser is signed out. GitHub is connected for deployment but not login; Google sign-in currently returns 502 Bad Gateway / connection refused. No deployment of 0.0.8 is claimed.
+## Deployments
+- Main API: https://ariel-sdd-weather-java.onrender.com/ — Render service srv-db27ln67bikc73covi50, branch java-fuentes, deployment dep-db2rm9m0tbcc738n30j0.
+- Weather service: https://ariel-sdd-weather-microservice.onrender.com/api/weather — Render service srv-db2rlbnlk1mc738gjtfg, branch microservices-v008, deployment dep-db2rlcvlk1mc738gk1lg.
+- Both services are Live on Free compute in Oregon.
+- Main API WEATHER_SERVICE_URL uses the public weather REST endpoint. Build filters isolate each module/Dockerfile from the other service and documentation-only changes.
 
-Next steps after authentication:
-1. Create Free web service from this repository and branch microservices-v008 using Weather-Dockerfile, health /health.
-2. Wait for Live and verify GET /api/weather with real provider data; record exact service URL.
-3. Set WEATHER_SERVICE_URL on ariel-sdd-weather-java to the deployed weather URL plus /api/weather.
-4. Promote tested commit to java-fuentes; both service Dockerfiles build tests during package.
-5. Verify 0.0.8 greeting, real weather, architecture path and stable loading UI at the existing app URL.
-6. Record deployed URLs and completed acceptance in SDD and release evidence.
+## Acceptance evidence — 2026-10-07, Buenos Aires
+Both modules passed deterministic Spring HTTP integration tests and executable JAR packaging. A local two-process smoke test verified two fresh provider queries via the main API and independent weather service.
 
-The existing java-fuentes branch and Render 0.0.7 remain unchanged during this checkpoint.
+After deployment, the weather service returned MET Norway data (17.1 °C). The browser then verified Hello World · Version 0.0.8, Open-Meteo data (17.2 °C, humidity 80%, wind 18.4 km/h), and Browser → Spring Boot API → Weather microservice → Open-Meteo → JSON → Browser.
+
+A repeated browser request retained identical card height 441.578125 px, message height 70.71875 px and button y=696.5 px. Loading placeholders and disabled button were verified.
+
+Render administration used its authenticated REST API. No credentials were committed or embedded in application configuration. Existing SDD specifications were archived at history/20261006-195112-ART/specs/002-java-backend/.

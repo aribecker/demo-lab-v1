@@ -15,5 +15,5 @@ Preserve the half-size title, two-line message and weather slots, single-line ar
 ## Acceptance
 Run deterministic HTTP integration tests for both service boundaries, provider fallback, deadlines, downstream failures, static resources and HTTP methods. Build two executable JARs. Commit source and SDD changes to java-fuentes. Deploy two Render Free services and verify a real weather request through both. Record exact deployment URLs and commit in the release report. Render Free hours are shared and services can sleep after inactivity.
 
-## Deployment checkpoint
-Stage the tested release on microservices-v008 while Render authentication is unavailable. Promote to java-fuentes only after the weather service exists and WEATHER_SERVICE_URL is configured, preserving the working 0.0.7 deployment during setup.
+## Deployment configuration
+The weather microservice deploys microservices-v008 through Weather-Dockerfile. The existing main API deploys java-fuentes through Render-Dockerfile. WEATHER_SERVICE_URL points to https://ariel-sdd-weather-microservice.onrender.com/api/weather. Each service uses a build filter for its module and Dockerfile, allowing independent deployment without rebuilding on documentation-only changes.
