@@ -9,3 +9,11 @@ The independent Spring Boot applications use Render-Dockerfile and Weather-Docke
 Historical Node/Sites/worker test sources are preserved for archival context, not part of the current Java test suite. Frozen Java test suites and packaged-process test must pass unchanged before experimental deployment.
 
 Specifications define behavior and basic layout but not complete pixel styling. The newly generated interface therefore does not claim visual pixel equivalence.
+
+## Experimental deployment
+
+Application: https://ariel-sdd-test-java-app.onrender.com/
+
+Weather API: https://ariel-sdd-test-java-weather.onrender.com/api/weather
+
+See specs/003-regeneration/result.md for verification evidence.

@@ -19,4 +19,4 @@ services:
       paths: [java-backend/**, Render-Dockerfile]
     envVars:
       - key: WEATHER_SERVICE_URL
-        sync: false
+        value: https://ariel-sdd-test-java-weather.onrender.com/api/weather
