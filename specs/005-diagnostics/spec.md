@@ -1,0 +1,7 @@
+# Runtime diagnostics for manual testing
+
+Instrument the test-java-fuentes experiment without changing weather contracts, deadlines or provider URLs. Correlate browser attempts, main API, weather service and providers with an X-Request-Id. Record UTC timestamps, stage, request endpoint, status, duration, content type, response size, provider fallback and full exception causes. Record asynchronous completion and timeout; show a reference ID on UI failure. Browser attempts report numeric metadata through /api/diagnostics; never record credentials, user identity or complete response bodies. Diagnostic reporting must not prevent weather interaction.
+
+Application logs go to Render's centralized retained log store, available through its dashboard and API after service sleeps/restarts. Hobby retention is seven days (https://render.com/docs/logging); this is bounded persistence, not a permanent archive. Do not use ephemeral local log files. Browser telemetry queues up to 100 pending events in localStorage and retries delivery on later events or refresh; if browser storage is unavailable, that queue is only in memory. No user data is stored. Platform requests rejected before application startup appear only in Render platform logs, not application logs.
+
+Preserve all frozen test sources. Run Java integration tests, packaged smoke and UI retry regression, deploy both experimental services, verify correlated retained logs and then leave the app for the user's manual trial. Draw incident conclusions only after reviewing that trial.

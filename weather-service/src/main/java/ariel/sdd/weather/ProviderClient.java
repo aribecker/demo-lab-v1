@@ -9,22 +9,27 @@ import java.io.IOException;
 import java.util.concurrent.*;
 @Service
 public class ProviderClient {
+ private static final org.slf4j.Logger log=org.slf4j.LoggerFactory.getLogger(ProviderClient.class);
  private final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4)).build();
  private final ObjectMapper json;private final String primary,secondary;private final long deadline;
  public ProviderClient(ObjectMapper json,@Value("${weather.primary-url}") String primary,@Value("${weather.secondary-url}") String secondary,@Value("${weather.deadline-seconds}") long deadline) {
   this.json=json;this.primary=primary;this.secondary=secondary;this.deadline=deadline;
  }
- private CompletableFuture<JsonNode> request(String endpoint) {
+ private CompletableFuture<JsonNode> request(String endpoint,String id,String provider) {
+  long start=System.nanoTime();log.info("WEATHER_TRACE id={} stage=provider event=start provider={} endpoint={} connectTimeoutSeconds=4 requestTimeoutSeconds=5",id,provider,endpoint);
   var request=HttpRequest.newBuilder(URI.create(endpoint)).timeout(Duration.ofSeconds(5)).header("User-Agent","SDD-Regeneration-Weather/0.0.8").GET().build();
   return http.sendAsync(request,HttpResponse.BodyHandlers.ofString()).thenApply(response -> {
+   log.info("WEATHER_TRACE id={} stage=provider event=response provider={} status={} elapsedMs={} contentType={} bytes={}",id,provider,response.statusCode(),Diagnostics.ms(start),response.headers().firstValue("Content-Type").orElse("unknown"),response.body().length());
    if(response.statusCode()!=200)throw new CompletionException(new IOException("Provider HTTP "+response.statusCode()));
    try { return json.readTree(response.body()); }catch(IOException e){throw new CompletionException(e);}
-  });
+  }).whenComplete((data,error)->{if(error!=null)Diagnostics.failure(log,id,"provider-"+provider,start,error);});
  }
- public CompletableFuture<WeatherData> fetch() {
-  return request(primary).thenApply(this::openMeteo)
-   .exceptionallyCompose(error -> request(secondary).thenApply(this::metNorway))
-   .orTimeout(deadline,TimeUnit.SECONDS);
+ public CompletableFuture<WeatherData> fetch(String trace) {
+  String id=Diagnostics.id(trace);long start=System.nanoTime();
+  log.info("WEATHER_TRACE id={} stage=weather-service event=start deadlineSeconds={}",id,deadline);
+  return request(primary,id,"Open-Meteo").thenApply(this::openMeteo)
+   .exceptionallyCompose(error -> {Diagnostics.failure(log,id,"primary-or-normalization",start,error);log.info("WEATHER_TRACE id={} stage=weather-service event=fallback provider=MET-Norway",id);return request(secondary,id,"MET-Norway").thenApply(this::metNorway);})
+   .orTimeout(deadline,TimeUnit.SECONDS).whenComplete((data,error)->{if(error!=null)Diagnostics.failure(log,id,"weather-service",start,error);else log.info("WEATHER_TRACE id={} stage=weather-service event=success provider={} elapsedMs={}",id,data.source(),Diagnostics.ms(start));});
  }
  private double number(JsonNode node,String field) {
   var value=node.get(field);

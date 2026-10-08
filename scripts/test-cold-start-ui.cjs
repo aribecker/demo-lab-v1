@@ -8,7 +8,7 @@ async function scenario(statuses){
  const data={message:'Hello World · Version 0.0.8',weather:{temperature:18,location:'Buenos Aires',humidity:60,windSpeed:12,source:'Fixture'},architecture:'Browser → API',timestamp:'2026-10-07T14:00:00Z'};
  const context={document:{querySelector:element},Intl,Date,AbortController,
  setTimeout:(callback,ms)=>{if(ms===3000)queueMicrotask(callback);return 1},clearTimeout(){},
- fetch:async()=>{calls++;assert.equal(element('#call').disabled,true);assert.equal(element('#weather-card')['aria-busy'],'true');busyRequests++;let status=statuses.shift();if(status==='network')throw Error('Network');return {status,ok:status===200,json:async()=>data}}};
+ fetch:async(url)=>{if(url==='/api/diagnostics')return {status:204,ok:true};calls++;assert.equal(element('#call').disabled,true);assert.equal(element('#weather-card')['aria-busy'],'true');busyRequests++;let status=statuses.shift();if(status==='network')throw Error('Network');return {status,ok:status===200,json:async()=>data}}};
  vm.runInNewContext(source,context);
  for(let i=0;i<20;i++)await new Promise(setImmediate);
  assert.equal(element('#call').disabled,false);assert.equal(element('#weather-card')['aria-busy'],'false');return {calls,busyRequests,status:element('#status').textContent};
