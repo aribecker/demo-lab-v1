@@ -1,9 +1,15 @@
 {
-  "name": "sites-worker-esm-starter",
+  "name": "sdd-weather-java-react",
   "private": true,
+  "version": "0.0.8",
   "type": "module",
   "scripts": {
-    "build": "bash scripts/build.sh",
-    "validate": "node scripts/validate-artifact.mjs"
+    "build": "mvn -B -f java-backend/pom.xml package",
+    "build:weather": "mvn -B -f weather-service/pom.xml package",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test:frontend": "npm --prefix frontend test",
+    "build:frontend": "npm --prefix frontend run build",
+    "test:smoke": "python3 scripts/smoke-microservices.py",
+    "validate": "python3 scripts/check-react-artifact.py"
   }
 }

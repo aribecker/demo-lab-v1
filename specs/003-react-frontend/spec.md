@@ -1,6 +1,6 @@
 # Feature 003 — React frontend with visual and API parity
 
-Status: specified before implementation.
+Status: implemented and locally verified; first specified in commit f025187 before any implementation changes.
 Baseline: microservices-v008, commit 79d118576a702cae04b38be6f9776b7fe5c784bf.
 Working branch: react-frontend-sdd.
 

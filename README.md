@@ -1,22 +1,61 @@
-# Java REST microservices — 0.0.8
+# React frontend + Java REST microservices — 0.0.8
 
-Java 17, Spring Boot 3.5.16, Maven and two independent executable JARs.
+Branch: `react-frontend-sdd`, based on `microservices-v008` at `79d1185`.
 
-- java-backend: public frontend and GET /api/hello; asynchronous REST client.
-- weather-service: GET /api/weather; asynchronous provider requests and fallback.
-- Both: GET /health, typed WeatherData, English errors, no-store responses.
+The original weather page is now implemented with React while preserving its English appearance, fixed result slots, loading skeletons, manual refresh, errors and REST contracts. React assets are built with Vite and included in the main Spring Boot JAR. No Node server runs in production.
 
-Build each module with `mvn -B package`. Start weather-service with `PORT=8081 java -jar weather-service/target/weather-service-0.0.8.jar`, then API with `java -jar java-backend/target/weather-java-0.0.8.jar`. Override WEATHER_SERVICE_URL with a complete URL ending in /api/weather for remote deployments.
+## Modules
+- `frontend/src`: editable React UI, request lifecycle, formatters and the original stylesheet.
+- `frontend/test`: deterministic interaction, lifecycle and baseline-parity tests.
+- `java-backend`: unchanged Java API logic; serves the generated React page and `GET /api/hello`.
+- `weather-service`: unchanged independent provider adapter, `GET /api/weather`.
+- `specs/003-react-frontend`: requirements, plan, task status, traceability and validation report.
+- `original/`: the historical source snapshot, preserved.
 
-Render-Dockerfile builds the API; Weather-Dockerfile builds the weather service. render.yaml documents two Free deployments. Free cold starts may take about a minute; the API allows 90 seconds for the downstream call. No database or credentials are needed. Integration fixtures test boundaries without external provider access.
+The API and visible release version remain 0.0.8 so the frozen original Java tests and clients retain their contract.
 
-SDD: specs/002-java-backend. Timestamped prior specifications: history/.
+## Build and test
+Requirements: Java 17, Maven and Node 22 or newer with npm.
 
-Run `python scripts/smoke-microservices.py` after building both JARs to test real cross-process REST calls with a deterministic local provider.
+```bash
+mvn -B -f java-backend/pom.xml package
+mvn -B -f weather-service/pom.xml package
+python3 scripts/smoke-microservices.py
+python3 scripts/check-react-artifact.py
+```
 
-Release branches: main API on java-fuentes; weather service on microservices-v008. Both use verified application commit 0656f3a8eca05daff97a776376b3daa4f3d3ae70. Render build filters deploy only changes to the respective module or Dockerfile.
+The main Maven build runs `npm ci`, frontend tests and the Vite build during `generate-resources`. Maven then copies `frontend/dist` into `public/` inside `weather-java-0.0.8.jar` and runs the original Java tests. Generated assets and `node_modules` are not committed.
 
-Application: https://ariel-sdd-weather-java.onrender.com/
-Weather REST endpoint: https://ariel-sdd-weather-microservice.onrender.com/api/weather
+For frontend-only work:
 
-Render administration uses its REST API. Credentials are kept outside the repository; no Render API key is included in the application or documentation.
+```bash
+cd frontend
+npm ci
+npm test
+npm run build
+npm run dev
+```
+
+Vite development requests to `/api` and `/health` proxy to the Java backend on `localhost:8080`. Production serves everything from the Java backend's origin; no CORS change is needed.
+
+## Run the packaged services
+
+```bash
+PORT=8081 java -jar weather-service/target/weather-service-0.0.8.jar
+PORT=8080 java -jar java-backend/target/weather-java-0.0.8.jar
+```
+
+Open `http://localhost:8080/`. Set `WEATHER_SERVICE_URL` to a full `/api/weather` URL when using a remote downstream service.
+
+## Docker and Render
+`Render-Dockerfile` and `Dockerfile` both use Node → Maven → JRE stages:
+1. Node installs locked dependencies, tests and bundles React.
+2. Maven packages the supplied assets with `-Dfrontend.prebuilt=true` and runs Java tests.
+3. The final image contains the JRE and executable JAR, with no Node, Maven or editable JSX.
+
+`frontend.prebuilt` is only for an already-tested React build at `frontend/dist`; a normal developer Maven build should omit it. `Weather-Dockerfile` stays unchanged.
+
+`render-react.yaml` is an optional separate Render service definition using this branch and the original weather microservice. It includes `frontend/**` in build filters. It has not been applied. The existing live services and other branch pointers are not changed by this migration.
+
+## SDD sequence
+Specifications and their timestamped archive were committed first (`f025187`). The implementation follows requirements R1–R10, with code and tests mapped in `specs/003-react-frontend/traceability.md`. The frozen baseline HTML is used only as a test fixture. Validation distinguishes exact CSS/DOM parity and packaged-JAR checks from screenshot comparisons or Docker-engine execution.
