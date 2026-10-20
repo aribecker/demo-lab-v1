@@ -18,25 +18,31 @@
 - Null feels-like is omitted and forecast labeling remains visible.
 - External strings are rendered as text. Accessibility and reduced-motion rules are present.
 
-## Application navigation
-- The Menu hamburger button initially reports aria-expanded=false and controls a hidden navigation region.
-- Opening it displays exactly one link, Weather demo, marked current.
-- Button toggle and Escape close the disclosure; Escape restores focus to Menu.
-- Selecting Weather demo closes navigation, focuses the weather section and preserves weather data without another provider request.
-- Check the deployed menu visually and by keyboard.
+## Application navigation and gallery
+- / renders Home with English app introduction and links to both features, without a weather request.
+- /weather renders the live Weather demo; /components renders Component gallery.
+- The hamburger contains Home, Weather demo and Component gallery; only the active NavLink has aria-current=page.
+- Menu closes on selection or Escape, restores button focus on Escape and focuses the new route heading after navigation. Browser Back/Forward update the page and active link.
+- Navigating to the already active weather route preserves its request ID; leaving cancels an active request. Re-entering mounts a new live request.
+- Gallery renders the shared WeatherWidget with clearly labeled sample data and Success/Loading/Error controls. A preview refresh demonstrates Loading then Success locally; leaving clears its timer. Gallery never calls the live loader.
+- Unknown paths display Page not found and a Home link.
+- Direct HTTP entry, browser refresh and client navigation all work at /, /weather and /components through the Render SPA rewrite.
 
 ## Build and deployment checks
 - Exact stable React/react-dom versions and a lockfile are committed.
 - npm ci, npm test and npm run build pass.
 - mvn package passes all generated Java tests and creates an executable JAR.
 - Start the JAR with local provider fixtures and verify a real JSON response plus health.
-- Deploy the two components from the same implementation commit; inspect terminal deployment status.
+- For the initial release, deploy both components from the same implementation commit. For this frontend-only release, inspect its terminal status and verify compatibility with the unchanged deployed API.
 - Verify CORS and real provider data through the public API.
 - Verify initial load and button refresh in the deployed React page and capture a non-sensitive screenshot.
 - Release report links the branch, deployed commit and exact public URLs.
 
-## Verification status — 2026-10-20
+## Previous verification status — before routed version
 
 Accepted against the generated checks: 14 backend tests, 25 frontend tests, packaged-JAR HTTP smoke, clean frontend production build and both live Render deployments. Initial browser load, visible startup retry and manual refresh were verified using real weather providers. See [release report](../docs/release.md), [traceability](traceability.md) and [captured evidence](../docs/evidence/).
 
 Navigation acceptance verified in the live frontend deployed from cae61c61405d31e8f2b908de40a4093b45a2c7ce: disclosure, single option, keyboard Tab/Escape, destination focus and unchanged request ID. Existing 25 frontend checks and production build passed. See navigation evidence in the release report.
+
+## Routed-version delivery gate
+Preserve and verify the v2.0.1 checkpoint before implementation. Publish original specification edits before grounding and code. Run routing, gallery and existing weather regressions plus the production build; verify all three public URLs, route reloads, keyboard menu, gallery states and live weather after deployment. Record the source commit, deployment and evidence in the release report.

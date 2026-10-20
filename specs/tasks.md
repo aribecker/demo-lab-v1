@@ -17,3 +17,13 @@
 - [x] Ground the navigation change in the existing React header and weather section.
 - [x] Implement the single Weather demo option with native fragment navigation.
 - [x] Validate, publish and verify the menu in Render.
+
+## Routed application and gallery
+
+- [x] Preserve the functional single-page version in a checkpoint commit and tag v2.0.1.
+- [x] Directly update original specifications before grounding and implementation.
+- [ ] Ground router, home and gallery in the existing shell, weather hook and card.
+- [ ] Generate routed shell, Home, Weather demo and reusable-widget gallery.
+- [ ] Validate regressions, route lifecycle and gallery isolation.
+- [ ] Publish, deploy and verify all three direct URLs and route refreshes.
+- [ ] Record acceptance evidence and final URLs.

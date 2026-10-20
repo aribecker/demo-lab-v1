@@ -23,8 +23,14 @@ https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-34.6037&lon=-58.
 
 Identify the application in User-Agent. References: https://open-meteo.com/en/docs and https://api.met.no/weatherapi/locationforecast/2.0/documentation.
 
-## Navigation
-The existing React application owns a small header navigation disclosure. It has one destination, Weather demo (#weather), with local open/closed state and native fragment navigation. A router is unnecessary while there is only one view. Opening, closing and selecting navigation preserve the mounted weather component and its request state.
+## Navigation and component boundaries
+- BrowserRouter in frontend/src/main.jsx; Routes in App.jsx with /, /weather, /components and a not-found page.
+- App owns the shared shell, accessible hamburger and NavLink destinations. Route changes close navigation and focus the route heading. Keep frontend version 2.1.0 separate from the existing weather API contract 2.0.0.
+- Home introduces the multi-feature demo and links both features, without mounting useWeather.
+- WeatherDemo owns useWeather and renders the reusable presentational WeatherWidget. Leaving the route cancels an active request; navigating to the same route preserves it.
+- ComponentGallery renders that exact widget with labeled sample data and controlled Success/Loading/Error states. A local preview timer may demonstrate the loading-to-success transition; it is cleaned up on unmount. No network provider access in Home or gallery.
+- Existing Render /* rewrite to /index.html supports direct BrowserRouter entry and reload on /weather and /components. A frontend-only deployment reuses the existing Java API.
+- Lightweight in-app gallery rather than a standalone Storybook service/dependency, appropriate for one reusable widget.
 
 ## Failure boundaries
 The static page is available independently of Java startup. Browser retry logic handles infrastructure startup/HTML responses. Once Java answers with a structured provider error and retryable=false, the UI allows a manual retry. Provider timeouts and browser cold-start deadlines are separate settings. CORS limits browser origins; it is not authentication for this public API.
