@@ -2,6 +2,8 @@
 
 A fresh application generated from the specifications in this branch: one React page directly calls one Java weather microservice. No code, builds or tests from the previous application are retained in this tree.
 
+The header's **Menu** hamburger opens one option, **Weather demo**. It uses React disclosure state and a native fragment link, with no router dependency for this single view. Selection closes navigation and focuses the weather section while preserving its data; Escape closes navigation and restores focus to Menu.
+
 The specifications-only commit is [`d41ef09988567cbcf63c1ead7462098fb0320d02`](https://github.com/aribecker/0080-prueba-SDD-full-stack/commit/d41ef09988567cbcf63c1ead7462098fb0320d02). Read [requirements](specs/requirements.md), [architecture](specs/architecture.md), [acceptance](specs/acceptance.md) and [traceability](specs/traceability.md). Deployment evidence is recorded separately in `docs/release.md` after validation.
 
 ## Local development

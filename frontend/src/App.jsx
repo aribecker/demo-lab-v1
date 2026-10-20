@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useWeather } from './useWeather.js';
 
 const number = value => new Intl.NumberFormat('en-GB', { maximumFractionDigits: 1 }).format(value);
@@ -11,13 +11,36 @@ function Placeholder({ wide = false }) {
 }
 
 export default function App({ loader }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef(null);
+  const weatherSection = useRef(null);
   const state = useWeather(loader);
   const { data } = state;
   const loading = state.phase === 'loading';
   return (
     <main className="page">
       <header className="masthead">
-        <a href="#weather" className="brand" aria-label="Weather demonstration home"><span className="brand-icon">◒</span> WEATHER LAB</a>
+        <div className="header-start">
+          <div className="navigation" onKeyDown={event => {
+            if (event.key === 'Escape' && menuOpen) {
+              event.preventDefault();
+              setMenuOpen(false);
+              menuButton.current?.focus();
+            }
+          }}>
+            <button ref={menuButton} type="button" className="menu-toggle" aria-label="Menu"
+              aria-expanded={menuOpen} aria-controls="main-navigation" onClick={() => setMenuOpen(open => !open)}>
+              <span className="hamburger" aria-hidden="true"><span /><span /><span /></span>
+            </button>
+            <nav id="main-navigation" aria-label="Main navigation" hidden={!menuOpen}>
+              <a href="#weather" aria-current="page" onClick={() => {
+                setMenuOpen(false);
+                weatherSection.current?.focus({ preventScroll: true });
+              }}>Weather demo</a>
+            </nav>
+          </div>
+          <a href="#weather" className="brand" aria-label="Weather demonstration home"><span className="brand-icon">◒</span> WEATHER LAB</a>
+        </div>
         <span className="version">ITERATION 02 <span>v2.0.0</span></span>
       </header>
 
@@ -27,7 +50,7 @@ export default function App({ loader }) {
         <p className="subtitle">One React page. One Java microservice. The weather in Buenos Aires.</p>
       </section>
 
-      <section id="weather" className={`weather-card ${state.phase}`} aria-label="Buenos Aires weather" aria-busy={loading}>
+      <section id="weather" ref={weatherSection} tabIndex={-1} className={`weather-card ${state.phase}`} aria-label="Buenos Aires weather" aria-busy={loading}>
         <div className="card-heading">
           <div><p className="eyebrow">BUENOS AIRES, ARGENTINA</p><p className="zone">America/Argentina/Buenos_Aires · UTC−3</p></div>
           <span className="live-tag"><span className="dot" /> PUBLIC WEATHER API</span>

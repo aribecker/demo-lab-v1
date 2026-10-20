@@ -18,3 +18,7 @@ The specification was published before any of the implementation paths below exi
 | R12: package/build/deploy validation | scripts/smoke_jar.py; Weather-Dockerfile; render.yaml | 14 backend tests; 25 frontend tests; JAR smoke; production build; docs/release.md |
 
 The deployment report supplies the final external evidence. A local Docker-engine build and pixel comparison with the old page are not claimed.
+
+## Header navigation grounding
+
+Original specifications updated first in commit 9392be8c916699cb371aa558babf4ade040ca8a1. The existing `App.jsx` owns the masthead and the continuously mounted `#weather` section, so the menu belongs in that component. Local disclosure state must not change `useWeather` or its loader identity. Native `href="#weather"` navigation is sufficient for the only view. Scope the existing weather-button CSS to `.actions` so a new header control does not inherit refresh-button dimensions. Update existing button queries to distinguish Menu from Get weather; verify disclosure, Escape focus and destination selection without another load. No provider, Java, API contract or runtime dependency change is needed.

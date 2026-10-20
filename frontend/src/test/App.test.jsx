@@ -8,7 +8,7 @@ describe('React weather page', () => {
   it('loads on mount and displays weather, attribution, times and the actual React version', async () => {
     const loader = vi.fn().mockResolvedValue(sample);
     render(<App loader={loader} />);
-    expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Get weather|Getting weather/ })).toBeDisabled();
     expect(screen.getByRole('region', { name: 'Buenos Aires weather' })).toHaveAttribute('aria-busy', 'true');
     expect(await screen.findByText('current model data')).toBeInTheDocument();
     expect(screen.getByText('Feels like 20.1 °C')).toBeInTheDocument();
@@ -27,15 +27,15 @@ describe('React weather page', () => {
       .mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
     const { container } = render(<App loader={loader} />);
     await screen.findByText('current model data');
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('button', { name: /Get weather|Getting weather/ }));
     expect(screen.queryByText(sample.requestId)).not.toBeInTheDocument();
     expect(container.querySelector('.reading-area')).toBeInTheDocument();
     expect(container.querySelectorAll('.metadata > div')).toHaveLength(3);
-    expect(screen.getByRole('button')).toBeDisabled();
-    fireEvent.click(screen.getByRole('button'));
+    expect(screen.getByRole('button', { name: /Get weather|Getting weather/ })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /Get weather|Getting weather/ }));
     expect(loader).toHaveBeenCalledTimes(2);
     await act(() => finish({ ...sample, temperatureC: 23 }));
-    expect(screen.getByRole('button')).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Get weather|Getting weather/ })).toBeEnabled();
     expect(screen.getByText('current model data')).toBeInTheDocument();
   });
 
@@ -43,7 +43,7 @@ describe('React weather page', () => {
     const loader = vi.fn().mockRejectedValueOnce(new Error('Providers are unavailable. Please try again.')).mockResolvedValueOnce(sample);
     render(<App loader={loader} />);
     expect(await screen.findByText('Providers are unavailable. Please try again.')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('button', { name: /Get weather|Getting weather/ }));
     await screen.findByText('current model data');
     expect(loader).toHaveBeenCalledTimes(2);
   });
@@ -54,7 +54,7 @@ describe('React weather page', () => {
     render(<App loader={loader} />);
     act(() => progress('Waking the weather service… retrying (attempt 2).'));
     expect(screen.getByRole('status')).toHaveTextContent('Waking the weather service');
-    expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Get weather|Getting weather/ })).toBeDisabled();
   });
 
   it('labels forecasts and omits a null feels-like temperature', async () => {
@@ -86,7 +86,7 @@ describe('React weather page', () => {
     });
     expect(screen.getByText('current model data')).toBeInTheDocument();
     expect(screen.queryByText(/Obsolete/)).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('button', { name: /Get weather|Getting weather/ }));
     await waitFor(() => expect(requests).toHaveLength(3));
     view.unmount();
     expect(requests[2].signal.aborted).toBe(true);
