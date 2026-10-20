@@ -1,0 +1,47 @@
+# Reference configuration for the two iteration-2 services in the existing workspace.
+# Actual creation and verification are recorded in docs/release.md.
+services:
+  - type: web
+    name: ariel-weather-api-iteration-2
+    runtime: docker
+    repo: https://github.com/aribecker/0080-prueba-SDD-full-stack
+    branch: iteracion-2
+    plan: free
+    region: oregon
+    autoDeployTrigger: commit
+    dockerfilePath: ./Weather-Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    buildFilter:
+      paths:
+        - weather-service/**
+        - Weather-Dockerfile
+        - .dockerignore
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: ALLOWED_ORIGINS
+        value: https://ariel-weather-iteration-2.onrender.com,http://localhost:5173
+
+  - type: web
+    name: ariel-weather-iteration-2
+    runtime: static
+    repo: https://github.com/aribecker/0080-prueba-SDD-full-stack
+    branch: iteracion-2
+    autoDeployTrigger: commit
+    buildCommand: cd frontend && npm ci && npm test && npm run build
+    staticPublishPath: frontend/dist
+    buildFilter:
+      paths:
+        - frontend/**
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: VITE_WEATHER_API_URL
+        value: https://ariel-weather-api-iteration-2.onrender.com/api/weather
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
