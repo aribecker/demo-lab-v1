@@ -41,5 +41,5 @@
 - [x] Implement server OAuth registrations, bound one-use handoff and expiring demo sessions.
 - [x] Implement Login route, profile, provider configuration states and logout.
 - [x] Validate Java auth boundaries, React regression and production build.
-- [ ] Deploy and verify unauthenticated behavior.
+- [x] Deploy and verify unauthenticated behavior.
 - [ ] Configure the owner's three OAuth applications and verify real consent.

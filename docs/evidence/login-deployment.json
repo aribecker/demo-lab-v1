@@ -1,0 +1,28 @@
+{
+  "version": "2.2.0",
+  "specificationsCommit": "38901ca778517faa2de6d79afe1944bc69b51b08",
+  "implementationCommit": "8fa3cddc5caff597594d31821c111e40b5f9cc42",
+  "uiCommit": "65ed67591af572c628caa579bf4240903374071a",
+  "frontendDeploy": "dep-dbbevq8473hc73dgl320",
+  "backendDeploy": "dep-dbbev4mk1f9s73bpc3o0",
+  "frontendStatus": "live",
+  "backendStatus": "live",
+  "checks": {
+    "reactTests": 42,
+    "javaTests": 23,
+    "jarSmoke": "passed",
+    "loginDirectRoute": "verified in browser",
+    "menu": "Login present",
+    "health": 200,
+    "weather": 200,
+    "providers": 200,
+    "cors": "exact frontend origin",
+    "runtimeErrors": "none in post-deploy query"
+  },
+  "providers": {
+    "google": false,
+    "github": false,
+    "microsoft": false
+  },
+  "externalConsent": "not tested: OAuth client registrations and secrets still required"
+}
