@@ -27,3 +27,7 @@
 - Verify CORS and real provider data through the public API.
 - Verify initial load and button refresh in the deployed React page and capture a non-sensitive screenshot.
 - Release report links the branch, deployed commit and exact public URLs.
+
+## Verification status — 2026-10-20
+
+Accepted against the generated checks: 14 backend tests, 25 frontend tests, packaged-JAR HTTP smoke, clean frontend production build and both live Render deployments. Initial browser load, visible startup retry and manual refresh were verified using real weather providers. See [release report](../docs/release.md), [traceability](traceability.md) and [captured evidence](../docs/evidence/).
