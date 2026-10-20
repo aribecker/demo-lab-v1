@@ -60,6 +60,7 @@ Accepted: v2.0.1 points to checkpoint 541da9ecf1af8ce14eabacad1ab67d100e6d0a16, 
 Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e80088824266b7f: 33 regression tests and build passed. At 1363×936, Home/Weather/Gallery content height decreased 9.0%/9.4%/8.7%, with no horizontal overflow. Mobile breakpoint spacing was reviewed; no direct mobile viewport measurement is claimed. See release evidence.
 
 
+
 ## Login acceptance R15–R18
 - /login is directly addressable, accessible through Home and hamburger, keeps compact mobile flow and does not mount weather.
 - Three provider choices are present; missing credentials disable a provider. No fake users or simulated sign-in.

@@ -120,3 +120,12 @@ The published React page stayed available while Java finished startup and displa
 See [browser evidence](evidence/browser.json) and the verified screenshot below. The fixture tests additionally cover unavailable providers, malformed data, retry limits, cancellation and obsolete lifecycle callbacks. A separate mobile-device session and a pixel comparison against the previous application were not performed. Docker was built and run by Render; no local Docker-engine build is claimed.
 
 ![Published iteration 2 after a successful manual refresh](evidence/live.jpg)
+
+
+
+## Login v2.2.0 (R15–R18)
+Specifications committed first as 38901ca778517faa2de6d79afe1944bc69b51b08. Existing shell/Home/router are extended by /login; authentication is implemented in the existing Java API. Three providers are supported with optional server-only client registrations. The no-credential deployment is intentional: no fabricated profiles or active buttons for an unconfigured provider.
+
+Validation: React 42/42 tests and Vite production build pass; Java 23/23 tests and Maven package pass. Executable-JAR smoke reports health UP, real HTTP weather fixture 200 twice, unique request IDs, exact-origin CORS and structured 502 provider failure. Auth tests cover provider-unconfigured startup, state/PKCE redirect construction, invalid callback state, single-use browser-bound exchange, expiry, revocation, missing attributes and foreign-origin rejection. Real provider token exchange/consent is not claimed until the owner's credentials are configured.
+
+Session tradeoffs: a bounded single-instance memory store, 60-second handoff, 30-minute demo session in sessionStorage, sessions invalidated by backend restart, no linked-user database. Provider tokens are discarded after userinfo. See docs/login-setup.md for exact callbacks and activation.

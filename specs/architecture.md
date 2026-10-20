@@ -46,6 +46,7 @@ The static page is available independently of Java startup. Browser retry logic 
 Use the existing shared styles.css selectors and mobile breakpoint. Compact the shell, page introductions, feature cards, shared WeatherWidget and gallery notes by adjusting vertical spacing only; retain font sizes and responsive flow. Do not change routes, weather requests, providers or gallery behavior.
 
 
+
 ## Multi-provider login v2.2.0
 Grounding: retain BrowserRouter/App shared shell, add Login.jsx and authClient.js, extend the existing Java service under its scanned weather package with auth/. No new service or database. R15–R18 supersede the earlier no-login scope only for this feature. Public weather DTO/version stay 2.0.0.
 Auth endpoints: GET /auth/providers, GET /auth/start/{provider}?challenge=..., GET /login/oauth2/code/{provider}, POST /auth/exchange {ticket,verifier}, GET /auth/me, POST /auth/logout. All auth responses no-store. Spring Security owns state, code exchange and Google OIDC validation. Configure fixed AUTH_BACKEND_URL and AUTH_FRONTEND_URL rather than accepting redirect destinations from requests. Successful OAuth invalidates its cookie session and passes only a one-use ticket to React; browser verifier binds that exchange. Profile/demo sessions live in bounded memory, with a 30-minute absolute lifetime. No user database or automatic account linking.

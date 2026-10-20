@@ -56,6 +56,7 @@ R14. Make Home, Weather demo and Component gallery approximately 10% shorter tha
 Use acceptance.md and traceability.md to map every requirement to code and a check. Keep failures and limits visible; do not claim a Docker-engine or pixel comparison unless performed. Subsequent requirement changes must directly update these original specifications before grounding and the corresponding implementation. Do not create separate specification patches.
 
 
+
 ## R15 — Real multi-provider login (v2.2.0)
 Add /login to the compact shared navigation and Home. Offer Google, GitHub and Microsoft. After consent show a greeting, display name, email or explicit unavailable value, provider, provider account ID, and optional picture/locale/profile URL. Never invent missing attributes. Signing out clears the demo session; it does not sign the user out of the identity provider. Weather remains public.
 

@@ -62,3 +62,12 @@ Render Free can suspend an inactive Java service. The static React page remains 
 The API is intentionally public and has no authentication. CORS configures browser access; it does not stop non-browser clients. No database, separate gateway, login flow or additional backend is part of this iteration.
 
 The 2.1.1 layout reduces vertical spacing across the shell, feature pages and gallery, with additional phone breakpoint adjustments. Text sizes and route behavior remain unchanged. See R14 and release evidence for measurement scope.
+
+
+## Login (frontend v2.2.0)
+
+New route: https://ariel-weather-iteration-2.onrender.com/login
+
+Google, GitHub and Microsoft use the existing Spring server. Each provider remains visibly disabled until its OAuth client ID/secret pair is configured in Render. See [setup and callbacks](docs/login-setup.md). Actual consent shows the shared name, email/account address, platform, account ID and optional photo/locale/public profile. Sessions last 30 minutes and end on backend restart. Provider tokens never reach React and are discarded after userinfo; no account database is introduced. Weather remains public.
+
+For changed hostnames configure AUTH_FRONTEND_URL, AUTH_BACKEND_URL and ALLOWED_ORIGINS on Java. VITE_AUTH_API_URL optionally overrides the frontend auth API origin, otherwise derived from VITE_WEATHER_API_URL. All client secrets stay server-side. Real consent must be verified after registration; automated tests exercise authentication boundaries with local fixtures only.

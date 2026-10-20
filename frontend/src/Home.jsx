@@ -21,7 +21,14 @@ export default function Home() {
         <p>Explore the reusable Weather widget in isolation. Try its success, loading and error states with clearly labeled sample data.</p>
         <span className="feature-action">Open Component gallery →</span>
       </Link>
+      <Link className="feature-card" to="/login">
+        <span className="feature-number" aria-hidden="true">03 / IDENTITY</span>
+        <h2>Login <span aria-hidden="true">↗</span></h2>
+        <p>Sign in with Google, GitHub or Microsoft and see the profile you choose to share.</p>
+        <span className="feature-action">Open Login →</span>
+      </Link>
     </section>
     <aside className="home-note"><span className="dot" aria-hidden="true" /><p>Built as a small learning lab. Each feature has its own URL, so you can bookmark it or open it directly.</p></aside>
   </>;
 }
+

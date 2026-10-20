@@ -23,12 +23,13 @@ function menuLink(name) {
 }
 
 describe('routed demo application', () => {
-  it('starts at an introduction with two feature links and no live weather request', () => {
+  it('starts at an introduction with feature links and no live weather request', () => {
     const { loader } = open();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Small features.Real connections.');
     expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
     expect(screen.getByRole('link', { name: /Open Weather demo/ })).toHaveAttribute('href', '/weather');
     expect(screen.getByRole('link', { name: /Open Component gallery/ })).toHaveAttribute('href', '/components');
+    expect(screen.getByRole('link', { name: /Open Login/ })).toHaveAttribute('href', '/login');
     expect(loader).not.toHaveBeenCalled();
     expect(screen.queryByRole('region', { name: 'Buenos Aires weather' })).not.toBeInTheDocument();
     expect(menuLink('Home')).toHaveAttribute('aria-current', 'page');
@@ -127,3 +128,4 @@ describe('routed demo application', () => {
     expect(loader).not.toHaveBeenCalled();
   });
 });
+

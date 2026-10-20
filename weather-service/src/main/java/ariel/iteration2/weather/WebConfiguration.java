@@ -31,8 +31,9 @@ class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins(origins).allowedMethods("GET", "OPTIONS")
-                .allowedHeaders("Accept", "Content-Type", "X-Request-Id")
+        registry.addMapping("/**").allowedOrigins(origins).allowedMethods("GET", "POST", "OPTIONS")
+                .allowedHeaders("Accept", "Content-Type", "X-Request-Id", "Authorization")
                 .exposedHeaders("X-Request-Id").allowCredentials(false).maxAge(600);
     }
 }
+

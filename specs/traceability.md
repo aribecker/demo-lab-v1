@@ -37,3 +37,13 @@ Specifications published first in 7bde53b3b4257896b3d18b771d598c3cfb0a84bf, afte
 
 ## Compact layout grounding
 R14 was specified before code in 938505ec604a12ce68aa2ba73404bdc54ad559c4. All three pages share styles.css: .page/.masthead/.intro/footer define the shell, Home uses .home-intro/.feature-card, WeatherWidget supplies both weather cards, and gallery adds .gallery-description/.preview-toolbar/.component-notes. Adjust those existing vertical values and their max-width:600px overrides directly, keeping font sizes and routing/network code unchanged. Maintain reserved state slots and a 44px action height. Compare .page content height before/after at the same available browser viewport; explicitly distinguish that desktop measurement from mobile CSS inspection.
+
+
+## Login v2.2.0 R15–R18
+| Requirement | Implementation | Evidence |
+| --- | --- | --- |
+| R15 navigation/profile | App/Home/Login.jsx | Routing.test.jsx, Login.test.jsx |
+| R16 three providers/secret boundary | AuthConfiguration, GitHubUserService, Profiles | OAuthBoundaryTest, DemoSessionsTest, docs/login-setup.md |
+| R17 one-use bound handoff | DemoSessions, AuthController, authClient.js | DemoSessionsTest, OAuthBoundaryTest, authClient.test.js |
+| R18 restore/logout/failures | Login, authClient, AuthController | AuthApiTest, Login.test.jsx, authClient.test.js |
+Real external consent awaits the owner's OAuth registrations and environment configuration.
