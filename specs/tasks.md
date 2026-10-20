@@ -22,8 +22,8 @@
 
 - [x] Preserve the functional single-page version in a checkpoint commit and tag v2.0.1.
 - [x] Directly update original specifications before grounding and implementation.
-- [ ] Ground router, home and gallery in the existing shell, weather hook and card.
-- [ ] Generate routed shell, Home, Weather demo and reusable-widget gallery.
-- [ ] Validate regressions, route lifecycle and gallery isolation.
+- [x] Ground router, home and gallery in the existing shell, weather hook and card.
+- [x] Generate routed shell, Home, Weather demo and reusable-widget gallery.
+- [x] Validate regressions, route lifecycle and gallery isolation.
 - [ ] Publish, deploy and verify all three direct URLs and route refreshes.
 - [ ] Record acceptance evidence and final URLs.

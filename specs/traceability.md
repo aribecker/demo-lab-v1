@@ -22,3 +22,15 @@ The deployment report supplies the final external evidence. A local Docker-engin
 ## Header navigation grounding
 
 Original specifications updated first in commit 9392be8c916699cb371aa558babf4ade040ca8a1. The existing `App.jsx` owns the masthead and the continuously mounted `#weather` section, so the menu belongs in that component. Local disclosure state must not change `useWeather` or its loader identity. Native `href="#weather"` navigation is sufficient for the only view. Scope the existing weather-button CSS to `.actions` so a new header control does not inherit refresh-button dimensions. Update existing button queries to distinguish Menu from Get weather; verify disclosure, Escape focus and destination selection without another load. No provider, Java, API contract or runtime dependency change is needed.
+
+## Routed application grounding
+
+Specifications published first in 7bde53b3b4257896b3d18b771d598c3cfb0a84bf, after checkpoint/tag v2.0.1 at 541da9ecf1af8ce14eabacad1ab67d100e6d0a16. App.jsx currently combines the masthead, useWeather and the weather card: extract the card unchanged into WeatherWidget.jsx and move useWeather ownership into WeatherDemo.jsx. App becomes the shared routed shell. Home and ComponentGallery never mount useWeather. main.jsx owns BrowserRouter; tests use MemoryRouter. render.yaml already contains the necessary /* → /index.html rewrite, so no infrastructure change is needed. Retain the existing HTTP client/API version 2.0.0; independently increment frontend package/badge to 2.1.0. React Router declarative BrowserRouter/Routes/Route and NavLink match the official installation/routing documentation (https://reactrouter.com/start/declarative/installation and https://reactrouter.com/start/declarative/routing). Verify route lifecycle, active links, gallery isolation/timer cleanup and direct reloads, alongside existing widget regressions.
+
+| Routed requirement | Implementation | Verification |
+| --- | --- | --- |
+| R8: Home, shell, routes and active navigation | App.jsx, Home.jsx, main.jsx | Routing.test.jsx: home isolation, active route, focus, Escape, history and not-found |
+| R9: live weather ownership and reusable display | WeatherDemo.jsx, WeatherWidget.jsx, unchanged useWeather.js | Existing App.test.jsx regressions; route cancellation and same-route preservation |
+| R11: direct entry and reload | BrowserRouter and existing render.yaml rewrite | Live HTTP path checks and browser route reloads |
+| R12: checkpoint/specification sequence | v2.0.1 tag and 7bde53b3 specification commit | GitHub tag points to checkpoint before specification commit |
+| R13: isolated component gallery | ComponentGallery.jsx and shared WeatherWidget.jsx | Routing.test.jsx: all display states, no live loader, local refresh and timer cleanup |

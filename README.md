@@ -1,10 +1,20 @@
-# Weather, full stack. — Iteration 2
+# Demo Lab — Iteration 2
 
-A fresh application generated from the specifications in this branch: one React page directly calls one Java weather microservice. No code, builds or tests from the previous application are retained in this tree.
+A React demo application with a Home page, live Weather demo and Component gallery. Frontend version **2.1.0** uses React 19.3.1 and React Router 7.18.4. The existing independently deployed Java weather API keeps its 2.0.0 contract.
 
-The header's **Menu** hamburger opens one option, **Weather demo**. It uses React disclosure state and a native fragment link, with no router dependency for this single view. Selection closes navigation and focuses the weather section while preserving its data; Escape closes navigation and restores focus to Menu.
+## Direct routes
 
-The specifications-only commit is [`d41ef09988567cbcf63c1ead7462098fb0320d02`](https://github.com/aribecker/0080-prueba-SDD-full-stack/commit/d41ef09988567cbcf63c1ead7462098fb0320d02). Read [requirements](specs/requirements.md), [architecture](specs/architecture.md), [acceptance](specs/acceptance.md) and [traceability](specs/traceability.md). Deployment evidence is recorded separately in `docs/release.md` after validation.
+- Home: https://ariel-weather-iteration-2.onrender.com/
+- Weather demo: https://ariel-weather-iteration-2.onrender.com/weather
+- Component gallery: https://ariel-weather-iteration-2.onrender.com/components
+
+The hamburger contains all three destinations. React Router handles client navigation and browser history; Render rewrites unknown static paths to index.html for direct entry/reload. Home introduces the demo and links its features. The gallery showcases the same reusable WeatherWidget used by the live page, with clearly labeled sample Success/Loading/Error states and a local refresh simulation. Only the Weather demo calls the microservice.
+
+## SDD and checkpoint
+
+Before adding routes, the working single-page application was preserved in commit `541da9ecf1af8ce14eabacad1ab67d100e6d0a16` and [tag v2.0.1](https://github.com/aribecker/0080-prueba-SDD-full-stack/releases/tag/v2.0.1).
+
+The original requirements, architecture and acceptance criteria were directly updated and published in `7bde53b3b4257896b3d18b771d598c3cfb0a84bf` before grounding or routed source generation. No specification patch documents are used. Read [requirements](specs/requirements.md), [architecture](specs/architecture.md), [acceptance](specs/acceptance.md), [grounding/traceability](specs/traceability.md) and [release evidence](docs/release.md). The initial application's specifications-only commit remains `d41ef09988567cbcf63c1ead7462098fb0320d02`.
 
 ## Local development
 

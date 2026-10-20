@@ -98,3 +98,44 @@ footer a { color: #9dbcca; }
 #main-navigation a:hover { background: #315768; }
 .weather-card:focus-visible { outline: 2px solid #82d3e2; outline-offset: 4px; }
 @media (max-width: 420px) { .header-start { gap: 9px; } .brand { letter-spacing: .4px; gap: 6px; } .brand-icon { display: none; } .version { letter-spacing: 0; } }
+
+#main-navigation a { background: transparent; margin: 2px 0; }
+#main-navigation a[aria-current="page"] { background: #234251; color: #a9edf5; }
+h1:focus { outline: none; }
+.home-intro { margin: 55px 0 35px; }
+.home-intro h1 { font-size: clamp(38px, 5vw, 58px); line-height: 1.13; margin: 16px 0 18px; }
+.home-intro .subtitle { max-width: 650px; }
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.feature-card { display: flex; flex-direction: column; color: #edf6fc; text-decoration: none; padding: 27px; border: 1px solid #314c5c; border-radius: 13px; background: linear-gradient(130deg, #142b3a, #102331); }
+.feature-card:hover { border-color: #82d3e2; background: #193748; }
+.feature-number { font-size: 9px; letter-spacing: 1.5px; color: #89b8cb; }
+.feature-card h2 { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 20px 0 12px; font-size: 23px; font-weight: 600; letter-spacing: -.6px; }
+.feature-card h2 span { color: #75dae9; font-size: 20px; }
+.feature-card p { margin: 0 0 24px; color: #a9bfcd; font-size: 13px; line-height: 1.8; }
+.feature-action { margin-top: auto; font-size: 12px; font-weight: 650; color: #91e1ee; }
+.home-note { display: flex; align-items: center; gap: 11px; padding: 20px 0 4px; color: #8ea9bb; }
+.home-note .dot { flex: 0 0 6px; }
+.home-note p { margin: 0; font-size: 11px; line-height: 1.8; }
+.text-link { display: inline-block; font-size: 12px; margin-top: 15px; }
+.gallery-description { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 0 24px; padding-bottom: 22px; border-bottom: 1px solid #304859; }
+.gallery-description h2 { font-size: 21px; margin: 9px 0; font-weight: 600; }
+.gallery-description p:not(.eyebrow) { color: #9fb6c6; font-size: 12px; line-height: 1.7; margin: 0; }
+.gallery-description .text-link { white-space: nowrap; margin: 0; }
+.preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
+.state-controls { display: inline-flex; gap: 3px; border: 1px solid #314c5c; border-radius: 7px; padding: 4px; background: #102331; }
+.state-controls button { padding: 9px 13px; border: 0; border-radius: 4px; background: transparent; color: #a9bfcd; font: inherit; font-size: 11px; cursor: pointer; }
+.state-controls button[aria-pressed="true"] { background: #285369; color: #c9f4f9; }
+.state-controls button:hover { background: #234251; }
+.sample-notice { font-size: 8px; letter-spacing: .9px; color: #aac4d3; line-height: 1.8; margin: 0; text-align: right; }
+.component-notes { margin-top: 23px; padding: 0 2px; color: #9cb5c5; font-size: 12px; line-height: 1.8; }
+.component-notes h3 { font-size: 13px; color: #d6e7ef; font-weight: 600; margin: 0 0 8px; }
+.component-notes p { margin: 5px 0; }
+@media (max-width: 600px) {
+  .home-intro { margin-top: 38px; }
+  .feature-grid { grid-template-columns: 1fr; gap: 15px; }
+  .feature-card { padding: 23px; }
+  .feature-card h2 { font-size: 22px; }
+  .gallery-description { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .preview-toolbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .sample-notice { text-align: left; font-size: 8px; }
+}

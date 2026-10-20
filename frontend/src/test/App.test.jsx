@@ -1,8 +1,13 @@
 import React, { StrictMode } from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render as renderDom, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import App from '../App.jsx';
 import { sample } from './fixture.js';
+import { MemoryRouter } from 'react-router';
+
+const render = element => element.type === StrictMode
+  ? renderDom(<StrictMode><MemoryRouter initialEntries={['/weather']}>{element.props.children}</MemoryRouter></StrictMode>)
+  : renderDom(<MemoryRouter initialEntries={['/weather']}>{element}</MemoryRouter>);
 
 describe('React weather page', () => {
   it('loads on mount and displays weather, attribution, times and the actual React version', async () => {
