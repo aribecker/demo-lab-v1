@@ -1,7 +1,26 @@
 # Iteration 2 — release evidence
 
 
-## Current frontend 2.1.0: routed application and component gallery
+
+## Current frontend 2.1.1: compact vertical layout
+
+Original specification R14, architecture and acceptance were updated first in `938505ec604a12ce68aa2ba73404bdc54ad559c4`. Grounding identifies existing shared shell, WeatherWidget, Home cards and gallery selectors. Implementation `1538a6a9b779d7db669506931e80088824266b7f` changes vertical spacing and the frontend patch version; font sizes and routing/weather logic are unchanged.
+
+Render deployment `dep-dbbcfeuk1f9s73bn3rhg` is live, finished `2026-10-20T01:46:02.539915Z`. All 33 frontend regressions and the production build passed. Existing public URLs are unchanged.
+
+Measured .page content height at the same **1363 × 936 desktop viewport**:
+- Home: 779.4 → 709.4 px (**9.0% shorter**).
+- Weather, loading state: 916.2 → 830.2 px (**9.4% shorter**).
+- Gallery, success state: 1205.2 → 1100.2 px (**8.7% shorter**).
+
+The mobile max-width:600px rules also reduce shell/intro margins, card padding, weather reserved heights, source rows, actions and gallery spacing while retaining text sizes. Menu remains 44 px high and the weather action was increased to 44 px. There was no horizontal overflow in the measured desktop viewport. No mobile viewport/device session was available for this check; exact phone percentages are not claimed. Natural wrapping and provider/error text can vary content height.
+
+See [measurements](evidence/compact-layout.json), [deployment record](evidence/compact-deployment.json) and screenshot.
+
+![Compact Home layout](evidence/compact-home.jpg)
+
+
+## Previous frontend 2.1.0: routed application and component gallery
 
 Verified on 2026-10-20 UTC (19 October in Buenos Aires). The application now starts on an introduction; the existing live weather feature and new component gallery have their own React Router paths. The gallery uses the exact same WeatherWidget as the live page with explicit sample data and controlled Success/Loading/Error states.
 

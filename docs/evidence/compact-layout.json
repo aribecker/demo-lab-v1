@@ -1,0 +1,25 @@
+{
+  "before": {
+    "home": 779.421875,
+    "weather": 916.1875,
+    "gallery": 1205.15625
+  },
+  "after": {
+    "gallery": 1100.15625,
+    "weather": 830.1875,
+    "home": 709.421875
+  },
+  "reductionPercent": {
+    "home": 9,
+    "weather": 9.4,
+    "gallery": 8.7
+  },
+  "viewport": {
+    "height": 936,
+    "noHorizontalOverflow": true,
+    "width": 1363
+  },
+  "menuHeight": 44,
+  "mobileViewportVerified": false,
+  "mobileBreakpointReviewed": true
+}
