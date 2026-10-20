@@ -1,0 +1,9 @@
+{
+  "url": "https://ariel-weather-api-iteration-2.onrender.com/health",
+  "status": 200,
+  "body": {
+    "status": "UP",
+    "version": "2.0.0"
+  },
+  "elapsedSeconds": 23.8
+}

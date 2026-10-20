@@ -1,0 +1,27 @@
+{
+  "urls": {
+    "home": "https://ariel-weather-iteration-2.onrender.com/",
+    "gallery": "https://ariel-weather-iteration-2.onrender.com/components",
+    "weather": "https://ariel-weather-iteration-2.onrender.com/weather"
+  },
+  "homeAndGalleryDirectReload": true,
+  "weatherDirectReload": true,
+  "browserBackForward": true,
+  "gallery": {
+    "successHeight": 526,
+    "loadingHeight": 526,
+    "errorHeight": 526,
+    "localRefreshVerified": true,
+    "sampleLabelVerified": true
+  },
+  "menu": {
+    "galleryActiveLink": "Component gallery",
+    "weatherActiveLink": "Weather demo",
+    "keyboardEscapeRestoresFocus": true
+  },
+  "weather": {
+    "initialRequestId": "82db46dc-5fe1-4014-b11c-9294957ca37b",
+    "refreshedRequestId": "98de449b-a3a7-48ed-b296-c145b4421982",
+    "sameRouteRequestId": "98de449b-a3a7-48ed-b296-c145b4421982"
+  }
+}

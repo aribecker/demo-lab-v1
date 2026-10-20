@@ -1,6 +1,42 @@
 # Iteration 2 — release evidence
 
-## Current frontend: single-option hamburger navigation
+
+## Current frontend 2.1.0: routed application and component gallery
+
+Verified on 2026-10-20 UTC (19 October in Buenos Aires). The application now starts on an introduction; the existing live weather feature and new component gallery have their own React Router paths. The gallery uses the exact same WeatherWidget as the live page with explicit sample data and controlled Success/Loading/Error states.
+
+### Checkpoint and SDD order
+
+1. Before changing specifications or implementation, checkpoint commit `541da9ecf1af8ce14eabacad1ab67d100e6d0a16` preserved the verified single-page application. Git tag [v2.0.1](https://github.com/aribecker/0080-prueba-SDD-full-stack/releases/tag/v2.0.1) was created and its target independently verified. See [tag screenshot](evidence/checkpoint-v2.0.1.jpg).
+2. Original requirements, architecture and acceptance criteria were edited directly and published in `7bde53b3b4257896b3d18b771d598c3cfb0a84bf`. No specification patch documents were introduced.
+3. Grounding identifies the existing shell, card and useWeather ownership in specs/traceability.md. Implementation commit: `1233bd390fc97bd52afe2e38ca816fa804e32bc4`, exact tested/published tree `6258400fb2cf62e36090707782a9b45fccfb849a`.
+4. This evidence-only follow-up does not affect the deployed bundle. The prior stable branch and v2.0.1 tag remain intact.
+
+### Public routes
+
+- Home: https://ariel-weather-iteration-2.onrender.com/
+- Weather demo: https://ariel-weather-iteration-2.onrender.com/weather
+- Component gallery: https://ariel-weather-iteration-2.onrender.com/components
+
+Frontend Render service `srv-dbbblibbc2fs73ajnn20`, deployment `dep-dbbc6lflk1mc73dkfbcg`: **live**, source commit `1233bd390fc97bd52afe2e38ca816fa804e32bc4`, finished `2026-10-20T01:27:04.660006Z`. The Java service `srv-dbbblerbc2fs73ajn9l0` continues to run its validated API 2.0.0 implementation from `c435c37244eed72b589e56f1f371f1d96b066bcb`. No Java changes were needed. Frontend package/badge version is 2.1.0; API contract remains 2.0.0.
+
+### Validation
+
+- Clean npm ci, **33 frontend tests passed**, zero failures/skips, and production build passed. The prior 25 weather checks are retained; eight routing/gallery checks verify network isolation, lifecycle cancellation, active-route preservation, history, focus, gallery states and timer cleanup.
+- React 19.3.1 and React Router 7.18.4 are pinned with the lockfile. BrowserRouter/Routes/NavLink supply path routing and history. Existing Render /* → /index.html rewrite supports fresh entry/reload without a new infrastructure service.
+- Direct HTTP /, /weather and /components all return 200 with the same production app shell and JavaScript asset. The production bundle is reachable and contains the configured full API endpoint. Its hash differs from the local default-endpoint build because Render supplies VITE_WEATHER_API_URL at build time.
+- Browser refresh verified on all three routes. Home shows the app introduction and two feature links. Browser Back/Forward, current-route marking, heading focus and keyboard Escape focus return verified.
+- Gallery states Success/Loading/Error and local preview refresh verified. Preview card height stayed **526 px** in all three states at the desktop viewport. All example values are labeled SAMPLE DATA. The automated loader-isolation checks confirm no live request from Home or the gallery.
+- /weather handled the real Render cold start and then displayed Open-Meteo data. Initial request ID `82db46dc-5fe1-4014-b11c-9294957ca37b`; manual refresh ID `98de449b-a3a7-48ed-b296-c145b4421982`. Selecting the already-active Weather demo menu link preserved that refreshed ID.
+- Captured reading after refresh: 13.4 °C, feels like 11.4 °C, humidity 76%, wind 12.1 km/h. These are real captured provider values, not application fixtures.
+- Public API health returns UP/version 2.0.0. No application console errors observed; unrelated browser-extension metadata errors were present. A separate mobile-device session was not performed.
+
+See [browser evidence](evidence/routed-browser.json), [HTTP/bundle checks](evidence/routed-http.json), [deployment](evidence/routed-deployment.json), [API health](evidence/routed-api-health.json), [gallery capture](evidence/routed-gallery.jpg) and [live weather capture](evidence/routed-weather.jpg).
+
+![Routed Demo Lab Home](evidence/routed-home.jpg)
+
+
+## Previous frontend: single-option hamburger navigation
 
 Original requirements, architecture and acceptance criteria were edited directly and published first in commit `9392be8c916699cb371aa558babf4ade040ca8a1`; no specification patch documents were introduced. Grounding in `specs/traceability.md` identifies the existing masthead, weather section and scoped button styles. Implementation commit: `cae61c61405d31e8f2b908de40a4093b45a2c7ce`.
 

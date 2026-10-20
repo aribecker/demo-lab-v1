@@ -46,3 +46,7 @@ Navigation acceptance verified in the live frontend deployed from cae61c61405d31
 
 ## Routed-version delivery gate
 Preserve and verify the v2.0.1 checkpoint before implementation. Publish original specification edits before grounding and code. Run routing, gallery and existing weather regressions plus the production build; verify all three public URLs, route reloads, keyboard menu, gallery states and live weather after deployment. Record the source commit, deployment and evidence in the release report.
+
+## Routed-version verification — 2026-10-20 UTC
+
+Accepted: v2.0.1 points to checkpoint 541da9ecf1af8ce14eabacad1ab67d100e6d0a16, created before specification commit 7bde53b3b4257896b3d18b771d598c3cfb0a84bf. Clean npm ci, all 33 frontend tests and production build passed. Frontend commit 1233bd390fc97bd52afe2e38ca816fa804e32bc4 is live in Render. All three routes return HTTP 200 and support browser reloads; Home introduction, gallery states/local preview, keyboard menu, active links and browser history verified. Real weather loaded and manually refreshed on /weather; selecting that active destination preserved the refreshed request ID. See routed evidence in the release report.
