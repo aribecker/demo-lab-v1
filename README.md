@@ -1,6 +1,6 @@
 # Demo Lab — Iteration 2
 
-A React demo application with a Home page, live Weather demo and Component gallery. Frontend version **2.1.0** uses React 19.3.1 and React Router 7.18.4. The existing independently deployed Java weather API keeps its 2.0.0 contract.
+A React demo application with a Home page, live Weather demo and Component gallery. Frontend version **2.1.1** uses React 19.3.1 and React Router 7.18.4. The existing independently deployed Java weather API keeps its 2.0.0 contract.
 
 ## Direct routes
 
@@ -60,3 +60,5 @@ Set `VITE_WEATHER_API_URL` to the full deployed API endpoint before building the
 Render Free can suspend an inactive Java service. The static React page remains independently available and retries startup/network failures for up to 180 seconds or 20 attempts, with a maximum 45-second request and 2–8-second delays. A structured provider failure stops the interaction and enables manual retry. There is no periodic refresh.
 
 The API is intentionally public and has no authentication. CORS configures browser access; it does not stop non-browser clients. No database, separate gateway, login flow or additional backend is part of this iteration.
+
+The 2.1.1 layout reduces vertical spacing across the shell, feature pages and gallery, with additional phone breakpoint adjustments. Text sizes and route behavior remain unchanged. See R14 and release evidence for measurement scope.

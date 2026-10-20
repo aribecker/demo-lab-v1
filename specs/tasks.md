@@ -30,6 +30,6 @@
 
 ## Compact layout
 - [x] Update the original specifications first.
-- [ ] Ground and apply compact vertical spacing across all three pages.
+- [x] Ground and apply compact vertical spacing across all three pages.
 - [ ] Build, deploy and inspect the three routes.
 - [ ] Record measured evidence and limitations.

@@ -34,3 +34,6 @@ Specifications published first in 7bde53b3b4257896b3d18b771d598c3cfb0a84bf, afte
 | R11: direct entry and reload | BrowserRouter and existing render.yaml rewrite | Live HTTP path checks and browser route reloads |
 | R12: checkpoint/specification sequence | v2.0.1 tag and 7bde53b3 specification commit | GitHub tag points to checkpoint before specification commit |
 | R13: isolated component gallery | ComponentGallery.jsx and shared WeatherWidget.jsx | Routing.test.jsx: all display states, no live loader, local refresh and timer cleanup |
+
+## Compact layout grounding
+R14 was specified before code in 938505ec604a12ce68aa2ba73404bdc54ad559c4. All three pages share styles.css: .page/.masthead/.intro/footer define the shell, Home uses .home-intro/.feature-card, WeatherWidget supplies both weather cards, and gallery adds .gallery-description/.preview-toolbar/.component-notes. Adjust those existing vertical values and their max-width:600px overrides directly, keeping font sizes and routing/network code unchanged. Maintain reserved state slots and a 44px action height. Compare .page content height before/after at the same available browser viewport; explicitly distinguish that desktop measurement from mobile CSS inspection.
