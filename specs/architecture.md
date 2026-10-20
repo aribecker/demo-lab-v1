@@ -25,7 +25,7 @@ Identify the application in User-Agent. References: https://open-meteo.com/en/do
 
 ## Navigation and component boundaries
 - BrowserRouter in frontend/src/main.jsx; Routes in App.jsx with /, /weather, /components and a not-found page.
-- App owns the shared shell, accessible hamburger and NavLink destinations. Route changes close navigation and focus the route heading. Keep frontend version 2.1.0 separate from the existing weather API contract 2.0.0.
+- App owns the shared shell, accessible hamburger and NavLink destinations. Route changes close navigation and focus the route heading. Keep frontend version 2.1.1 separate from the existing weather API contract 2.0.0.
 - Home introduces the multi-feature demo and links both features, without mounting useWeather.
 - WeatherDemo owns useWeather and renders the reusable presentational WeatherWidget. Leaving the route cancels an active request; navigating to the same route preserves it.
 - ComponentGallery renders that exact widget with labeled sample data and controlled Success/Loading/Error states. A local preview timer may demonstrate the loading-to-success transition; it is cleaned up on unmount. No network provider access in Home or gallery.
@@ -41,3 +41,6 @@ The static page is available independently of Java startup. Browser retry logic 
 3. Validate and publish the implementation.
 4. Create/configure both Render services, verify readiness and real end-to-end interaction.
 5. Publish release evidence and final specification status.
+
+## Compact layout
+Use the existing shared styles.css selectors and mobile breakpoint. Compact the shell, page introductions, feature cards, shared WeatherWidget and gallery notes by adjusting vertical spacing only; retain font sizes and responsive flow. Do not change routes, weather requests, providers or gallery behavior.

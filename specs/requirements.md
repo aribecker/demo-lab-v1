@@ -2,7 +2,7 @@
 
 Status: specified before code generation.
 Repository: aribecker/0080-prueba-SDD-full-stack.
-Branch: iteracion-2. Frontend application version: 2.1.0. Weather API contract/version: 2.0.0.
+Branch: iteracion-2. Frontend application version: 2.1.1. Weather API contract/version: 2.0.0.
 
 ## Fresh start
 R1. This branch's first project tree contains only these specifications. Do not copy previous implementation, tests, build files, generated assets or historical source snapshots. Generate this application from the requirements below. The older branches remain separate.
@@ -48,6 +48,9 @@ R12. Before this routed version, preserve the working single-page application in
 
 ## Component gallery
 R13. /components is a lightweight in-app component gallery, not a separate Storybook installation. Explain that it showcases reusable UI components. Catalog the Weather widget currently used by the live demo, with a short description and accessible state controls for Success, Loading and Error. Render the same WeatherWidget implementation in an isolated preview. Use explicitly labeled sample data (never presented as live weather); selecting a state or retrying a preview has no network effects. A preview Get weather action switches to Loading and then Success with an abortable/local timer, allowing interaction without a provider. Clear the timer on leaving the gallery. Show concise state/props guidance and a link to the live Weather demo. Gallery loading and error previews reserve the same result slots as success. Do not add a UI framework or extra demo components that are not used by the application.
+
+## Compact layout
+R14. Make Home, Weather demo and Component gallery approximately 10% shorter than frontend 2.1.0, prioritizing phone widths of 320–600 px. Reduce vertical padding, margins, gaps and oversized reserved blocks consistently across the shared shell and all pages. Keep body text sizes readable, maintain all content and the existing fixed weather slots across states, and keep the Menu and weather action at least 44 px high. Use natural responsive CSS flow, without page zoom, transform scaling, clipping or fixed viewport heights. Desktop spacing follows the same more compact rhythm. The target is approximate because text wrapping and live error messages vary. Verify the three routes and production build; record any measurement limits honestly.
 
 ## Acceptance evidence
 Use acceptance.md and traceability.md to map every requirement to code and a check. Keep failures and limits visible; do not claim a Docker-engine or pixel comparison unless performed. Subsequent requirement changes must directly update these original specifications before grounding and the corresponding implementation. Do not create separate specification patches.

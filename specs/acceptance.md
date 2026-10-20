@@ -50,3 +50,9 @@ Preserve and verify the v2.0.1 checkpoint before implementation. Publish origina
 ## Routed-version verification — 2026-10-20 UTC
 
 Accepted: v2.0.1 points to checkpoint 541da9ecf1af8ce14eabacad1ab67d100e6d0a16, created before specification commit 7bde53b3b4257896b3d18b771d598c3cfb0a84bf. Clean npm ci, all 33 frontend tests and production build passed. Frontend commit 1233bd390fc97bd52afe2e38ca816fa804e32bc4 is live in Render. All three routes return HTTP 200 and support browser reloads; Home introduction, gallery states/local preview, keyboard menu, active links and browser history verified. Real weather loaded and manually refreshed on /weather; selecting that active destination preserved the refreshed request ID. See routed evidence in the release report.
+
+## Compact layout acceptance
+- All three routes use more compact vertical spacing, with a target of approximately 10% less content height than 2.1.0.
+- Existing text sizes, data, route behavior, weather state slots and keyboard navigation remain usable.
+- Menu and weather action are at least 44 px high; no scaling/clipping or horizontal overflow is introduced.
+- Inspect the existing mobile breakpoint rules and verify the deployed pages. Distinguish desktop measurements from any mobile measurements; do not claim exact mobile percentages without a matching viewport check.

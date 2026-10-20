@@ -27,3 +27,9 @@
 - [x] Validate regressions, route lifecycle and gallery isolation.
 - [x] Publish, deploy and verify all three direct URLs and route refreshes.
 - [x] Record acceptance evidence and final URLs.
+
+## Compact layout
+- [x] Update the original specifications first.
+- [ ] Ground and apply compact vertical spacing across all three pages.
+- [ ] Build, deploy and inspect the three routes.
+- [ ] Record measured evidence and limitations.
