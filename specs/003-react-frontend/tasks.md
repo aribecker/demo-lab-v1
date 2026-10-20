@@ -9,4 +9,4 @@
 - [x] Pass UI tests and both Java suites; verify original test hashes.
 - [x] Pass two-JAR API and packaged static-asset checks.
 - [x] Commit implementation and requirement traceability.
-- [ ] Record validation results and publish final branch head.
+- [x] Record validation results and publish final branch head.
