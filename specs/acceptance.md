@@ -18,6 +18,13 @@
 - Null feels-like is omitted and forecast labeling remains visible.
 - External strings are rendered as text. Accessibility and reduced-motion rules are present.
 
+## Application navigation
+- The Menu hamburger button initially reports aria-expanded=false and controls a hidden navigation region.
+- Opening it displays exactly one link, Weather demo, marked current.
+- Button toggle and Escape close the disclosure; Escape restores focus to Menu.
+- Selecting Weather demo closes navigation, focuses the weather section and preserves weather data without another provider request.
+- Check the deployed menu visually and by keyboard.
+
 ## Build and deployment checks
 - Exact stable React/react-dom versions and a lockfile are committed.
 - npm ci, npm test and npm run build pass.

@@ -10,3 +10,10 @@
 - [x] Deploy both components in the existing Render workspace.
 - [x] Verify real API calls, initial UI load and manual refresh.
 - [x] Publish release evidence and final acceptance status.
+
+## Header navigation
+
+- [x] Directly update the original requirements, architecture and acceptance criteria first.
+- [ ] Ground the navigation change in the existing React header and weather section.
+- [ ] Implement the single Weather demo option with native fragment navigation.
+- [ ] Validate, publish and verify the menu in Render.
