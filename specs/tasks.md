@@ -33,3 +33,12 @@
 - [x] Ground and apply compact vertical spacing across all three pages.
 - [x] Build, deploy and inspect the three routes.
 - [x] Record measured evidence and limitations.
+
+
+## Multi-provider login
+- [x] Define R15–R18 and architecture/acceptance before implementation.
+- [ ] Implement server OAuth registrations, bound one-use handoff and expiring demo sessions.
+- [ ] Implement Login route, profile, provider configuration states and logout.
+- [ ] Validate Java auth boundaries, React regression and production build.
+- [ ] Deploy and verify unauthenticated behavior.
+- [ ] Configure the owner's three OAuth applications and verify real consent.

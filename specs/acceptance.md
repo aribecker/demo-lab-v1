@@ -58,3 +58,13 @@ Accepted: v2.0.1 points to checkpoint 541da9ecf1af8ce14eabacad1ab67d100e6d0a16, 
 - Inspect the existing mobile breakpoint rules and verify the deployed pages. Distinguish desktop measurements from any mobile measurements; do not claim exact mobile percentages without a matching viewport check.
 
 Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e80088824266b7f: 33 regression tests and build passed. At 1363×936, Home/Weather/Gallery content height decreased 9.0%/9.4%/8.7%, with no horizontal overflow. Mobile breakpoint spacing was reviewed; no direct mobile viewport measurement is claimed. See release evidence.
+
+
+## Login acceptance R15–R18
+- /login is directly addressable, accessible through Home and hamburger, keeps compact mobile flow and does not mount weather.
+- Three provider choices are present; missing credentials disable a provider. No fake users or simulated sign-in.
+- Verified callback normalizes actual profile; missing email/name is handled. No tokens/secrets rendered or logged.
+- Handoff succeeds only with matching verifier; replay, wrong verifier and expired ticket are rejected. Invalid starts do not redirect. Callback without a browser challenge fails.
+- Profile restore and signout validate the opaque bearer; expiry/revocation is enforced. Signout does not log out the upstream account.
+- Existing Java weather and frontend tests pass. Add deterministic auth boundary and UI tests, including no credentials, rejected exchange, logout failure and fallback fields.
+- Deployment health, direct /login, provider availability and CORS are checked. Real end-to-end consent for Google/GitHub/Microsoft remains blocked until their app credentials are supplied and must be reported separately.
