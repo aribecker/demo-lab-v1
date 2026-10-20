@@ -10,6 +10,8 @@ The main API in java-backend serves the frontend and GET /api/hello. It must cal
 GET /api/hello retains message, version, weather, timestamp and architecture. Version and greeting identify 0.0.8. Architecture identifies both Spring Boot API and Weather microservice. WEATHER_SERVICE_URL configures the full downstream endpoint, defaulting to localhost:8081/api/weather for local development. Use a 90-second downstream request timeout and 95-second MVC timeout to tolerate Render Free cold starts. Return English 502 errors for downstream failures/invalid responses and 504 for downstream timeouts. Health is independent of downstream availability. Preserve original provider attribution, units and forecast labeling.
 
 ## UI
+The active frontend architecture is defined by [Feature 003](../003-react-frontend/spec.md): React components built with Vite and packaged in the existing main API JAR. The original appearance and API contracts below remain binding.
+
 Preserve the half-size title, two-line message and weather slots, single-line architecture and timestamp slots, animated grey skeletons, accessibility and stable layout. Keep the refresh button disabled during a request. Identify REST microservices in the technology footer.
 
 ## Acceptance
@@ -17,3 +19,6 @@ Run deterministic HTTP integration tests for both service boundaries, provider f
 
 ## Deployment configuration
 The weather microservice deploys microservices-v008 through Weather-Dockerfile. The existing main API deploys java-fuentes through Render-Dockerfile. WEATHER_SERVICE_URL points to https://ariel-sdd-weather-microservice.onrender.com/api/weather. Each service uses a build filter for its module and Dockerfile, allowing independent deployment without rebuilding on documentation-only changes.
+
+## Subsequent migration scope
+Feature 003 starts from microservices-v008 at 79d118576a702cae04b38be6f9776b7fe5c784bf in the isolated react-frontend-sdd branch. The deployment descriptions above record the 0.0.8 baseline; the live main API is currently configured on microservices-v008. Feature 003 does not switch that live service or change provider behavior.
