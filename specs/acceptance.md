@@ -38,3 +38,5 @@
 ## Verification status — 2026-10-20
 
 Accepted against the generated checks: 14 backend tests, 25 frontend tests, packaged-JAR HTTP smoke, clean frontend production build and both live Render deployments. Initial browser load, visible startup retry and manual refresh were verified using real weather providers. See [release report](../docs/release.md), [traceability](traceability.md) and [captured evidence](../docs/evidence/).
+
+Navigation acceptance verified in the live frontend deployed from cae61c61405d31e8f2b908de40a4093b45a2c7ce: disclosure, single option, keyboard Tab/Escape, destination focus and unchanged request ID. Existing 25 frontend checks and production build passed. See navigation evidence in the release report.

@@ -1,4 +1,23 @@
-# Iteration 2 — deployed and verified
+# Iteration 2 — release evidence
+
+## Current frontend: single-option hamburger navigation
+
+Original requirements, architecture and acceptance criteria were edited directly and published first in commit `9392be8c916699cb371aa558babf4ade040ca8a1`; no specification patch documents were introduced. Grounding in `specs/traceability.md` identifies the existing masthead, weather section and scoped button styles. Implementation commit: `cae61c61405d31e8f2b908de40a4093b45a2c7ce`.
+
+Render frontend deployment `dep-dbbbt8mi0phs738be3lg` is live from that implementation commit, finished at `2026-10-20T01:07:06.109924Z`. The existing Java service continues to run its validated initial implementation; it required no changes. The stable branch `iteracion-2-v2.0.0-estable` remains at `bf018405eb8127dc47d3a651e44b7228393eccf1`.
+
+- Frontend regression suite: 25 tests passed; production build passed.
+- Live page: https://ariel-weather-iteration-2.onrender.com/
+- Verified the initially closed Menu disclosure and its single English option, Weather demo.
+- Keyboard Tab reaches the option; Escape closes the menu and restores focus to Menu.
+- Selecting the option closes navigation and focuses #weather. Request ID remained `154936ee-4fc2-4dd8-a489-e328f1ba7959`, confirming preservation of the existing reading.
+- Native fragment navigation and local React state implement this single-view application; no router or other runtime dependency was added.
+
+See [navigation verification](evidence/navigation.json), [Render record](evidence/navigation-deployment.json) and [screenshot](evidence/navigation.jpg).
+
+![Published hamburger menu with Weather demo](evidence/navigation.jpg)
+
+## Initial release: weather microservice and React page
 
 Verified on 2026-10-20 UTC in the existing Render workspace.
 
@@ -6,7 +25,7 @@ Verified on 2026-10-20 UTC in the existing Render workspace.
 
 1. [Specifications-only commit d41ef09988567cbcf63c1ead7462098fb0320d02](https://github.com/aribecker/0080-prueba-SDD-full-stack/commit/d41ef09988567cbcf63c1ead7462098fb0320d02): tree `5cfbd0c2ec3b1f71dd4f9062aa6bb4124615466c` contains only the four initial specification documents. Previous application files are absent.
 2. [Implementation commit c435c37244eed72b589e56f1f371f1d96b066bcb](https://github.com/aribecker/0080-prueba-SDD-full-stack/commit/c435c37244eed72b589e56f1f371f1d96b066bcb): generated source, build configuration, tests, lockfile and requirement traceability. Tested local Git tree and published tree both equal `dce31e702374fa246c38b489af9549d9af1ee7fd`.
-3. This subsequent documentation commit adds acceptance evidence. Component build filters exclude these documentation-only paths, so both deployments continue to run the implementation commit above.
+3. The initial documentation commit added acceptance evidence without changing either deployed component. Component build filters excluded those documentation-only paths.
 
 ## Live components
 
