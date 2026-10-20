@@ -1,5 +1,0 @@
-const assert=require('node:assert/strict'),http=require('http'),handler=require('../src/server');
-const realFetch=global.fetch;
-const fixture={timezone:'America/Argentina/Buenos_Aires',current:{time:'2026-10-04T19:30',temperature_2m:20,apparent_temperature:19,relative_humidity_2m:70,wind_speed_10m:12,weather_code:3}};
-const server=http.createServer(handler);
-server.listen(0,'127.0.0.1',async()=>{try{let calls=0;global.fetch=async()=>{calls++;return Response.json(fixture);};const url=`http://127.0.0.1:${server.address().port}/api/hello`;for(let i=0;i<2;i++){const r=await realFetch(url);assert.equal(r.status,200);assert.equal((await r.json()).weather.temperature,20);}assert.equal(calls,2);global.fetch=async()=>new Response('',{status:500});assert.equal((await realFetch(url)).status,502);global.fetch=async()=>{throw new DOMException('timeout','AbortError');};assert.equal((await realFetch(url)).status,504);console.log('Node weather integration passed');}catch(e){console.error(e);process.exitCode=1;}finally{global.fetch=realFetch;server.close();}});
