@@ -69,3 +69,14 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - Profile restore and signout validate the opaque bearer; expiry/revocation is enforced. Signout does not log out the upstream account.
 - Existing Java weather and frontend tests pass. Add deterministic auth boundary and UI tests, including no credentials, rejected exchange, logout failure and fallback fields.
 - Deployment health, direct /login, provider availability and CORS are checked. Real end-to-end consent for Google/GitHub/Microsoft remains blocked until their app credentials are supplied and must be reported separately.
+
+
+## R19 — Hello World branch acceptance
+
+- New branch descends from login checkpoint `9b1104b`.
+- Hamburger includes Home, Weather demo, Component gallery, Login and Hello World.
+- Hello World navigates to `/hello-world`, closes the menu, and focuses the page heading using existing navigation behavior.
+- Direct entry/reload at `/hello-world` renders the same page; browser Back/Forward continue to work.
+- Hello World displays a heading and makes no weather/auth requests.
+- Existing frontend tests and production build pass; Java behavior is inherited without source changes.
+- Independent Render frontend and Java API use this branch and new URLs. Verify live route entry and API health. Preserve the prior OAuth activation limitation.

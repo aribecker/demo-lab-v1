@@ -47,3 +47,8 @@ R14 was specified before code in 938505ec604a12ce68aa2ba73404bdc54ad559c4. All t
 | R17 one-use bound handoff | DemoSessions, AuthController, authClient.js | DemoSessionsTest, OAuthBoundaryTest, authClient.test.js |
 | R18 restore/logout/failures | Login, authClient, AuthController | AuthApiTest, Login.test.jsx, authClient.test.js |
 Real external consent awaits the owner's OAuth registrations and environment configuration.
+
+
+## R19 — Hello World branch
+
+Requirement: requirements.md R19. Architecture: isolated Hello World environment. Source: frontend/src/HelloWorld.jsx and App.jsx. Validation: existing routing/frontend regression suite, production build, live direct route and API health. Infrastructure: render.yaml with two new service names and branch `proximo-desarrollo-hello-world`. Login setup: docs/login-setup.md remains applicable with environment-specific origins.
