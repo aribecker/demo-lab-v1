@@ -66,3 +66,11 @@
 - [x] Update master requirements/architecture/acceptance before implementation: default 10000 USDT, no initial buy, first sample as reference.
 - [x] Ground and update reset state, crossing guard, UI and tests.
 - [x] Pass frontend regressions/build, publish parallel environment and verify cash-only Reset.
+
+
+## Shared simulation v2.5.0
+- [x] Specify durable shared authority, lifecycle/control persistence and concurrency before generation.
+- [ ] Ground in existing Java service, polling/math/UI and PostgreSQL.
+- [ ] Implement/test durable server loop and shared-client controls.
+- [ ] Configure backend database access, deploy/verify server, then activate frontend.
+- [ ] Verify two-client state and restart persistence; record release evidence.

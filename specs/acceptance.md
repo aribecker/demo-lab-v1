@@ -98,3 +98,11 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - Reset with changed capital/rate discards old BTC/fees/trades/history, restores configured USDT, and waits for a fresh successful quote to establish the crossing reference; no fill uses a stale pre-Reset quote or happens merely on Reset. Paused/hidden/failed/aborted requests cannot fill orders.
 - Invalid/min>=max/negative/NaN settings block Start and trading with readable feedback. +/- controls adjust thresholds while keeping balances. Chart shows both threshold lines with correct USDT labels.
 - Deterministic reducer/component tests and all frontend regressions/build pass; live direct route, real quote and cash-only reset and subsequent crossing behavior verified in the published parallel environment.
+
+
+## Shared simulation R29–R32
+- Two independently mounted clients read identical balances, parameters, run/pause state and trade history. Unmount/reload/hidden browser does not reset or pause the engine.
+- Persisted snapshot survives service/store re-creation. Shared Pause and Reset remain reflected in a subsequently connected client. Reset remains 10000 configurable USDT/no BTC/no fees/no initial buy; later genuine crossings use existing fee rules.
+- Identical command UUID is applied once; stale control revision receives HTTP409 and refreshed state; scheduled quotes do not cause control conflicts. Concurrent poll/command work cannot overwrite another committed snapshot or execute the same crossing twice.
+- Provider failure records error while preserving balances/last quote; storage failure returns safe503 without fake local success. Missing SIMULATION_DATABASE_URL must not create a volatile simulator.
+- Backend tests use local Binance fixtures and isolated JDBC storage; frontend tests mock shared API. Publish schema and env setup steps. Confirm configured PostgreSQL and both live services before activating the frontend.
