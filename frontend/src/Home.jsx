@@ -27,6 +27,7 @@ export default function Home() {
         <p>Sign in with Google, GitHub or Microsoft and see the profile you choose to share.</p>
         <span className="feature-action">Open Login →</span>
       </Link>
+      <Link className="feature-card" to="/chatbot"><span className="feature-number">04 / SPRING AI</span><h2>Chatbot ↗</h2><p>Conversá con modelos gratuitos. Elegí un modelo, escribí o probá el dictado por voz.</p><span className="feature-action">Open Chatbot →</span></Link>
     </section>
     <aside className="home-note"><span className="dot" aria-hidden="true" /><p>Built as a small learning lab. Each feature has its own URL, so you can bookmark it or open it directly.</p></aside>
   </>;

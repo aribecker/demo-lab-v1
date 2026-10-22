@@ -1,0 +1,14 @@
+**
+!frontend/
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/index.html
+!frontend/vite.config.*
+!frontend/src/
+!frontend/src/**
+!frontend/public/
+!frontend/public/**
+!weather-service/
+!weather-service/pom.xml
+!weather-service/src/
+!weather-service/src/**
