@@ -56,3 +56,8 @@ Only configured registrations are advertised as enabled. A custom empty-capable 
 ## Hello World development environment (R19)
 
 `HelloWorld.jsx` is a presentational route in the existing React application and reuses the intro/heading styles. It adds no API, database or service. Keep the existing Java weather/auth API as a separately deployed service. Both new Render services track `proximo-desarrollo-hello-world`; frontend endpoint variables, backend allowed origins and auth callback origins reference only the new environment. `render.yaml` records the new service names. `frontend/scripts/static-routes.mjs` emits route entry HTML plus a custom 404 page because the creation connector cannot configure SPA rewrites. React Router still handles navigation and history. Existing environments remain outside this configuration.
+
+
+
+## Bitcoin tracking R20–R23
+The new `/bitcoin` route owns its polling hook. A public Coinbase browser client fetches BTC-USD spot JSON without credentials; an 8-second AbortController timeout bounds each fetch. The route stores at most 180 successful samples in component memory. A reusable presentational BitcoinWidget renders quote/summary/chart/table; no database or additional service is needed. App/Home link this route; static-routes emits its index.html. Scoped CSS reuses the dark navy shell. A visibility listener and effect cleanup stop background/abandoned work. An in-flight guard serializes automatic and manual requests. All failure states preserve the last sample as stale.

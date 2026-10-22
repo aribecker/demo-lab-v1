@@ -80,3 +80,12 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - Hello World displays a heading and makes no weather/auth requests.
 - Existing frontend tests and production build pass; Java behavior is inherited without source changes.
 - Independent Render frontend and Java API use this branch and new URLs. Verify live route entry and API health. Preserve the prior OAuth activation limitation.
+
+
+
+## Bitcoin tracker R20–R23
+- Menu and Home open `/bitcoin`; direct entry and reload work in the parallel static site. Other routes retain their behavior.
+- Valid fixture quotes populate USD price, retrieval time, baseline delta, minimum/maximum, bounded history/chart and table. No pre-session history is claimed.
+- Fake timers prove immediate fetch, 10-second polling, pause/resume, visibility suspension and cleanup/abort on route exit. Pending requests cannot overlap.
+- HTTP/429/invalid/non-finite responses and timeouts show honest failure; previous success remains stale; next success recovers.
+- Full frontend regression suite and production build pass. Render reports live for the implementation commit; verify the new route and live Coinbase API/CORS, distinguishing automated browser evidence from HTTP checks.
