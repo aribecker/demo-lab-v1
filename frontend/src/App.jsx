@@ -4,7 +4,7 @@ import packageInfo from '../package.json';
 import Home from './Home.jsx';
 import Login from './Login.jsx';
 import HelloWorld from './HelloWorld.jsx';
-import BitcoinTracker from './BitcoinTracker.jsx';
+import BitcoinTracker from './SharedBitcoinTracker.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
 

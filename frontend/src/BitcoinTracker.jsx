@@ -38,14 +38,14 @@ export function BitcoinWidget({ tracker, minimum, maximum }) {
         <polyline points={points} fill="none" stroke="#75dae9" strokeWidth="3" strokeLinejoin="round" />
         <text x="30" y="178">{time(samples[0].retrievedAt)}</text><text x="570" y="178" textAnchor="end">{time(latest.retrievedAt)}</text>
       </svg> : <p className="bitcoin-empty">{latest ? 'The chart starts with the next successful reading.' : 'Your session chart will appear here.'}</p>}
-      <p className="bitcoin-note">Last 180 readings (about 30 minutes). History starts when you open this page and resets when you leave. Chart scale follows this session.</p>
+      <p className="bitcoin-note">{tracker.shared ? 'Latest 180 shared readings. History is saved on the server and only Reset clears it.' : 'Last 180 readings (about 30 minutes). History starts when you open this page and resets when you leave.'} Chart scale follows these readings.</p>
     </figure>
     <p role="status" className="bitcoin-status">{error ? `${error}${latest ? ' Showing the last successful quote — stale.' : ' No quote available yet.'}`
       : !running ? 'Tracking paused. Resume to get a fresh quote.' : !visible ? 'Automatic updates pause while this tab is hidden.'
-        : pending ? 'Retrieving a Binance quote…' : 'Automatic refresh every 10 seconds while this page is visible.'}</p>
+        : pending ? 'Retrieving a Binance quote…' : tracker.shared ? 'Server checks Binance every 10 seconds while running and awake.' : 'Automatic refresh every 10 seconds while this page is visible.'}</p>
     <div className="bitcoin-actions"><button onClick={toggle}>{running ? 'Pause tracking' : 'Resume tracking'}</button>
       <button onClick={refresh} disabled={pending || !running || !visible}>Refresh now</button></div>
-    <p className="bitcoin-note">Source: <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance BTC/USDT spot price</a>. Retrieval time is your browser's time, not an exchange timestamp. Prices may repeat; provider caching and browser throttling can delay updates.</p>
+    <p className="bitcoin-note">Source: <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance BTC/USDT spot price</a>. Retrieval time is {tracker.shared ? 'the server retrieval time' : "your browser's time"}, not an exchange timestamp. Prices may repeat; provider caching can delay updates.</p>
     <details className="bitcoin-history"><summary>Recent readings (latest 10)</summary><table><caption>Successful quotes retrieved in this session</caption><thead><tr><th scope="col">Retrieved · Buenos Aires</th><th scope="col">BTC / USDT</th></tr></thead><tbody>
       {samples.slice(-10).reverse().map((point, i) => <tr key={`${point.retrievedAt}-${i}`}><td>{time(point.retrievedAt)}</td><td>{money(point.price)}</td></tr>)}
     </tbody></table></details>

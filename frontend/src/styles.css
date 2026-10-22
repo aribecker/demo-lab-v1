@@ -187,3 +187,5 @@ h1:focus { outline: none; }
 .simulation-start { width:100%; min-height:44px; border:1px solid #9de7f1; border-radius:7px; background:#9ae6ef; color:#0c2734; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }.simulation-start:disabled { opacity:.5; cursor:default; }
 .simulation-ledger { max-width:100%; overflow:auto; }.simulation-ledger table { min-width:320px; }.simulation-ledger td { vertical-align:top; }.simulation-ledger small { color:#adc4d0; }
 @media(max-width:820px) { .bitcoin-workspace { grid-template-columns:1fr; }.bitcoin-workspace .bitcoin-quote { font-size:clamp(26px,6vw,40px); }.simulation-card { padding:18px; } }
+
+.shared-notice { border:1px solid #365466; border-left:3px solid #75dae9; padding:14px 16px; color:#b5d0df; font-size:12px; line-height:1.65; border-radius:6px; margin-bottom:16px; }.shared-notice strong { color:#def6fc; }.shared-error { border:1px solid #af765f; padding:12px; color:#ffd5c4; font-size:13px; line-height:1.6; border-radius:6px; }

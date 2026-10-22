@@ -6,6 +6,7 @@ import BitcoinTracker from '../BitcoinTracker.jsx';
 import App from '../App.jsx';
 import { loadBitcoin, BITCOIN_URL } from '../bitcoinClient.js';
 import { appendSample } from '../useBitcoin.js';
+import { sharedSnapshot } from './sharedFixture.js';
 
 const quote = price => ({ price, retrievedAt: new Date().toISOString() });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
@@ -101,9 +102,9 @@ describe('Bitcoin tracking lifecycle', () => {
     expect(history.at(-1).price).toBe(200);
   });
 
-  it('integrates menu navigation and cancels network requests on route exit', async () => {
+  it('integrates shared menu navigation and cancels view polling on route exit', async () => {
     vi.useFakeTimers();
-    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ price: '80000', symbol: 'BTCUSDT' }) });
+    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => sharedSnapshot() });
     vi.stubGlobal('fetch', fetcher);
     render(<MemoryRouter><App /></MemoryRouter>);
     expect(fetcher).not.toHaveBeenCalled();

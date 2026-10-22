@@ -70,7 +70,7 @@
 
 ## Shared simulation v2.5.0
 - [x] Specify durable shared authority, lifecycle/control persistence and concurrency before generation.
-- [ ] Ground in existing Java service, polling/math/UI and PostgreSQL.
-- [ ] Implement/test durable server loop and shared-client controls.
+- [x] Ground in existing Java service, polling/math/UI and PostgreSQL.
+- [x] Implement/test durable server loop and shared-client controls (29 backend tests, 81 frontend tests, builds).
 - [ ] Configure backend database access, deploy/verify server, then activate frontend.
 - [ ] Verify two-client state and restart persistence; record release evidence.

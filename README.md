@@ -107,3 +107,7 @@ SDD: master requirements R24–R28 and architecture/acceptance published first i
 
 ## Cash-only Reset (v2.4.1; supersedes v2.4.0 startup behavior)
 Default capital is now 10,000 USDT. Start/Reset restores the configured USDT balance and zero BTC, fees and trades, without buying. The first fresh quote establishes the crossing reference even if already below the minimum. A later crossing from at/above the minimum to strictly below it buys; subsequent upward maximum crossings sell, repeating with the available balance. Capital remains configurable. All fee and sampling assumptions above still apply. Master specifications were updated before implementation in b1329a3a7705b37d521b2abbc78033d29b77bc2c.
+
+
+## Shared simulation v2.5.0 (storage-gated rollout)
+The Bitcoin feature uses one durable server-owned state across browsers/devices, including Start/paused/holding state, all controls, balances, fees and history. No view lifecycle starts or resets it. The server polls public Binance prices while running and awake; clients poll/read snapshots. See docs/shared-simulation-setup.md for database setup, rollout order, public shared-control semantics, Free sleep and database expiry limits. Missing storage returns503 instead of creating a volatile local substitute. Keep the existing live frontend until the configured backend is verified. The original per-browser historical runs cannot be imported from a central source that never existed.
