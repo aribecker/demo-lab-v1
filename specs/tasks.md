@@ -43,3 +43,11 @@
 - [x] Validate Java auth boundaries, React regression and production build.
 - [x] Deploy and verify unauthenticated behavior.
 - [ ] Configure the owner's three OAuth applications and verify real consent.
+
+
+## Experimental chatbot (R19–R22)
+- [x] Commit specification before implementation on a new branch.
+- [x] Implement Spring AI chat, free-model catalog and bounded history.
+- [x] Implement router/menu/Home entry, text chat, dictation and speech synthesis.
+- [x] Pass 46 React tests, 27 Java tests, Vite build and JAR package.
+- [ ] Activate external inference with owner's OPENROUTER_API_KEY; validate real model response and physical microphone.

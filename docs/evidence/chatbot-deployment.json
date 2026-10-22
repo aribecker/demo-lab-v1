@@ -1,0 +1,29 @@
+{
+  "branch": "prueba-chatbot-spring-ai",
+  "baseline": "9b1104b17667f183cd54c70250a7c9d8a4626b7a",
+  "specCommit": "32598af68e9d4db94f26009b8b6803974a018482",
+  "implementationCommit": "05e822c11be48b8e18ac038746b71a0e3a2988b5",
+  "serviceId": "srv-dbcni429lscs73egi2n0",
+  "deployId": "dep-dbcni4i9lscs73egi3qg",
+  "status": "live",
+  "url": "https://ariel-sdd-chatbot-test.onrender.com/chatbot",
+  "tests": {
+    "react": 46,
+    "java": 27
+  },
+  "verification": [
+    "Vite production build",
+    "Executable JAR package",
+    "Render Docker build/tests",
+    "Live /health HTTP 200",
+    "Live /chatbot HTTP 200 and visual inspection",
+    "Live free catalog in UI",
+    "Absent key clearly reported; no fake response"
+  ],
+  "pending": [
+    "Owner OPENROUTER_API_KEY",
+    "Real external LLM response",
+    "Physical microphone"
+  ],
+  "productionBranchChanged": false
+}

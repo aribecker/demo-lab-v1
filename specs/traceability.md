@@ -47,3 +47,12 @@ R14 was specified before code in 938505ec604a12ce68aa2ba73404bdc54ad559c4. All t
 | R17 one-use bound handoff | DemoSessions, AuthController, authClient.js | DemoSessionsTest, OAuthBoundaryTest, authClient.test.js |
 | R18 restore/logout/failures | Login, authClient, AuthController | AuthApiTest, Login.test.jsx, authClient.test.js |
 Real external consent awaits the owner's OAuth registrations and environment configuration.
+
+
+## Experimental chatbot
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| R19 | App, Home, Chatbot, chatClient | Chatbot.test.jsx, existing routing regressions |
+| R20 | ChatController Spring AI/catalog | ChatControllerTest upstream serialization, free-model rejection |
+| R21 | Chatbot speech recognition/synthesis | Mock lifecycle test; real microphone pending |
+| R22 | Server-only key, limits, sanitization | ChatControllerTest missing key, role/length bounds, upstream errors |
