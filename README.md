@@ -71,3 +71,16 @@ New route: https://ariel-weather-iteration-2.onrender.com/login
 Google, GitHub and Microsoft use the existing Spring server. Each provider remains visibly disabled until its OAuth client ID/secret pair is configured in Render. See [setup and callbacks](docs/login-setup.md). Actual consent shows the shared name, email/account address, platform, account ID and optional photo/locale/public profile. Sessions last 30 minutes and end on backend restart. Provider tokens never reach React and are discarded after userinfo; no account database is introduced. Weather remains public.
 
 For changed hostnames configure AUTH_FRONTEND_URL, AUTH_BACKEND_URL and ALLOWED_ORIGINS on Java. VITE_AUTH_API_URL optionally overrides the frontend auth API origin, otherwise derived from VITE_WEATHER_API_URL. All client secrets stay server-side. Real consent must be verified after registration; automated tests exercise authentication boundaries with local fixtures only.
+
+
+
+## Independent Hello World development branch
+
+Branch: `proximo-desarrollo-hello-world`, based on login checkpoint `9b1104b`. Adds **Hello World** in the hamburger menu at `/hello-world`, retaining the weather microservice, component gallery, compact layout and three login providers.
+
+New environment (configured separately from iteration-2):
+- Frontend: https://ariel-demo-next.onrender.com
+- Hello World: https://ariel-demo-next.onrender.com/hello-world
+- API: https://ariel-demo-next-api.onrender.com
+
+`render.yaml` now describes only these new services. Dashboard/MCP is used for creation; this file records matching deployment settings. OAuth credentials are not copied: activate providers using `docs/login-setup.md` with the new backend callbacks and frontend origin. Existing deployment evidence above describes the source environment.

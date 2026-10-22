@@ -1,11 +1,11 @@
-# Reference configuration for the two iteration-2 services in the existing workspace.
+# Independent Hello World environment; do not apply to the existing iteration-2 services.
 # Actual creation and verification are recorded in docs/release.md.
 services:
   - type: web
-    name: ariel-weather-api-iteration-2
+    name: ariel-demo-next-api
     runtime: docker
     repo: https://github.com/aribecker/0080-prueba-SDD-full-stack
-    branch: iteracion-2
+    branch: proximo-desarrollo-hello-world
     plan: free
     region: oregon
     autoDeployTrigger: commit
@@ -21,13 +21,17 @@ services:
       - key: PORT
         value: "8080"
       - key: ALLOWED_ORIGINS
-        value: https://ariel-weather-iteration-2.onrender.com,http://localhost:5173
+        value: https://ariel-demo-next.onrender.com,http://localhost:5173
+      - key: AUTH_FRONTEND_URL
+        value: https://ariel-demo-next.onrender.com
+      - key: AUTH_BACKEND_URL
+        value: https://ariel-demo-next-api.onrender.com
 
   - type: web
-    name: ariel-weather-iteration-2
+    name: ariel-demo-next
     runtime: static
     repo: https://github.com/aribecker/0080-prueba-SDD-full-stack
-    branch: iteracion-2
+    branch: proximo-desarrollo-hello-world
     autoDeployTrigger: commit
     buildCommand: cd frontend && npm ci && npm test && npm run build
     staticPublishPath: frontend/dist
@@ -40,8 +44,11 @@ services:
       - key: SKIP_INSTALL_DEPS
         value: "true"
       - key: VITE_WEATHER_API_URL
-        value: https://ariel-weather-api-iteration-2.onrender.com/api/weather
+        value: https://ariel-demo-next-api.onrender.com/api/weather
+      - key: VITE_AUTH_API_URL
+        value: https://ariel-demo-next-api.onrender.com
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+

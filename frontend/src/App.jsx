@@ -3,6 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
 import packageInfo from '../package.json';
 import Home from './Home.jsx';
 import Login from './Login.jsx';
+import HelloWorld from './HelloWorld.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
 
@@ -11,6 +12,7 @@ const destinations = [
   { to: '/weather', label: 'Weather demo' },
   { to: '/components', label: 'Component gallery' },
   { to: '/login', label: 'Login' },
+  { to: '/hello-world', label: 'Hello World' },
 ];
 
 export default function App({ loader }) {
@@ -55,6 +57,7 @@ export default function App({ loader }) {
         <Route path="/weather" element={<WeatherDemo loader={loader} />} />
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/hello-world" element={<HelloWorld />} />
         <Route path="*" element={<section className="intro">
           <p className="eyebrow">404</p>
           <h1 id="page-heading" tabIndex={-1}>Page not found.</h1>
@@ -70,4 +73,5 @@ export default function App({ loader }) {
     </footer>
   </main>;
 }
+
 
