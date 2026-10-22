@@ -92,9 +92,9 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 
 
 ## Virtual simulator R24–R28
-- Initial balances/fees/trades are zero until Start. Starting with 1000 USDT at 100000 USDT/BTC and 0.1% fee yields 0 USDT, 0.00999 BTC, 0.00001 BTC buy fee and 1 USDT commission equivalent.
+- Initial balances/fees/trades are zero until Start. Default Start/Reset restores 10000 USDT, zero BTC/fees/trades and waits without buying. The first fresh sample (above, equal to or below the minimum) establishes a reference only. A later downward crossing executes the first purchase. With configured capital 1000 USDT and a crossing fill at 100000 USDT/BTC at 0.1%, net balances are 0 USDT and 0.00999 BTC with a 0.00001 BTC fee (1 USDT execution equivalent).
 - With minimum 99000, maximum 101000, crossing from <=101000 to 102000 sells all: gross 1018.98 USDT, sell fee 1.01898 USDT, net 1017.96102 USDT; a later downward crossing below 99000 buys with that available balance.
 - Every trade deducts only its received-asset fee; totals, equity/P&L and ledger reconcile. Repeat/equal quotes and replayed sample sequence do not duplicate trades.
-- Reset with changed capital/rate discards old balances/fees/trades/history and waits for a fresh successful quote; no fill uses a stale pre-Reset quote. Paused/hidden/failed/aborted requests cannot fill orders.
+- Reset with changed capital/rate discards old BTC/fees/trades/history, restores configured USDT, and waits for a fresh successful quote to establish the crossing reference; no fill uses a stale pre-Reset quote or happens merely on Reset. Paused/hidden/failed/aborted requests cannot fill orders.
 - Invalid/min>=max/negative/NaN settings block Start and trading with readable feedback. +/- controls adjust thresholds while keeping balances. Chart shows both threshold lines with correct USDT labels.
-- Deterministic reducer/component tests and all frontend regressions/build pass; live direct route, real quote and initial simulation order verified in the published parallel environment.
+- Deterministic reducer/component tests and all frontend regressions/build pass; live direct route, real quote and cash-only reset and subsequent crossing behavior verified in the published parallel environment.
