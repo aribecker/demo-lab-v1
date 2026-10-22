@@ -1,0 +1,5 @@
+**
+!people-service/
+!people-service/pom.xml
+!people-service/src/
+!people-service/src/**

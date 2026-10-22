@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: people_demo
+      POSTGRES_USER: people
+      POSTGRES_PASSWORD: ${PEOPLE_DB_PASSWORD:?Set PEOPLE_DB_PASSWORD in your environment}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - people-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U people -d people_demo"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  people-api:
+    build:
+      context: .
+      dockerfile: People-Dockerfile
+    environment:
+      PEOPLE_PROFILE: database
+      DB_HOST: db
+      DB_NAME: people_demo
+      DB_USER: people
+      DB_PASSWORD: ${PEOPLE_DB_PASSWORD:?Set PEOPLE_DB_PASSWORD in your environment}
+      ALLOWED_ORIGINS: http://localhost:5173
+      PORT: 8080
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  people-data:

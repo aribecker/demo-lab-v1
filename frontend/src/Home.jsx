@@ -28,6 +28,7 @@ export default function Home() {
         <span className="feature-action">Open Login →</span>
       </Link>
       <Link className="feature-card" to="/chatbot"><span className="feature-number">04 / SPRING AI</span><h2>Chatbot ↗</h2><p>Conversá con modelos gratuitos. Elegí un modelo, escribí o probá el dictado por voz.</p><span className="feature-action">Open Chatbot →</span></Link>
+      <Link className="feature-card" to="/people"><span className="feature-number">05 / POSTGRESQL</span><h2>People ↗</h2><p>Hello, database! Add a person and explore a persistent PostgreSQL list through a Java microservice.</p><span className="feature-action">Open People →</span></Link>
     </section>
     <aside className="home-note"><span className="dot" aria-hidden="true" /><p>Built as a small learning lab. Each feature has its own URL, so you can bookmark it or open it directly.</p></aside>
   </>;

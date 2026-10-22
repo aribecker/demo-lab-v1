@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
 import packageInfo from '../package.json';
+import People from './People.jsx';
 import Chatbot from './Chatbot.jsx';
 import Home from './Home.jsx';
 import Login from './Login.jsx';
@@ -13,6 +14,7 @@ const destinations = [
   { to: '/components', label: 'Component gallery' },
   { to: '/login', label: 'Login' },
   { to: '/chatbot', label: 'Chatbot' },
+  { to: '/people', label: 'People' },
 ];
 
 export default function App({ loader }) {
@@ -58,6 +60,7 @@ export default function App({ loader }) {
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login />} />
         <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/people" element={<People />} />
         <Route path="*" element={<section className="intro">
           <p className="eyebrow">404</p>
           <h1 id="page-heading" tabIndex={-1}>Page not found.</h1>

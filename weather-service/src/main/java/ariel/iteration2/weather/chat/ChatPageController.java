@@ -5,6 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 /** Direct-route refresh for the optional combined frontend/API test deployment. */
 @Controller
 class ChatPageController {
-    @GetMapping({"/chatbot", "/weather", "/components", "/login"})
+    @GetMapping({"/chatbot", "/weather", "/components", "/login", "/people"})
     String page() { return "forward:/index.html"; }
 }
