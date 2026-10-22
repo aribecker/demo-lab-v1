@@ -64,3 +64,15 @@ Specifications committed separately in ac7222060ea3221cb06e07528532ae6c72e47b84 
 | R21 10-second lifecycle and no overlap | useBitcoin.js | fake timers, pause/visibility/abort tests |
 | R22 validated live source and stale errors | bitcoinClient.js | deterministic client/error tests, live CORS request |
 | R23 SDD and parallel deployment | original specs, separate specification commit, static routes | npm test/build, Render deploy status and live checks |
+
+
+## Simulator grounding R24–R28
+Master specification published first in 579aa057a0f8b0368302a214dd18106c69cd87fe. Existing useBitcoin owns request cancellation/generation and successful sample count: add reset that clears history/counters and aborts old generation. The route owns local simulation reducer and settings; each new successful count is an idempotent engine event, edits alone cannot fill. Existing BitcoinWidget accepts optional current thresholds for chart overlays, while a SimulationPanel renders virtual balances/ledger next to it. Public Binance market-data GET verified HTTP 200, Access-Control-Allow-Origin:* with symbol BTCUSDT and price string. Official reference: https://developers.binance.com/en/docs/products/spot/rest-api recommends data-api.binance.vision for public market data. Binance standard fee table (https://www.binance.com/en/fee/trading) verified 0.100% regular-user maker/taker without BNB discount; official calculation reference https://www.binance.com/en/support/faq/detail/e85d6e703b874674840122196b89780a explains received-asset fees. Use that model, configurable because account rates/promotions differ. No authentication/trade endpoint is introduced.
+
+| Requirement | Code | Check |
+| --- | --- | --- |
+| R24 fresh virtual reset/start | useBitcoin.reset, simulator reducer, SimulationPanel | fresh-reset UI and initial balance tests |
+| R25 BTCUSDT source/lifecycle | bitcoinClient.js, existing polling owner | symbol/price tests, live CORS |
+| R26 live thresholds | BitcoinTracker/SimulationPanel, chart lines | invalid inputs, +/- and edit/no-fill tests |
+| R27 fee math and alternating crossings | simulation.js | exact round-trip math, equality/duplicate/idempotence cases |
+| R28 delivery/disclosures | specs, docs, simulation UI | full tests/build, parallel Render/browser evidence |

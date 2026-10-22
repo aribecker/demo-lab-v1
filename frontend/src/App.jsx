@@ -71,9 +71,9 @@ export default function App({ loader }) {
     </div>
 
     <footer>
-      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Coinbase public quotes' : 'Weather microservice → Provider'}</p>
+      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Binance public quotes' : 'Weather microservice → Provider'}</p>
       <p>Data: {pathname === '/bitcoin'
-        ? <a href="https://www.coinbase.com/price/bitcoin" target="_blank" rel="noreferrer">Coinbase</a>
+        ? <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance</a>
         : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="footer-note">· Times in Buenos Aires</span></p>
     </footer>
   </main>;

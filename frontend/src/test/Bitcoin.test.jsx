@@ -47,7 +47,7 @@ describe('Bitcoin tracking lifecycle', () => {
     expect(requests[0].signal.aborted).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Pause tracking' }));
     await act(() => requests[0].resolve(quote(1)));
-    expect(screen.queryByText('$1.00')).not.toBeInTheDocument();
+    expect(screen.queryByText('1.00 USDT')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Resume tracking' }));
     view.unmount();
     expect(requests[1].signal.aborted).toBe(true);
@@ -77,7 +77,7 @@ describe('Bitcoin tracking lifecycle', () => {
     await flush();
     await act(() => vi.advanceTimersByTimeAsync(10000));
     expect(screen.getByRole('status')).toHaveTextContent('stale');
-    expect(screen.getAllByText('$80,000.00').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('80,000.00 USDT').length).toBeGreaterThan(0);
     await act(() => vi.advanceTimersByTimeAsync(10000));
     expect(screen.getByRole('status')).not.toHaveTextContent('stale');
     expect(screen.getByText(/1.250%/)).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('Bitcoin tracking lifecycle', () => {
 
   it('integrates menu navigation and cancels network requests on route exit', async () => {
     vi.useFakeTimers();
-    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { amount: '80000', currency: 'USD', base: 'BTC' } }) });
+    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ price: '80000', symbol: 'BTCUSDT' }) });
     vi.stubGlobal('fetch', fetcher);
     render(<MemoryRouter><App /></MemoryRouter>);
     expect(fetcher).not.toHaveBeenCalled();
@@ -120,23 +120,23 @@ describe('Bitcoin tracking lifecycle', () => {
   });
 });
 
-describe('public Coinbase client', () => {
+describe('public Binance client', () => {
   it('validates the public response and never sends credentials', async () => {
-    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { amount: '80000.12', currency: 'USD', base: 'BTC' } }) });
+    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ price: '80000.12', symbol: 'BTCUSDT' }) });
     vi.stubGlobal('fetch', fetcher);
     expect(await loadBitcoin()).toEqual({ price: 80000.12, retrievedAt: expect.any(String) });
     expect(fetcher).toHaveBeenCalledWith(BITCOIN_URL, expect.objectContaining({ cache: 'no-store', credentials: 'omit' }));
   });
   it.each(['', 'NaN', 'Infinity', '-10', null, '0', true])('rejects invalid price %s', async amount => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { amount, currency: 'USD' } }) }));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ price: amount, symbol: 'BTCUSDT' }) }));
     await expect(loadBitcoin()).rejects.toThrow('invalid');
   });
   it.each([429, 500])('reports HTTP %s honestly', async status => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status }));
     await expect(loadBitcoin()).rejects.toThrow(status === 429 ? /rate limit/ : /HTTP 500/);
   });
-  it('rejects a mismatched currency', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { amount: '80000', currency: 'EUR' } }) }));
+  it('rejects a mismatched trading pair', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ price: '80000', symbol: 'BTCEUR' }) }));
     await expect(loadBitcoin()).rejects.toThrow('invalid');
   });
 });

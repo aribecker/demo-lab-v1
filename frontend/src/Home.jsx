@@ -12,7 +12,7 @@ export default function Home() {
       <Link className="feature-card" to="/bitcoin">
         <span className="feature-number" aria-hidden="true">04 / MARKET WATCH</span>
         <h2>Bitcoin tracker <span aria-hidden="true">↗</span></h2>
-        <p>Follow BTC in US dollars every 10 seconds. See your session chart, price changes and recent readings.</p>
+        <p>Follow BTC/USDT every 10 seconds and simulate buy/sell crossings with virtual balances, adjustable limits and fees.</p>
         <span className="feature-action">Open Bitcoin tracker →</span>
       </Link>
       <Link className="feature-card" to="/weather">

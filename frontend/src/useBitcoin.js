@@ -14,6 +14,7 @@ export default function useBitcoin(loader = loadBitcoin) {
   const [count, setCount] = useState(0);
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
+  const [generation, setGeneration] = useState(0);
   const refresh = useRef(() => {});
 
   useEffect(() => {
@@ -61,8 +62,12 @@ export default function useBitcoin(loader = loadBitcoin) {
       clearTimeout(timeout);
       flight?.abort();
     };
-  }, [running, visible, loader]);
+  }, [running, visible, loader, generation]);
 
   return { running, visible, samples, baseline, range, count, error, pending,
-    toggle: () => setRunning(old => !old), refresh: () => refresh.current() };
+    toggle: () => setRunning(old => !old), refresh: () => refresh.current(),
+    reset: () => {
+      setSamples([]); setBaseline(null); setRange(null); setCount(0); setError('');
+      setRunning(true); setGeneration(old => old + 1);
+    } };
 }
