@@ -84,3 +84,5 @@ New environment (configured separately from iteration-2):
 - API: https://ariel-demo-next-api.onrender.com
 
 `render.yaml` now describes only these new services. Dashboard/MCP is used for creation; this file records matching deployment settings. OAuth credentials are not copied: activate providers using `docs/login-setup.md` with the new backend callbacks and frontend origin. Existing deployment evidence above describes the source environment.
+
+The new static build emits index entry files for all four subroutes plus a custom 404 document. This supports direct entry/reload using Render static hosting while React Router keeps client navigation and history. A Dashboard rewrite is not required.

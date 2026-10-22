@@ -51,4 +51,4 @@ Real external consent awaits the owner's OAuth registrations and environment con
 
 ## R19 — Hello World branch
 
-Requirement: requirements.md R19. Architecture: isolated Hello World environment. Source: frontend/src/HelloWorld.jsx and App.jsx. Validation: existing routing/frontend regression suite, production build, live direct route and API health. Infrastructure: render.yaml with two new service names and branch `proximo-desarrollo-hello-world`. Login setup: docs/login-setup.md remains applicable with environment-specific origins.
+Requirement: requirements.md R19. Architecture: isolated Hello World environment. Source: frontend/src/HelloWorld.jsx, App.jsx and frontend/scripts/static-routes.mjs. Validation: existing routing/frontend regression suite, production build, live direct route and API health. Infrastructure: render.yaml with two new service names and branch `proximo-desarrollo-hello-world`. Login setup: docs/login-setup.md remains applicable with environment-specific origins.
