@@ -55,7 +55,7 @@ export function BitcoinWidget({ tracker, minimum, maximum }) {
 export default function BitcoinTracker({ loader }) {
   const tracker = useBitcoin(loader);
   const [simulation, dispatch] = useReducer(simulationReducer, EMPTY_SIMULATION);
-  const [capital, setCapital] = useState('1000');
+  const [capital, setCapital] = useState('10000');
   const [fee, setFee] = useState('0.1');
   const [minimum, setMinimum] = useState('');
   const [maximum, setMaximum] = useState('');
@@ -83,7 +83,7 @@ export default function BitcoinTracker({ loader }) {
     <section className="intro" aria-labelledby="page-heading"><p className="eyebrow">LIVE QUOTES · YOUR SESSION</p>
       <h1 id="page-heading" tabIndex={-1}>Bitcoin <span>tracker.</span></h1>
       <p className="subtitle">Live Binance BTC/USDT quotes every 10 seconds, with a virtual buy-low / sell-high simulator.</p></section>
-    <ol className="bitcoin-guide" aria-label="Tracking guide"><li><strong>Configure</strong><span>Choose virtual capital, fee and buy/sell limits.</span></li><li><strong>Start & watch</strong><span>Start buys BTC; crossings sell and buy with the available balance.</span></li><li><strong>Adjust or reset</strong><span>Move limits live, pause, or restart with fresh virtual funds.</span></li></ol>
+    <ol className="bitcoin-guide" aria-label="Tracking guide"><li><strong>Configure</strong><span>Choose virtual capital, fee and buy/sell limits.</span></li><li><strong>Start & watch</strong><span>Start holds USDT; buy below the minimum and sell above the maximum on crossings.</span></li><li><strong>Adjust or reset</strong><span>Move limits live, pause, or restart with virtual USDT and wait for a buy crossing.</span></li></ol>
     <div className="bitcoin-workspace"><BitcoinWidget tracker={tracker} minimum={number(minimum)} maximum={number(maximum)} />
       <SimulationPanel simulation={simulation} latest={latest} valid={validRun(number(capital), number(fee))} limitsValid={limitsValid} autoLimits={!limitsInitialized && minimum === '' && maximum === ''} start={start}
         settings={{ capital, setCapital, fee, setFee, minimum, setMinimum, maximum, setMaximum, step, setStep }} /></div>

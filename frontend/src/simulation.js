@@ -15,7 +15,7 @@ export function validRun(capital, feePercent) {
 function execute(state, side, quote, reason) {
   const rate = state.feePercent / 100;
   const buy = side === 'BUY';
-  const spent = buy ? (state.phase === 'awaiting_quote' ? state.capital : state.usdt) : state.btc;
+  const spent = buy ? state.usdt : state.btc;
   const gross = buy ? spent / quote.price : spent * quote.price;
   const fee = gross * rate;
   const received = gross - fee;
@@ -34,17 +34,16 @@ function execute(state, side, quote, reason) {
 export function simulationReducer(state, action) {
   if (action.type === 'reset') {
     if (!validRun(action.capital, action.feePercent)) return state;
-    return { ...EMPTY_SIMULATION, phase: 'awaiting_quote', capital: action.capital, feePercent: action.feePercent };
+    return { ...EMPTY_SIMULATION, phase: 'holding_usdt', capital: action.capital, usdt: action.capital, feePercent: action.feePercent };
   }
   if (action.type !== 'quote' || state.phase === 'inactive' || action.sequence <= state.lastSequence) return state;
   const { quote, minimum, maximum } = action;
   if (!Number.isFinite(quote.price) || quote.price <= 0) return state;
   let next = { ...state, previousPrice: quote.price, lastSequence: action.sequence };
   if (!validLimits(minimum, maximum)) return next;
-  if (state.phase === 'awaiting_quote') return execute(next, 'BUY', quote, 'Initial purchase');
   if (state.phase === 'holding_btc' && state.previousPrice <= maximum && quote.price > maximum) {
     next = execute(next, 'SELL', quote, 'Crossed above maximum');
-  } else if (state.phase === 'holding_usdt' && state.previousPrice >= minimum && quote.price < minimum) {
+  } else if (state.phase === 'holding_usdt' && state.previousPrice !== null && state.previousPrice >= minimum && quote.price < minimum) {
     next = execute(next, 'BUY', quote, 'Crossed below minimum');
   }
   return next;

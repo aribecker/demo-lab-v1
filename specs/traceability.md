@@ -76,3 +76,7 @@ Master specification published first in 579aa057a0f8b0368302a214dd18106c69cd87fe
 | R26 live thresholds | BitcoinTracker/SimulationPanel, chart lines | invalid inputs, +/- and edit/no-fill tests |
 | R27 fee math and alternating crossings | simulation.js | exact round-trip math, equality/duplicate/idempotence cases |
 | R28 delivery/disclosures | specs, docs, simulation UI | full tests/build, parallel Render/browser evidence |
+
+
+## Cash-only Reset v2.4.1 grounding
+Master specification committed first in b1329a3a7705b37d521b2abbc78033d29b77bc2c. The existing simulation reducer owns all balances/crossings: seed USDT directly on Reset, enter holding_usdt and leave previousPrice=null. Require a non-null previous sample for a buy crossing, remove awaiting_quote initial-purchase branch and capital shortcut. Quote generation/reset cleanup in useBitcoin already provides a fresh sample boundary. Update the route's default capital, button/instruction/state labels and P/L mark so cash-only portfolios show full equity and zero P/L before buying. Existing fee, sell-crossing, polling and provider contracts stay unchanged. Tests must prove no first-sample buy (including below minimum), genuine downward crossing, repeat/equality idempotence, zero fees until purchase, and cash-only Reset after prior trades.

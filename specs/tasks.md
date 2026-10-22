@@ -64,5 +64,5 @@
 
 ## Cash-only Reset v2.4.1
 - [x] Update master requirements/architecture/acceptance before implementation: default 10000 USDT, no initial buy, first sample as reference.
-- [ ] Ground and update reset state, crossing guard, UI and tests.
+- [x] Ground and update reset state, crossing guard, UI and tests.
 - [ ] Pass frontend regressions/build, publish parallel environment and verify cash-only Reset.
