@@ -51,4 +51,4 @@
 - [x] Ground the implementation in the existing router, shell and static route generator.
 - [x] Implement quote client, bounded polling widget and guided route.
 - [x] Pass frontend regression/lifecycle tests and production build.
-- [ ] Publish parallel branch, verify Render live and record evidence.
+- [x] Publish parallel branch, verify Render live and record evidence (docs/bitcoin-release.md).
