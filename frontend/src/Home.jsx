@@ -9,6 +9,12 @@ export default function Home() {
       <p className="subtitle">A demo application for exploring React, reusable components and a Java microservice. Choose a feature and take a look around.</p>
     </section>
     <section className="feature-grid" aria-label="Demo features">
+      <Link className="feature-card" to="/bitcoin">
+        <span className="feature-number" aria-hidden="true">04 / MARKET WATCH</span>
+        <h2>Bitcoin tracker <span aria-hidden="true">↗</span></h2>
+        <p>Follow BTC in US dollars every 10 seconds. See your session chart, price changes and recent readings.</p>
+        <span className="feature-action">Open Bitcoin tracker →</span>
+      </Link>
       <Link className="feature-card" to="/weather">
         <span className="feature-number" aria-hidden="true">01 / LIVE DATA</span>
         <h2>Weather demo <span aria-hidden="true">↗</span></h2>
@@ -31,4 +37,5 @@ export default function Home() {
     <aside className="home-note"><span className="dot" aria-hidden="true" /><p>Built as a small learning lab. Each feature has its own URL, so you can bookmark it or open it directly.</p></aside>
   </>;
 }
+
 

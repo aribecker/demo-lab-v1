@@ -52,3 +52,15 @@ Real external consent awaits the owner's OAuth registrations and environment con
 ## R19 — Hello World branch
 
 Requirement: requirements.md R19. Architecture: isolated Hello World environment. Source: frontend/src/HelloWorld.jsx, App.jsx and frontend/scripts/static-routes.mjs. Validation: existing routing/frontend regression suite, production build, live direct route and API health. Infrastructure: render.yaml with two new service names and branch `proximo-desarrollo-hello-world`. Login setup: docs/login-setup.md remains applicable with environment-specific origins.
+
+
+
+## Bitcoin grounding (R20–R23)
+Specifications committed separately in ac7222060ea3221cb06e07528532ae6c72e47b84 before generating this feature. Grounding: App.jsx already owns Routes/NavLink destinations and Home.jsx links feature cards. Extend those boundaries with BitcoinTracker.jsx; keep the existing weather loader isolated. Reuse shared intro/card styles and add scoped bitcoin CSS. static-routes.mjs must emit bitcoin/index.html for Render direct reloads. A browser-side Coinbase client needs no backend mutation: verified HTTPS GET returned 200 with Access-Control-Allow-Origin:* and JSON data.amount/base/currency. Primary reference verified: https://docs.cdp.coinbase.com/coinbase-app/track-apis/prices (spot endpoint requires no authentication). The endpoint supplies no market timestamp; label browser retrieval time explicitly. Provider caching can yield identical successive quotes.
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| R20 guided route and quote history | App/Home, BitcoinTracker/BitcoinWidget | Bitcoin tests, direct-route build |
+| R21 10-second lifecycle and no overlap | useBitcoin.js | fake timers, pause/visibility/abort tests |
+| R22 validated live source and stale errors | bitcoinClient.js | deterministic client/error tests, live CORS request |
+| R23 SDD and parallel deployment | original specs, separate specification commit, static routes | npm test/build, Render deploy status and live checks |

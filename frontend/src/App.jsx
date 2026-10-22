@@ -4,6 +4,7 @@ import packageInfo from '../package.json';
 import Home from './Home.jsx';
 import Login from './Login.jsx';
 import HelloWorld from './HelloWorld.jsx';
+import BitcoinTracker from './BitcoinTracker.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
 
@@ -13,6 +14,7 @@ const destinations = [
   { to: '/components', label: 'Component gallery' },
   { to: '/login', label: 'Login' },
   { to: '/hello-world', label: 'Hello World' },
+  { to: '/bitcoin', label: 'Bitcoin tracker' },
 ];
 
 export default function App({ loader }) {
@@ -58,6 +60,7 @@ export default function App({ loader }) {
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login />} />
         <Route path="/hello-world" element={<HelloWorld />} />
+        <Route path="/bitcoin" element={<BitcoinTracker />} />
         <Route path="*" element={<section className="intro">
           <p className="eyebrow">404</p>
           <h1 id="page-heading" tabIndex={-1}>Page not found.</h1>
@@ -68,10 +71,13 @@ export default function App({ loader }) {
     </div>
 
     <footer>
-      <p><span>React {React.version}</span> <i>→</i> Weather microservice <i>→</i> Provider</p>
-      <p>Data: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a> <span className="footer-note">· Times in Buenos Aires</span></p>
+      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Coinbase public quotes' : 'Weather microservice → Provider'}</p>
+      <p>Data: {pathname === '/bitcoin'
+        ? <a href="https://www.coinbase.com/price/bitcoin" target="_blank" rel="noreferrer">Coinbase</a>
+        : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="footer-note">· Times in Buenos Aires</span></p>
     </footer>
   </main>;
 }
+
 
 

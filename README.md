@@ -86,3 +86,11 @@ New environment (configured separately from iteration-2):
 `render.yaml` now describes only these new services. Dashboard/MCP is used for creation; this file records matching deployment settings. OAuth credentials are not copied: activate providers using `docs/login-setup.md` with the new backend callbacks and frontend origin. Existing deployment evidence above describes the source environment.
 
 The new static build emits index entry files for all four subroutes plus a custom 404 document. This supports direct entry/reload using Render static hosting while React Router keeps client navigation and history. A Dashboard rewrite is not required.
+
+
+
+## Bitcoin tracker (frontend v2.3.0, parallel environment)
+
+Open https://ariel-demo-next.onrender.com/bitcoin or choose **Bitcoin tracker** in the hamburger menu/Home. The guided panel retrieves the public Coinbase BTC/USD spot quote on entry and every 10 seconds while running and visible. It includes session change, low/high, a bounded 180-reading chart, recent quotes, pause/resume and manual refresh. Tab visibility and route cleanup stop background requests. Failed updates retain an explicitly stale last quote. Browser retrieval times are not exchange timestamps; quotes may repeat because of provider caching. History is memory-only and resets on leaving the page. No new backend, credentials, database or paid service is added.
+
+Master specification: specs/requirements.md R20–R23, architecture and acceptance updated before generation; separate specifications commit ac7222060ea3221cb06e07528532ae6c72e47b84. Grounding is recorded in specs/traceability.md. Source reference: https://docs.cdp.coinbase.com/coinbase-app/track-apis/prices.

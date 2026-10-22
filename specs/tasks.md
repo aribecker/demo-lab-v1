@@ -48,7 +48,7 @@
 
 ## Bitcoin tracker
 - [x] Specify R20–R23 in original master documents before source generation.
-- [ ] Ground the implementation in the existing router, shell and static route generator.
-- [ ] Implement quote client, bounded polling widget and guided route.
-- [ ] Pass frontend regression/lifecycle tests and production build.
+- [x] Ground the implementation in the existing router, shell and static route generator.
+- [x] Implement quote client, bounded polling widget and guided route.
+- [x] Pass frontend regression/lifecycle tests and production build.
 - [ ] Publish parallel branch, verify Render live and record evidence.
