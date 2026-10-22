@@ -59,4 +59,4 @@
 - [x] Ground in existing quote lifecycle, chart, router and official Binance docs.
 - [x] Implement virtual balances, all-in crossing engine, fees, live limits and ledger.
 - [x] Pass deterministic/regression tests and production build.
-- [ ] Publish parallel branch and record verified release evidence.
+- [x] Publish parallel branch and record verified release evidence (docs/bitcoin-simulator-release.md).
