@@ -89,3 +89,12 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - Fake timers prove immediate fetch, 10-second polling, pause/resume, visibility suspension and cleanup/abort on route exit. Pending requests cannot overlap.
 - HTTP/429/invalid/non-finite responses and timeouts show honest failure; previous success remains stale; next success recovers.
 - Full frontend regression suite and production build pass. Render reports live for the implementation commit; verify the new route and live Coinbase API/CORS, distinguishing automated browser evidence from HTTP checks.
+
+
+## Virtual simulator R24–R28
+- Initial balances/fees/trades are zero until Start. Starting with 1000 USDT at 100000 USDT/BTC and 0.1% fee yields 0 USDT, 0.00999 BTC, 0.00001 BTC buy fee and 1 USDT commission equivalent.
+- With minimum 99000, maximum 101000, crossing from <=101000 to 102000 sells all: gross 1018.98 USDT, sell fee 1.01898 USDT, net 1017.96102 USDT; a later downward crossing below 99000 buys with that available balance.
+- Every trade deducts only its received-asset fee; totals, equity/P&L and ledger reconcile. Repeat/equal quotes and replayed sample sequence do not duplicate trades.
+- Reset with changed capital/rate discards old balances/fees/trades/history and waits for a fresh successful quote; no fill uses a stale pre-Reset quote. Paused/hidden/failed/aborted requests cannot fill orders.
+- Invalid/min>=max/negative/NaN settings block Start and trading with readable feedback. +/- controls adjust thresholds while keeping balances. Chart shows both threshold lines with correct USDT labels.
+- Deterministic reducer/component tests and all frontend regressions/build pass; live direct route, real quote and initial simulation order verified in the published parallel environment.

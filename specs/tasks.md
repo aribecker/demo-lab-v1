@@ -52,3 +52,11 @@
 - [x] Implement quote client, bounded polling widget and guided route.
 - [x] Pass frontend regression/lifecycle tests and production build.
 - [x] Publish parallel branch, verify Render live and record evidence (docs/bitcoin-release.md).
+
+
+## Virtual simulator
+- [x] Specify R24–R28, fee math, sample crossings and reset semantics before generation.
+- [ ] Ground in existing quote lifecycle, chart, router and official Binance docs.
+- [ ] Implement virtual balances, all-in crossing engine, fees, live limits and ledger.
+- [ ] Pass deterministic/regression tests and production build.
+- [ ] Publish parallel branch and record verified release evidence.
