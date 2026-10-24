@@ -34,10 +34,16 @@ export default function SharedBitcoinTracker({ api }) {
     <section className="intro" aria-labelledby="page-heading"><p className="eyebrow">ONE SHARED SIMULATION · VIRTUAL FUNDS</p>
       <h1 id="page-heading" tabIndex={-1}>Bitcoin <span>tracker.</span></h1>
       <p className="subtitle">The same saved balances, controls and run state on every device. Opening this page never restarts the simulation.</p></section>
-    <aside className="shared-notice"><strong>Shared demo: controls affect everyone.</strong> Quotes and virtual orders are processed on the server. Render Free can sleep when no one is connected; saved state resumes when it wakes, with no invented catch-up trades.</aside>
+    <aside className="shared-notice"><strong>Shared demo: controls affect everyone.</strong> Quotes, thresholds and virtual orders are processed on the server. Closing this page does not pause the engine.
+      {data?.execution?.hostingMode === 'always-on'
+        ? ' Always-on hosting is configured. The engine works without open browsers while the service and database are available.'
+        : ' This deployment uses sleep-capable hosting: Render Free stops processing after idle suspension. Continuous unattended operation requires an always-on plan.'}
+    </aside>
     {shared.error && <p role="alert" className="shared-error">{shared.error}{data ? ' Showing the last known shared state.' : ' No local session has been started.'}</p>}
     {!data || !draft ? <section className="bitcoin-card" aria-label="Shared simulation connection"><p role="status">Connecting to the saved simulation… The free backend may take a minute to wake up.</p></section> : <>
       <p className="bitcoin-note">Shared state revision {data.revision} · {data.running ? 'Tracking enabled' : 'Paused for everyone'} · Last server quote: {data.lastPollAt ? new Date(data.lastPollAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' }) : 'Waiting for the server'} · Times in Buenos Aires{shared.pending ? ' · Saving shared action…' : ''}</p>
+      {data.execution && <p className="bitcoin-note">Backend engine: {data.execution.schedulingEnabled ? data.execution.lastCycleStatus : 'disabled'} · Last scheduler cycle: {data.execution.lastCycleAt
+        ? new Date(data.execution.lastCycleAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' }) : 'Waiting'} · Target interval: {data.execution.pollIntervalMs / 1000}s</p>}
       {data.running && data.lastPollAt > 0 && Date.now() - data.lastPollAt > 30000 && <p className="shared-error">The last server quote is over 30 seconds old. The backend may be waking up or its provider may be unavailable. Balances are the last saved state.</p>}
       <div className="bitcoin-workspace"><BitcoinWidget minimum={data.settings.minimum} maximum={data.settings.maximum}
         tracker={{ ...data, shared: true, visible: true, pending: shared.pending,
@@ -53,3 +59,4 @@ export default function SharedBitcoinTracker({ api }) {
     </>}
   </>;
 }
+

@@ -7,8 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.Properties;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SimulationStore {
+    private static final Logger LOG = LoggerFactory.getLogger(SimulationStore.class);
     private final String url;
     private final ObjectMapper json;
     private final Properties properties = new Properties();
@@ -48,7 +51,10 @@ public class SimulationStore {
                 try { insert.executeUpdate(); } catch (SQLException race) { if (!"23505".equals(race.getSQLState())) throw race; }
             }
             ready = true;
-        } catch (Exception failure) { throw new StorageUnavailable(); }
+        } catch (Exception failure) {
+            LOG.warn("Simulation storage initialization failed (SQL state: {}).", failure instanceof SQLException sql ? sql.getSQLState() : "unavailable");
+            throw new StorageUnavailable();
+        }
     }
     private Connection connect() throws SQLException { return DriverManager.getConnection(url, properties); }
     public SharedState read() {
@@ -63,6 +69,9 @@ public class SimulationStore {
         try (Connection c = connect()) {
             c.setAutoCommit(false);
             try {
+                if (c.getMetaData().getDatabaseProductName().equals("PostgreSQL")) {
+                    try (var timeout = c.createStatement()) { timeout.execute("SET LOCAL lock_timeout = '8s'"); }
+                }
                 SharedState state;
                 try (var statement = c.createStatement(); var rows = statement.executeQuery("SELECT document FROM bitcoin_shared.simulation_state WHERE state_id=1 FOR UPDATE")) {
                     if (!rows.next()) throw new StorageUnavailable();
@@ -85,3 +94,4 @@ public class SimulationStore {
         public StorageUnavailable() { super("Shared simulation storage is unavailable. No local simulation was created."); }
     }
 }
+

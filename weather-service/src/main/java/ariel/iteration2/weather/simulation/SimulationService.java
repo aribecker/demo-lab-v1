@@ -9,9 +9,20 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class SimulationService {
+    private static final Logger LOG = LoggerFactory.getLogger(SimulationService.class);
+    private final String processStartedAt = Instant.now().toString();
+    private volatile String lastCycleAt, lastCycleStatus = "waiting";
+    @Value("${simulation.hosting-mode:free}") private String hostingMode = "free";
+    public record Execution(String hostingMode, boolean schedulingEnabled, long pollIntervalMs,
+        String processStartedAt, String lastCycleAt, String lastCycleStatus) {}
+    public Execution execution() {
+        return new Execution(hostingMode, scheduling, 10000, processStartedAt, lastCycleAt, lastCycleStatus);
+    }
     private final SimulationStore store;
     private final HttpClient http;
     private final Clock clock;
@@ -29,12 +40,24 @@ public class SimulationService {
     public SharedState read() { return store.read(); }
     @Scheduled(fixedDelayString="${simulation.poll-ms:10000}", initialDelayString="${simulation.initial-delay-ms:1000}")
     public void scheduledTick() {
-        if (!scheduling || !store.configured()) return;
-        try { store.initialize(); tick(); } catch (SimulationStore.StorageUnavailable ignored) { /* Keep durable state; next cycle retries storage. */ }
+        if (!scheduling) return;
+        try {
+            store.initialize(); tick(); lastCycleStatus = "ok";
+        } catch (SimulationStore.StorageUnavailable unavailable) {
+            if (!lastCycleStatus.equals("storage_unavailable"))
+                LOG.warn("Simulation scheduler storage unavailable; durable state retained, retrying next cycle.");
+            lastCycleStatus = "storage_unavailable";
+        } catch (RuntimeException failure) {
+            lastCycleStatus = "failed";
+            LOG.warn("Simulation scheduler cycle failed; retrying next cycle.");
+        } finally { lastCycleAt = clock.instant().toString(); }
     }
     public SharedState tick() {
         return store.locked(s -> {
-            if (s.running && clock.millis() >= s.nextPollAt) poll(s);
+            if (s.running && clock.millis() >= s.nextPollAt) {
+                if (s.lastPollAt > 0 && clock.millis() - s.lastPollAt > 30000) s.simulation.previousPrice = null;
+                poll(s);
+            }
             return s;
         });
     }
@@ -76,9 +99,14 @@ public class SimulationService {
                 case "running" -> {
                     if (!command.path("running").isBoolean()) throw new IllegalArgumentException("Running must be true or false.");
                     boolean resume = !s.running && command.path("running").asBoolean();
-                    s.running=command.path("running").asBoolean(); if (resume) s.nextPollAt=0;
+                    s.running=command.path("running").asBoolean();
+                    if (resume) { s.nextPollAt=0; s.simulation.previousPrice=null; }
                 }
-                case "refresh" -> { if (!s.running) throw new IllegalArgumentException("Resume tracking before refreshing."); poll(s); }
+                case "refresh" -> {
+                    if (!s.running) throw new IllegalArgumentException("Resume tracking before refreshing.");
+                    if (s.lastPollAt > 0 && clock.millis() - s.lastPollAt > 30000) s.simulation.previousPrice=null;
+                    poll(s);
+                }
             }
             s.commandIds.add(id); if (s.commandIds.size()>128) s.commandIds.remove(0);
             s.controlRevision++; s.revision++; s.updatedAt=clock.instant().toString();
@@ -105,3 +133,4 @@ public class SimulationService {
     }
     public static class Conflict extends RuntimeException { public Conflict() { super("Shared controls changed in another view. Review the current state and try again."); } }
 }
+

@@ -26,7 +26,17 @@ class SharedSimulationTest {
             hits.incrementAndGet(); byte[] body=("{\"symbol\":\"BTCUSDT\",\"price\":\""+price.get()+"\"}").getBytes();
             exchange.sendResponseHeaders(200,body.length); exchange.getResponseBody().write(body); exchange.close();
         }); market.start();
-        database="jdbc:h2:mem:"+UUID.randomUUID()+";MODE=PostgreSQL;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000";
+        // Optional dedicated PostgreSQL test database; never point this at a deployed database.
+        database=System.getenv("SIMULATION_TEST_DATABASE_URL");
+        if (database == null || database.isBlank()) database="jdbc:h2:mem:"+UUID.randomUUID()+";MODE=PostgreSQL;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000";
+        else if (!database.matches("jdbc:postgresql://(127\\.0\\.0\\.1|localhost):[0-9]+/.*")) {
+            throw new IllegalArgumentException("Simulation integration tests require a disposable loopback PostgreSQL database.");
+        } else try (var c=java.sql.DriverManager.getConnection(database);var statement=c.createStatement()) {
+            statement.execute("CREATE SCHEMA IF NOT EXISTS bitcoin_shared");
+            statement.execute("DROP TABLE IF EXISTS bitcoin_shared.simulation_state");
+            statement.execute("CREATE TABLE IF NOT EXISTS public.unrelated_people_fixture(id integer primary key)");
+            statement.execute("INSERT INTO public.unrelated_people_fixture SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM public.unrelated_people_fixture WHERE id=1)");
+        }
         store=new SimulationStore(database,json); store.initialize(); service=service(store);
     }
     @AfterEach void close() { market.stop(0); }
@@ -100,6 +110,35 @@ class SharedSimulationTest {
         assertEquals(20000,s.settings.capital);assertEquals(0.2,s.settings.feePercent);assertEquals(10000,s.simulation.capital);assertEquals(0.1,s.simulation.feePercent);
         s=action("reset","");assertEquals(20000,s.simulation.usdt);assertEquals(0.2,s.simulation.feePercent);
     }
+    @Test void unattendedSchedulerTradesAndRestoresWithoutClientReads() throws Exception {
+        service=new SimulationService(store,HttpClient.newHttpClient(),clock,json,
+            "http://127.0.0.1:"+market.getAddress().getPort()+"/price",true);
+        action("reset",",\"changes\":{\"minimum\":99000,\"maximum\":101000}");
+        // No browser or API reads between these scheduler cycles.
+        service.scheduledTick(); clock.advance();price.set("98000");service.scheduledTick();
+        clock.advance();price.set("102000");service.scheduledTick();
+        var restarted=new SimulationStore(database,json);restarted.initialize();
+        var saved=restarted.read();
+        assertEquals(3,saved.count);assertEquals(2,saved.simulation.tradeCount);
+        assertTrue(saved.running);assertEquals("holding_usdt",saved.simulation.phase);
+        assertEquals(2,saved.simulation.trades.size());
+        assertEquals("ok",service.execution().lastCycleStatus());
+        assertEquals(clock.instant().toString(),service.execution().lastCycleAt());
+        if (database.startsWith("jdbc:postgresql:")) try(var c=java.sql.DriverManager.getConnection(database);var st=c.createStatement();var rows=st.executeQuery("SELECT count(*) FROM public.unrelated_people_fixture")) {
+            assertTrue(rows.next());assertEquals(1,rows.getInt(1));
+        }
+    }
+    @Test void downtimeAndResumeRequireNewReferenceBeforeTrading() throws Exception {
+        action("reset",",\"changes\":{\"minimum\":99000,\"maximum\":101000}");service.tick();
+        for(int i=0;i<4;i++)clock.advance();
+        price.set("98000");assertEquals(0,service.tick().simulation.tradeCount);
+        clock.advance();price.set("100000");service.tick();
+        clock.advance();price.set("98000");assertEquals(1,service.tick().simulation.tradeCount);
+        action("running",",\"running\":false");clock.advance();price.set("102000");
+        action("running",",\"running\":true");assertEquals(1,service.tick().simulation.tradeCount);
+        clock.advance();price.set("100000");service.tick();
+        clock.advance();price.set("102000");assertEquals(2,service.tick().simulation.tradeCount);
+    }
     static class MutableClock extends Clock {
         final AtomicReference<Instant> now=new AtomicReference<>(Instant.parse("2026-10-22T12:00:00Z"));
         void advance(){now.updateAndGet(t->t.plusSeconds(10));}
@@ -108,3 +147,4 @@ class SharedSimulationTest {
         public Instant instant(){return now.get();}
     }
 }
+

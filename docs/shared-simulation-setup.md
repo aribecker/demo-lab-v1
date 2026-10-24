@@ -33,3 +33,12 @@ SELECT FOR UPDATE locks the singleton while commands/polls run. Snapshot and com
 The server scheduler targets10-second samples while running and awake, regardless of whether a browser is visible. Render Free can suspend the service after15 minutes without inbound traffic and can restart it at any time. PostgreSQL preserves the state; execution resumes after wake-up, without invented historical prices or catch-up fills. Uninterrupted24/7 execution is not guaranteed on Free. No self-ping is used to prevent sleep.
 
 Earlier v2.4.1 browser-only sessions were not centrally saved and cannot be reconstructed automatically. The database initializes a single new inactive simulation only once. From then on all clients share it.
+
+
+## v2.5.1 autonomous operation
+
+All price/trade logic executes in the backend; views only read or issue commands. The API snapshot includes an execution object with hostingMode, schedulingEnabled, pollIntervalMs, processStartedAt, lastCycleAt and lastCycleStatus. These are process heartbeat metadata, not persisted balances. After a >30-second observation gap or pause/resume, the first quote establishes a new crossing reference; no downtime trade is fabricated.
+
+For continuous operation, approve and change the existing ariel-demo-next-api compute plan to a non-sleeping plan, then set SIMULATION_HOSTING_MODE=always-on. The marker describes the configured plan; it cannot prevent Free suspension. Do not create an additional worker for this single-instance demo. Check progress with two isolated snapshots separated by a period without browser/API requests, then restart and confirm state survives. The current Free setup is suitable for persistence verification but cannot satisfy continuous execution.
+
+Tests: optional SIMULATION_TEST_DATABASE_URL points only to a disposable local/build PostgreSQL database; the suite drops its own simulation_state table between cases. Never use a deployed database for this test variable. Docker builds provision a dedicated disposable cluster automatically.

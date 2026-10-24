@@ -102,3 +102,15 @@ it('shared HTTP client uses server snapshots, omits credentials and sends explic
   expect(fetcher.mock.calls[1][1]).toEqual(expect.objectContaining({method:'POST',body:expect.stringContaining('expectedControlRevision')}));
   expect(()=>validateSnapshot({simulation:{usdt:0}})).toThrow('invalid snapshot');
 });
+
+it('shows backend heartbeat and the actual hosting limitation', async () => {
+  const state=sharedSnapshot();state.execution={hostingMode:'free',schedulingEnabled:true,pollIntervalMs:10000,
+    lastCycleStatus:'ok',lastCycleAt:'2026-10-24T03:00:00Z'};
+  const b=backend(state);const view=render(<SharedBitcoinTracker api={b.api} />);await flush();
+  expect(screen.getByText(/Backend engine: ok/)).toHaveTextContent('Target interval: 10s');
+  expect(screen.getByText(/Continuous unattended operation requires an always-on plan/)).toBeInTheDocument();
+  expect(b.api.command).not.toHaveBeenCalled();view.unmount();
+  state.execution.hostingMode='always-on';render(<SharedBitcoinTracker api={backend(state).api} />);await flush();
+  expect(screen.getByText(/engine works without open browsers/)).toBeInTheDocument();
+});
+

@@ -111,3 +111,7 @@ Default capital is now 10,000 USDT. Start/Reset restores the configured USDT bal
 
 ## Shared simulation v2.5.0 (storage-gated rollout)
 The Bitcoin feature uses one durable server-owned state across browsers/devices, including Start/paused/holding state, all controls, balances, fees and history. No view lifecycle starts or resets it. The server polls public Binance prices while running and awake; clients poll/read snapshots. See docs/shared-simulation-setup.md for database setup, rollout order, public shared-control semantics, Free sleep and database expiry limits. Missing storage returns503 instead of creating a volatile local substitute. Keep the existing live frontend until the configured backend is verified. The original per-browser historical runs cannot be imported from a central source that never existed.
+
+
+## Autonomous simulator v2.5.1
+The backend owns pricing, limits, fees, trades and durable state; the web page is a monitor/control panel. Dedicated storage remains in bitcoin_shared.simulation_state inside the existing People database. Engine heartbeat and hosting status are visible. Restart/downtime reference handling prevents fabricated catch-up trades. See docs/shared-simulation-release.md and docs/shared-simulation-setup.md. Continuous operation requires non-sleeping hosting; the existing Free plan cannot provide it.

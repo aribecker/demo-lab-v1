@@ -1,25 +1,25 @@
-# Shared simulation v2.5.0 — implementation ready, activation pending storage
+# Shared simulation v2.5.1 — autonomous backend
 
-Branch: proximo-desarrollo-hello-world. Master specifications R29–R32 were published before implementation in a9522be4a9fac3c4426570b2626bed610e225322. Grounding is in specs/traceability.md; rollout prerequisites are in docs/shared-simulation-setup.md.
+Branch: `proximo-desarrollo-hello-world`.
 
-## Implemented
+## SDD
 
-- One PostgreSQL singleton document with the complete settings/run-pause/holding state, funds, fees, history, ledger, previous price and command revisions.
-- Server scheduling independent of clients; atomic received-asset fee/trade updates, row-lock serialization, poll-slot guard, command UUID idempotence and control-revision conflict detection.
-- Browser read-only lifecycle; explicit central commands for controls/reset/start/pause/refresh, valid field persistence and shared-action notice.
-- Missing storage returns safe503 with no volatile/local fallback. Existing weather/auth contracts and readiness remain available.
+Specifications R33 committed first in `1db68a8fe0a57f116e442c3785ffb6ca4af7b5fc`; code grounding committed next in `df05501ee4cda4c15b690115cde5cb9d826526ea`. Existing R29–R32 implementation is retained.
 
-## Local validation
+## Behavior
 
-- All29 Java tests passed, including JDBC state re-creation, two service instances, duplicate/concurrent poll slots/commands, persisted pause and settings, whole-document rollback, provider errors, cash-only reset/crossing math and the missing-storage HTTP boundary.
-- All81 frontend tests passed, including two-client pause/read consistency, reconnect/restored BTC holdings, no auto-command on mount/exit, central +/- and field edits, stale-control conflict handling and no fake session when storage is absent.
-- Maven executable-JAR packaging and production Vite/static-route build succeeded.
-- Packaged JAR smoke: health200; missing-storage simulation503 with the safe public error, without creating a volatile session.
+The Java scheduler alone samples Binance and applies threshold crossings, fees and trades. React reads snapshots and sends explicit commands. Browser close/hide/reload never pauses or resets the shared engine. State remains in `bitcoin_shared.simulation_state` within the existing People database. No People tables are changed. Row locks and durable poll slots serialize instances; commands use UUID idempotence and control revisions.
 
-## Pending live prerequisites
+New execution metadata reports process start, completed scheduler cycle/status, interval and configured hosting mode. Temporary storage failures retry; safe log categories omit credentials. PostgreSQL transaction lock waits are bounded. Graceful shutdown allows current work to finish. A gap over 30 seconds or explicit resume clears only the crossing reference, so no simulated fill spans unobserved downtime.
 
-SIMULATION_DATABASE_URL is not yet configured for ariel-demo-next-api. The connected Render API lists the existing same-region database but does not expose its connection credential. The browser Render Dashboard is signed out. Authenticate securely in the task browser to copy the internal database connection directly into backend environment settings; never paste the credential into chat. Then deploy/verify backend PostgreSQL first and activate frontend only after that check passes.
+## Validation
 
-Implementation commits use [skip render] while this prerequisite is pending. The currently published frontend remains v2.4.1; do not report shared persistence as live before the connection/rollout is completed. Local JDBC tests use isolated H2 in PostgreSQL mode, not the production Render database. Actual Render PostgreSQL schema/two-client/restart validation remains pending.
+Local Java suite: 31 tests passed, including unattended scheduler-only trading, restart restore, paused holdings, gaps/resume, two-instance locking, idempotence, rollback and provider failure. Fast local storage uses isolated H2. Frontend: 82 tests passed; production build passed.
 
-Existing Free Postgres expiry: 2026-11-21T03:09:14Z. Free backend sleeps after15 idle minutes; persistence survives but uninterrupted execution does not. No paid resource/upgrade was created. Previous per-browser runs were not durably saved and are not automatically imported.
+The Docker build additionally starts disposable PostgreSQL 17 and runs the storage suite against it using SIMULATION_TEST_DATABASE_URL. This test database is never the deployment database. Record remote Docker build outcome in rollout evidence.
+
+## Deployment constraints
+
+Activate backend and verify real PostgreSQL before publishing frontend. SIMULATION_DATABASE_URL is backend-only. Live configuration is managed through Render Dashboard/MCP; credentials do not appear in the repository. SIMULATION_HOSTING_MODE defaults to free, and only becomes always-on after the owner approves and applies a non-sleeping compute plan.
+
+Render Free sleeps after 15 idle minutes, so continuous unattended execution is not satisfied on the current plan. No keep-alive workaround or paid upgrade is performed. PostgreSQL trial expires 2026-11-21T03:09:14Z (2026-11-21 00:09:14 Buenos Aires). Preserve the saved row when upgrading/migrating storage.
