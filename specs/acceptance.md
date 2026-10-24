@@ -107,9 +107,13 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - Provider failure records error while preserving balances/last quote; storage failure returns safe503 without fake local success. Missing SIMULATION_DATABASE_URL must not create a volatile simulator.
 - Backend tests use local Binance fixtures and isolated JDBC storage; frontend tests mock shared API. Publish schema and env setup steps. Confirm configured PostgreSQL and both live services before activating the frontend.
 
+
 ## Autonomous execution R33
 - Start against a local market fixture; invoke the real scheduled loop without any GET/client calls and observe persistent quote count and a complete buy/sell cycle. Recreate the service/store and verify exact holdings, settings, ledger and running state.
 - After a >30-second gap or pause/resume, the first successful quote establishes a reference without filling; a subsequent genuine crossing may fill. No repeated slot is processed twice.
 - Run storage/concurrency/idempotence/rollback checks against PostgreSQL in addition to fast H2 tests. Pre-existing unrelated tables remain unchanged.
 - The API reports actual scheduler heartbeat and hosting mode; frontend shows last quote/engine heartbeat and public shared control semantics. All existing frontend/backend tests and production build pass.
 - Deployment activation requires configured PostgreSQL and a successful live snapshot read before frontend rollout. An always-on claim additionally requires a non-sleeping plan and background progress verification with no viewer requests. Record any outstanding plan approval explicitly; no hidden self-pings or upgrades.
+
+## R34 acceptance
+Verify Reset clears readings/renews timestamp, valid quotes increment once, failed provider and reads leave counters unchanged, and store recreation preserves timestamp/count. Elapsed duration is nonnegative and server-clock-derived, including pauses. UI renders count/date/duration, ticks without sending commands and handles legacy missing timing. Run backend/frontend suites and production build; deploy backend before frontend without resetting live state.
