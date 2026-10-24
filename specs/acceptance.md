@@ -127,3 +127,11 @@ Verify Reset clears readings/renews timestamp, valid quotes increment once, fail
 
 ## R36 acceptance
 Verify existing public.people and Flyway V1 are readable without reset; add/list/strip/Unicode/SQL-string/idempotent replay/conflict/pagination and restart persistence pass against disposable PostgreSQL17. Invalid names/UUID/cursors return400; storage absence503 does not break weather/login. Existing trading tests still pass after connection-parser extraction. React tests cover list/add/error/uncertain retry UUID/pagination and unified menu/navigation; direct /people reload works. Run backend/frontend suites/build and inspect live People list and health, Login providers and unchanged simulation run/control revision. Do not mutate live People/trading state for smoke checks. Record deployment IDs and remaining OAuth/Free hosting limits.
+
+## R37 acceptance
+- Temporary Hello World2/3 branch no longer exists; preserve unified work and source chatbot branch.
+- Chatbot is accessible through Home/menu/direct /chatbot with a free model selector, history, new conversation and supported voice controls.
+- Spring AI fixture tests verify actual request model/history/output cap; reject paid/unknown models, forged roles, oversized input; missing key503, safe upstream failure, no fabricated replies.
+- Production-origin client and React behavior/navigation tests pass; voice mock lifecycle/cleanup pass without requesting a real microphone permission.
+- All backend/PostgreSQL and frontend suites/build pass. Deploy and verify live API/catalog/UI. Check People list and simulation settings/run state are retained without live mutation.
+- Report real-key or browser-voice verification limitations honestly and measured total duration, not only coding/build time.
