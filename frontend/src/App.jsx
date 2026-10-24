@@ -4,6 +4,7 @@ import packageInfo from '../package.json';
 import Home from './Home.jsx';
 import Login from './Login.jsx';
 import HelloWorld from './HelloWorld.jsx';
+import People from './People.jsx';
 import BitcoinTracker from './SharedBitcoinTracker.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
@@ -13,6 +14,7 @@ const destinations = [
   { to: '/weather', label: 'Weather demo' },
   { to: '/components', label: 'Component gallery' },
   { to: '/login', label: 'Login' },
+  { to: '/people', label: 'People' },
   { to: '/hello-world', label: 'Hello World' },
   { to: '/bitcoin', label: 'Bitcoin tracker' },
 ];
@@ -59,6 +61,7 @@ export default function App({ loader, authApi, simulationApi }) {
         <Route path="/weather" element={<WeatherDemo loader={loader} />} />
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login api={authApi} />} />
+        <Route path="/people" element={<People />} />
         <Route path="/hello-world" element={<HelloWorld />} />
         <Route path="/bitcoin" element={<BitcoinTracker api={simulationApi} />} />
         <Route path="*" element={<section className="intro">
@@ -71,8 +74,8 @@ export default function App({ loader, authApi, simulationApi }) {
     </div>
 
     <footer>
-      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Binance public quotes' : 'Weather microservice → Provider'}</p>
-      <p>Data: {pathname === '/bitcoin'
+      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Binance public quotes' : pathname === '/people' ? 'Java API → PostgreSQL' : 'Weather microservice → Provider'}</p>
+      <p>Data: {pathname === '/people' ? 'PostgreSQL shared people list' : pathname === '/bitcoin'
         ? <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance</a>
         : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="footer-note">· Times in Buenos Aires</span></p>
     </footer>

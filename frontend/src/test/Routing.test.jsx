@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from '../App.jsx';
 import { sample } from './fixture.js';
 import { sharedSnapshot } from './sharedFixture.js';
+import * as peopleClient from '../peopleClient.js';
 
 afterEach(() => vi.useRealTimers());
 
@@ -22,6 +23,14 @@ function menuLink(name) {
   fireEvent.click(screen.getByRole('button', { name: 'Menu', exact: true }));
   return screen.getByRole('link', { name, exact: true });
 }
+
+it('opens the unified People route and marks its menu destination', async () => {
+  vi.spyOn(peopleClient,'listPeople').mockResolvedValue({people:[],nextCursor:null});
+  open('/people');
+  expect(await screen.findByText('No people yet. Add the first person.')).toBeInTheDocument();
+  expect(screen.getByRole('heading',{level:1})).toHaveTextContent('Hello, database!');
+  expect(menuLink('People')).toHaveAttribute('aria-current','page');
+});
 
 it('integrates login and trading navigation without resetting the shared simulation', async () => {
   const authApi={providers:vi.fn().mockResolvedValue([{id:'google',enabled:true}]),

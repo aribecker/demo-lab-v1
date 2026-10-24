@@ -1,44 +1,23 @@
 package ariel.iteration2.weather.simulation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
-import java.net.URLDecoder;
+import ariel.iteration2.weather.database.DatabaseConnections;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.Properties;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimulationStore {
     private static final Logger LOG = LoggerFactory.getLogger(SimulationStore.class);
-    private final String url;
+    private final DatabaseConnections connections;
     private final ObjectMapper json;
-    private final Properties properties = new Properties();
     private volatile boolean ready;
     public SimulationStore(String connection, ObjectMapper json) {
         this.json = json;
-        if (connection == null || connection.isBlank()) { url = ""; return; }
-        if (connection.startsWith("jdbc:")) url = connection;
-        else {
-            URI uri;
-            try { uri = URI.create(connection); }
-            catch (Exception invalid) { throw new IllegalArgumentException("Invalid simulation database configuration."); }
-            if (!uri.getScheme().equals("postgres") && !uri.getScheme().equals("postgresql")) throw new IllegalArgumentException("Invalid database scheme.");
-            url = "jdbc:postgresql://" + uri.getRawAuthority().substring(uri.getRawAuthority().lastIndexOf('@') + 1)
-                + uri.getRawPath() + (uri.getRawQuery() == null ? "" : "?" + uri.getRawQuery());
-            if (uri.getRawUserInfo() != null) {
-                String[] credentials = uri.getRawUserInfo().split(":",2);
-                properties.setProperty("user", decode(credentials[0]));
-                if (credentials.length == 2) properties.setProperty("password", decode(credentials[1]));
-            }
-        }
-        if (url.startsWith("jdbc:postgresql:")) {
-            properties.setProperty("connectTimeout","5"); properties.setProperty("socketTimeout","10");
-        }
+        this.connections = new DatabaseConnections(connection);
     }
-    private static String decode(String value) { return URLDecoder.decode(value.replace("+","%2B"), StandardCharsets.UTF_8); }
-    public boolean configured() { return !url.isEmpty(); }
+    public boolean configured() { return connections.configured(); }
     public synchronized void initialize() {
         if (ready) return;
         if (!configured()) throw new StorageUnavailable();
@@ -56,7 +35,7 @@ public class SimulationStore {
             throw new StorageUnavailable();
         }
     }
-    private Connection connect() throws SQLException { return DriverManager.getConnection(url, properties); }
+    private Connection connect() throws SQLException { return connections.open(); }
     public SharedState read() {
         if (!ready) throw new StorageUnavailable();
         try (Connection c = connect(); var statement = c.createStatement(); var rows = statement.executeQuery("SELECT document FROM bitcoin_shared.simulation_state WHERE state_id=1")) {
