@@ -1,7 +1,7 @@
 {
   "name": "weather-iteration-2",
   "private": true,
-  "version": "2.10.1",
+  "version": "2.11.0",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -10,7 +10,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && node scripts/static-routes.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run"
+    "test": "node scripts/check-styles.mjs && vitest run"
   },
   "dependencies": {
     "react": "19.3.1",

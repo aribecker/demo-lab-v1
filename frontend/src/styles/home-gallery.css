@@ -1,0 +1,43 @@
+.app-shell__menu-link { background: transparent; margin:2px 0; }
+.app-shell__menu-link[aria-current="page"] { background: var(--color-button); color: var(--color-accent); }
+.page-intro__title:focus { outline: none; }
+.page-intro--home { margin:var(--space-44) 0 var(--space-28); }
+.page-intro--home .page-intro__title { font-size: clamp(38px, 5vw, 58px); line-height: 1.13; margin:13px 0 15px; }
+.page-intro--home .page-intro__subtitle { max-width: 650px; }
+.home__grid { display: grid; grid-template-columns: 1fr 1fr; gap:var(--space-20); }
+.home__card { display: flex; flex-direction: column; color: var(--color-text); text-decoration: none; padding:22px; border:var(--border-width) solid var(--color-panel-border); border-radius:var(--radius-13px); background: linear-gradient(130deg, var(--color-surface), var(--color-surface-end)); }
+.home__card:hover { border-color: var(--color-accent); background: var(--color-button); }
+.home__number { font-size:var(--text-9px); letter-spacing: 1.5px; color: var(--color-text-secondary); }
+.home__card h2 { display: flex; align-items: center; justify-content: space-between; gap:10px; margin:var(--space-16) 0 10px; font-size:var(--text-23px); font-weight:var(--weight-medium); letter-spacing: -.6px; }
+.home__card h2 span { color: var(--color-accent); font-size:var(--text-20px); }
+.home__card p { margin:0 0 var(--space-20); color: var(--color-text-secondary); font-size:var(--text-13px); line-height: 1.8; }
+.home__action { margin-top:auto; font-size:var(--text-12px); font-weight:var(--weight-medium); color: var(--color-accent); }
+.home__note { display: flex; align-items: center; gap:11px; padding:var(--space-16) 0 var(--space-4); color: var(--color-text-secondary); }
+.home__note .status-dot { flex: 0 0 6px; }
+.home__note p { margin:0; font-size:var(--text-11px); line-height: 1.8; }
+.text__link { display: inline-block; font-size:var(--text-12px); margin-top:15px; }
+.gallery__description { display: flex; align-items: center; justify-content: space-between; gap:var(--space-24); margin:0 0 var(--space-20); padding-bottom:18px; border-bottom:var(--border-width) solid var(--color-border); }
+.gallery__description h2 { font-size:var(--text-21px); margin:var(--space-8) 0; font-weight:var(--weight-medium); }
+.gallery__description p:not(.text__eyebrow) { color: var(--color-text-secondary); font-size:var(--text-12px); line-height: 1.7; margin:0; }
+.gallery__description .text__link { white-space: nowrap; margin:0; }
+.gallery__toolbar { display: flex; align-items: center; justify-content: space-between; gap:var(--space-20); margin-bottom:13px; }
+.gallery__state-controls { display: inline-flex; gap:3px; border:var(--border-width) solid var(--color-panel-border); border-radius:var(--radius-7px); padding:var(--space-4); background: var(--color-surface-end); }
+.gallery__state-controls button { padding:9px 13px; border: 0; border-radius:var(--radius-4px); background: transparent; color: var(--color-text-secondary); font: inherit; font-size:var(--text-11px); cursor: pointer; }
+.gallery__state-controls button[aria-pressed="true"] { background: var(--color-button); color: var(--color-accent); }
+.gallery__state-controls button:hover { background: var(--color-button); }
+.gallery__notice { font-size:var(--text-8px); letter-spacing: .9px; color: var(--color-text-secondary); line-height: 1.8; margin:0; text-align: right; }
+.gallery__notes { margin-top:19px; padding:0 2px; color: var(--color-text-secondary); font-size:var(--text-12px); line-height: 1.8; }
+.gallery__notes h3 { font-size:var(--text-13px); color: var(--color-text); font-weight:var(--weight-medium); margin:0 0 7px; }
+.gallery__notes p { margin:var(--space-4) 0; }
+@media (max-width: 600px) {
+  .page-intro--home { margin-top:30px; margin-bottom:var(--space-24); }
+  .home__grid { grid-template-columns: 1fr; gap:var(--space-12); }
+  .home__card { padding:19px; }
+  .home__card h2 { font-size:var(--text-22px); }
+  .gallery__description { flex-direction: column; align-items: flex-start; gap:11px; }
+  .gallery__toolbar { flex-direction: column; align-items: flex-start; gap:var(--space-8); }
+  .gallery__notice { text-align: left; font-size:var(--text-8px); }
+}
+
+
+

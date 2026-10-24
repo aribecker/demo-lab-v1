@@ -31,27 +31,28 @@ export default function ComponentGallery() {
   }
 
   return <>
-    <section className="intro" aria-labelledby="page-heading">
-      <p className="eyebrow">UI EXPLORER · 1 COMPONENT</p>
-      <h1 id="page-heading" tabIndex={-1}>Component <span>gallery.</span></h1>
-      <p className="subtitle">Reusable UI, shown in isolation. Explore how each component looks and behaves before using it in a feature.</p>
+    <section className="page-intro" aria-labelledby="page-heading">
+      <p className="text__eyebrow">UI EXPLORER · 1 COMPONENT</p>
+      <h1 className="page-intro__title" id="page-heading" tabIndex={-1}>Component <span>gallery.</span></h1>
+      <p className="page-intro__subtitle">Reusable UI, shown in isolation. Explore how each component looks and behaves before using it in a feature.</p>
     </section>
-    <section className="gallery-description" aria-labelledby="widget-title">
-      <div><p className="eyebrow">COMPONENT 01</p><h2 id="widget-title">Weather widget</h2><p>The same component used by the live demo, with a small set of controlled display states.</p></div>
-      <Link className="text-link" to="/weather">Open live Weather demo →</Link>
+    <section className="gallery__description" aria-labelledby="widget-title">
+      <div><p className="text__eyebrow">COMPONENT 01</p><h2 id="widget-title">Weather widget</h2><p>The same component used by the live demo, with a small set of controlled display states.</p></div>
+      <Link className="text__link" to="/weather">Open live Weather demo →</Link>
     </section>
-    <div className="preview-toolbar">
-      <div className="state-controls" role="group" aria-label="Preview state">
-        {['success', 'loading', 'error'].map(value => <button key={value} type="button"
+    <div className="gallery__toolbar">
+      <div className="gallery__state-controls" role="group" aria-label="Preview state">
+        {['success', 'loading', 'error'].map(value => <button className="button" key={value} type="button"
           aria-pressed={selected === value} onClick={() => select(value)}>{value[0].toUpperCase() + value.slice(1)}</button>)}
       </div>
-      <p className="sample-notice">COMPONENT PREVIEW · SAMPLE DATA · NO NETWORK REQUESTS</p>
+      <p className="gallery__notice">COMPONENT PREVIEW · SAMPLE DATA · NO NETWORK REQUESTS</p>
     </div>
     <WeatherWidget preview state={{ ...states[selected], refresh: refreshPreview }} />
-    <aside className="component-notes" aria-label="Component usage">
+    <aside className="gallery__notes" aria-label="Component usage">
       <h3>How to use it</h3>
       <p>Pass a display state, weather data when available and a refresh handler. The widget renders the interface; the page decides where its data comes from.</p>
       <p>Try the state buttons above, or use Get weather in the preview to simulate a short loading cycle. For real provider data, open the Weather demo.</p>
     </aside>
   </>;
 }
+

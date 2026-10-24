@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { loadDatabase, loadTable } from './databaseClient.js';
-import './database.css';
 
 function TableView({ schema, table }) {
   const [open, setOpen] = useState(false), [page, setPage] = useState(null);
@@ -29,35 +28,35 @@ function TableView({ schema, table }) {
   function toggleRow(position) {
     setExpanded(current => { const next = new Set(current); next.has(position) ? next.delete(position) : next.add(position); return next; });
   }
-  return <li className="database-table">
-    <div className="database-table-heading"><h3>{table}</h3>
-      <button className="database-toggle" type="button" aria-expanded={open}
+  return <li className="database__table">
+    <div className="database__table-heading"><h3>{table}</h3>
+      <button className="button database__toggle" type="button" aria-expanded={open}
         aria-label={`${open ? 'Collapse' : 'Expand'} table ${schema}.${table}`} onClick={toggle}>{open ? '−' : '+'}</button></div>
-    {open && <div className="database-table-content">
-      <div className="database-table-tools"><p>{page ? `Order: ${page.ordering}` : 'Rows load when you expand a table.'}</p>
-        <button type="button" disabled={loading} onClick={() => load()}>Refresh rows</button></div>
-      {error && <p role="alert" className="auth-message">{error} <button type="button" disabled={loading} onClick={() => load(failedOffset.current)}>Retry rows</button></p>}
-      <p role="status" className="database-status">{loading ? 'Loading rows…' : page ? `${page.rows.length} rows loaded` : ''}</p>
-      {page && !page.rows.length && <p className="database-empty">This table has no rows.</p>}
-      {page && <ul className="database-rows" aria-label={`Rows in ${schema}.${table}`} aria-busy={loading}>
+    {open && <div className="database__table-content">
+      <div className="database__table-tools"><p>{page ? `Order: ${page.ordering}` : 'Rows load when you expand a table.'}</p>
+        <button className="button" type="button" disabled={loading} onClick={() => load()}>Refresh rows</button></div>
+      {error && <p role="alert" className="notice notice--warning">{error} <button className="button" type="button" disabled={loading} onClick={() => load(failedOffset.current)}>Retry rows</button></p>}
+      <p role="status" className="database__status">{loading ? 'Loading rows…' : page ? `${page.rows.length} rows loaded` : ''}</p>
+      {page && !page.rows.length && <p className="database__empty">This table has no rows.</p>}
+      {page && <ul className="database__rows" aria-label={`Rows in ${schema}.${table}`} aria-busy={loading}>
         {page.rows.map(row => <li key={row.position}>
-          <div className="database-row-heading"><span>{row.label}</span>
-            <button className="database-toggle" type="button" aria-expanded={expanded.has(row.position)}
+          <div className="database__row-heading"><span>{row.label}</span>
+            <button className="button database__toggle" type="button" aria-expanded={expanded.has(row.position)}
               aria-label={`${expanded.has(row.position) ? 'Collapse' : 'Expand'} row ${row.position + 1} in ${schema}.${table}`}
               onClick={() => toggleRow(row.position)}>{expanded.has(row.position) ? '−' : '+'}</button></div>
-          {expanded.has(row.position) && <dl className="database-columns" aria-label={`Columns in row ${row.position + 1}`}>
+          {expanded.has(row.position) && <dl className="database__columns" aria-label={`Columns in row ${row.position + 1}`}>
             {page.columns.map((column, index) => <div key={column.name}>
               <dt>{column.name} <small>{column.type}{column.primaryKey ? ' · primary key' : ''}</small></dt>
-              <dd>{row.cells[index].value === null ? <span className="database-null">NULL</span>
-                : row.cells[index].value === '' ? <span className="database-null">(empty string)</span>
+              <dd>{row.cells[index].value === null ? <span className="database__null">NULL</span>
+                : row.cells[index].value === '' ? <span className="database__null">(empty string)</span>
                 : <pre>{row.cells[index].value}</pre>}
-                {row.cells[index].truncated && <small className="database-truncated">Value truncated to 65,536 characters.</small>}</dd>
+                {row.cells[index].truncated && <small className="database__truncated">Value truncated to 65,536 characters.</small>}</dd>
             </div>)}
           </dl>}
         </li>)}
       </ul>}
-      {page?.nextOffset != null && <button type="button" disabled={loading} onClick={() => load(page.nextOffset)}>Load more rows</button>}
-      <p className="database-hint">Read-only snapshot. Refresh to see changes made since these rows were loaded.</p>
+      {page?.nextOffset != null && <button className="button" type="button" disabled={loading} onClick={() => load(page.nextOffset)}>Load more rows</button>}
+      <p className="database__hint">Read-only snapshot. Refresh to see changes made since these rows were loaded.</p>
     </div>}
   </li>;
 }
@@ -78,17 +77,17 @@ export default function Database() {
   }
   useEffect(() => { mounted.current = true; refresh(); return () => { mounted.current = false; active.current?.abort(); }; }, []);
   return <>
-    <section className="intro"><p className="eyebrow">POSTGRESQL · READ-ONLY EXPLORER</p><h1 tabIndex={-1}>Database.</h1>
-      <p className="subtitle">Explore schemas and tables. Expand a table to see its rows, then expand a row to inspect every column.</p></section>
-    <section className="database-panel" aria-label="Database explorer">
-      <div className="database-toolbar"><p>{catalog ? <>Database <strong>{catalog.database}</strong></> : 'Connected PostgreSQL database'}</p>
-        <button type="button" disabled={loading} onClick={refresh}>Refresh tables</button></div>
-      {error && <p role="alert" className="auth-message">{error} <button type="button" onClick={refresh}>Retry database</button></p>}
-      <p role="status" className="database-status">{loading ? 'Loading schemas and tables…' : catalog ? `${catalog.schemas.reduce((n, schema) => n + schema.tables.length, 0)} tables across ${catalog.schemas.length} schemas` : ''}</p>
-      {catalog && !catalog.schemas.length && <p className="database-empty">No accessible tables were found.</p>}
-      {catalog?.schemas.map(schema => <section key={schema.name} className="database-schema" aria-label={`Schema ${schema.name}`}>
+    <section className="page-intro"><p className="text__eyebrow">POSTGRESQL · READ-ONLY EXPLORER</p><h1 className="page-intro__title" tabIndex={-1}>Database.</h1>
+      <p className="page-intro__subtitle">Explore schemas and tables. Expand a table to see its rows, then expand a row to inspect every column.</p></section>
+    <section className="panel database__panel" aria-label="Database explorer">
+      <div className="database__toolbar"><p>{catalog ? <>Database <strong>{catalog.database}</strong></> : 'Connected PostgreSQL database'}</p>
+        <button className="button" type="button" disabled={loading} onClick={refresh}>Refresh tables</button></div>
+      {error && <p role="alert" className="notice notice--warning">{error} <button className="button" type="button" onClick={refresh}>Retry database</button></p>}
+      <p role="status" className="database__status">{loading ? 'Loading schemas and tables…' : catalog ? `${catalog.schemas.reduce((n, schema) => n + schema.tables.length, 0)} tables across ${catalog.schemas.length} schemas` : ''}</p>
+      {catalog && !catalog.schemas.length && <p className="database__empty">No accessible tables were found.</p>}
+      {catalog?.schemas.map(schema => <section key={schema.name} className="database__schema" aria-label={`Schema ${schema.name}`}>
         <h2><small>SCHEMA</small> {schema.name}</h2>
-        <ul className="database-tables">{schema.tables.map(table => <TableView key={`${generation}:${table.name}`} schema={schema.name} table={table.name} />)}</ul>
+        <ul className="database__tables">{schema.tables.map(table => <TableView key={`${generation}:${table.name}`} schema={schema.name} table={table.name} />)}</ul>
       </section>)}
     </section>
   </>;

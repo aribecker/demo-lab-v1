@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { listPeople, addPerson } from './peopleClient.js';
-import './people.css';
 
 export default function People() {
   const [name, setName] = useState(''), [people, setPeople] = useState([]), [cursor, setCursor] = useState(null);
@@ -36,22 +35,22 @@ export default function People() {
     finally { clearTimeout(timeout); pending.current = false; if (mounted.current) setSaving(false); }
   }
   return <>
-    <section className="intro"><p className="eyebrow">HELLO WORLD · POSTGRESQL</p><h1 tabIndex={-1}>Hello, database!</h1>
-      <p className="subtitle">Add a person and see the names saved in PostgreSQL by this application.</p></section>
-    <section className="people-panel" aria-label="People database demo">
-      <p className="people-note">Public demo: use sample names. Everyone can see this shared list.</p>
-      <form onSubmit={submit}><label htmlFor="person-name">Name</label><div className="people-form">
-        <input id="person-name" value={name} maxLength={100} required autoComplete="off" disabled={saving} onChange={e => setName(e.target.value)} placeholder="e.g. Ada Lovelace" />
-        <button type="submit" disabled={loading || saving || !name.trim()}>{saving ? 'Adding…' : 'Add person'}</button></div></form>
-      {error && <p role="alert" className="auth-message">{error}</p>}
-      <p role="status" className="people-notice">{saving ? 'Saving person…' : notice || (loading ? 'Loading people…' : '')}</p>
-      <div className="people-heading"><h2>People</h2><button type="button" disabled={loading || saving} onClick={() => { setNotice(''); load(); }}>Refresh list</button></div>
-      {!loading && !people.length && !error && <p className="people-note">No people yet. Add the first person.</p>}
-      <ul className="people-list" aria-label="Saved people" aria-busy={loading}>
+    <section className="page-intro"><p className="text__eyebrow">HELLO WORLD · POSTGRESQL</p><h1 className="page-intro__title" tabIndex={-1}>Hello, database!</h1>
+      <p className="page-intro__subtitle">Add a person and see the names saved in PostgreSQL by this application.</p></section>
+    <section className="panel people__panel" aria-label="People database demo">
+      <p className="people__note">Public demo: use sample names. Everyone can see this shared list.</p>
+      <form onSubmit={submit}><label htmlFor="person-name">Name</label><div className="people__form">
+        <input className="field" id="person-name" value={name} maxLength={100} required autoComplete="off" disabled={saving} onChange={e => setName(e.target.value)} placeholder="e.g. Ada Lovelace" />
+        <button className="button button--primary" type="submit" disabled={loading || saving || !name.trim()}>{saving ? 'Adding…' : 'Add person'}</button></div></form>
+      {error && <p role="alert" className="notice notice--warning">{error}</p>}
+      <p role="status" className="people__notice">{saving ? 'Saving person…' : notice || (loading ? 'Loading people…' : '')}</p>
+      <div className="people__heading"><h2>People</h2><button className="button" type="button" disabled={loading || saving} onClick={() => { setNotice(''); load(); }}>Refresh list</button></div>
+      {!loading && !people.length && !error && <p className="people__note">No people yet. Add the first person.</p>}
+      <ul className="people__list" aria-label="Saved people" aria-busy={loading}>
         {people.map(person => <li key={person.id}><span><strong>{person.name}</strong><small>#{person.id}</small></span><time dateTime={person.createdAt}>{new Date(person.createdAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' })}</time></li>)}
       </ul>
-      {cursor && <button type="button" disabled={loading || saving} onClick={() => load(cursor)}>{loading ? 'Loading…' : 'Load more'}</button>}
-      <p className="people-note">Records survive page refreshes and service restarts. The free demo database expires after 30 days.</p>
+      {cursor && <button className="button" type="button" disabled={loading || saving} onClick={() => load(cursor)}>{loading ? 'Loading…' : 'Load more'}</button>}
+      <p className="people__note">Records survive page refreshes and service restarts. The free demo database expires after 30 days.</p>
     </section>
   </>;
 }

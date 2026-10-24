@@ -34,8 +34,8 @@ describe('React weather page', () => {
     await screen.findByText('current model data');
     fireEvent.click(screen.getByRole('button', { name: /Get weather|Getting weather/ }));
     expect(screen.queryByText(sample.requestId)).not.toBeInTheDocument();
-    expect(container.querySelector('.reading-area')).toBeInTheDocument();
-    expect(container.querySelectorAll('.metadata > div')).toHaveLength(3);
+    expect(container.querySelector('.weather-widget__readings')).toBeInTheDocument();
+    expect(container.querySelectorAll('.weather-widget__metadata > div')).toHaveLength(3);
     expect(screen.getByRole('button', { name: /Get weather|Getting weather/ })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: /Get weather|Getting weather/ }));
     expect(loader).toHaveBeenCalledTimes(2);
@@ -97,3 +97,4 @@ describe('React weather page', () => {
     expect(requests[2].signal.aborted).toBe(true);
   });
 });
+

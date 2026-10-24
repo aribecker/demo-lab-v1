@@ -90,9 +90,9 @@ export default function Login({ api = defaultApi }) {
   const user = session?.profile;
   return (
     <>
-      <section className="intro" aria-labelledby="page-heading">
-        <p className="eyebrow">03 / IDENTITY · TRADING DEMO LAB</p>
-        <h1 id="page-heading" tabIndex={-1}>
+      <section className="page-intro" aria-labelledby="page-heading">
+        <p className="text__eyebrow">03 / IDENTITY · TRADING DEMO LAB</p>
+        <h1 className="page-intro__title" id="page-heading" tabIndex={-1}>
           {user ? (
             <>
               Hello, <span>{user.name || "there"}.</span>
@@ -105,34 +105,34 @@ export default function Login({ api = defaultApi }) {
             </>
           )}
         </h1>
-        <p className="subtitle">
+        <p className="page-intro__subtitle">
           {user
             ? "Here is the profile you shared with this demo."
             : "Try Google, GitHub or Microsoft sign-in in the same application as the trading simulator."}
         </p>
       </section>
-      <aside className="shared-notice">
+      <aside className="notice">
         <strong>Optional login demo.</strong> The trading simulator is public
         and shared. Signing in or out does not reset balances, change its
         controls or create a private simulation.
         <p>
-          <a className="text-link" href="/bitcoin">
+          <a className="text__link" href="/bitcoin">
             Open trading simulator →
           </a>
         </p>
       </aside>
       {error && (
-        <p className="auth-message" role="alert">
+        <p className="notice notice--warning" role="alert">
           {error}
         </p>
       )}
       {busy && <p role="status">{user ? "Signing out…" : "Connecting…"}</p>}
       {user ? (
-        <section className="auth-profile" aria-label="Your profile">
-          <div className="auth-person">
+        <section className="panel auth__profile" aria-label="Your profile">
+          <div className="auth__person">
             {user.picture?.startsWith("https://") && (
               <img
-                className="auth-avatar"
+                className="auth__avatar"
                 src={user.picture}
                 referrerPolicy="no-referrer"
                 alt=""
@@ -142,13 +142,13 @@ export default function Login({ api = defaultApi }) {
               />
             )}
             <div>
-              <p className="eyebrow">
+              <p className="text__eyebrow">
                 SIGNED IN WITH {labels[user.provider] || user.provider}
               </p>
               <h2>{user.name || "Name not shared"}</h2>
             </div>
           </div>
-          <dl className="auth-details">
+          <dl className="auth__details">
             <div>
               <dt>Email</dt>
               <dd>{user.email || "Not shared by this account"}</dd>
@@ -178,31 +178,31 @@ export default function Login({ api = defaultApi }) {
               </div>
             )}
           </dl>
-          <button className="auth-button" disabled={busy} onClick={signOut}>
+          <button className="button auth__button" disabled={busy} onClick={signOut}>
             Sign out of demo
           </button>
-          <p className="auth-note">
+          <p className="auth__note">
             This ends your demo session. Your{" "}
             {labels[user.provider] || "platform"} account stays signed in, and
             the shared simulator keeps its state.
           </p>
         </section>
       ) : (
-        <section className="auth-panel" aria-label="Sign-in providers">
-          <div className="auth-providers">
+        <section className="panel auth__panel" aria-label="Sign-in providers">
+          <div className="auth__providers">
             {Object.entries(labels).map(([id, name]) => {
               const enabled =
                 choices?.find((p) => p.id === id)?.enabled === true;
               return (
-                <div className="auth-provider" key={id}>
+                <div className="auth__provider" key={id}>
                   <button
-                    className="auth-button"
+                    className="button auth__button"
                     disabled={busy || !enabled}
                     onClick={() => signIn(id)}
                   >
                     Continue with {name} <span aria-hidden="true">↗</span>
                   </button>
-                  <span className="auth-provider-status">
+                  <span className="auth__provider-status">
                     {!choices
                       ? "Checking availability…"
                       : enabled
@@ -217,7 +217,7 @@ export default function Login({ api = defaultApi }) {
             <div role="status">
               <p>{providerError}</p>
               <button
-                className="auth-button"
+                className="button auth__button"
                 disabled={retrying}
                 onClick={loadProviders}
               >
@@ -226,12 +226,12 @@ export default function Login({ api = defaultApi }) {
             </div>
           )}
           {choices && !choices.some((p) => p.enabled) && (
-            <p className="auth-note">
+            <p className="auth__note">
               Sign-in is pending provider configuration for this environment.
               The shared trading simulator is available while setup is pending.
             </p>
           )}
-          <p className="auth-note">
+          <p className="auth__note">
             Only the profile details you authorize are shown. Your password
             stays with your platform.
           </p>
