@@ -115,6 +115,27 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - The API reports actual scheduler heartbeat and hosting mode; frontend shows last quote/engine heartbeat and public shared control semantics. All existing frontend/backend tests and production build pass.
 - Deployment activation requires configured PostgreSQL and a successful live snapshot read before frontend rollout. An always-on claim additionally requires a non-sleeping plan and background progress verification with no viewer requests. Record any outstanding plan approval explicitly; no hidden self-pings or upgrades.
 
+## R34 acceptance
+Verify Reset clears readings/renews timestamp, valid quotes increment once, failed provider and reads leave counters unchanged, and store recreation preserves timestamp/count. Elapsed duration is nonnegative and server-clock-derived, including pauses. UI renders count/date/duration, ticks without sending commands and handles legacy missing timing. Run backend/frontend suites and production build; deploy backend before frontend without resetting live state.
+
+## R35 integrated acceptance
+- Same deployment exposes /login and /bitcoin via menu/Home and explicit cross-links; profile view also offers simulator navigation.
+- Login/logout/view navigation neither require nor issue simulation commands. Existing balances, metrics and settings persist through rollout.
+- Three providers are shown, disabled until configured, with an honest environment setup explanation. No source-environment auth fallback.
+- Existing OAuth callback/ticket/replay/expiry/logout/CORS checks and simulator persistence tests pass. Add integration navigation tests, run all Java and frontend tests/build, and verify both live routes/provider endpoint. Report missing real OAuth credentials separately from application integration.
+- Record measured start time and final verified delivery time in Buenos Aires; report total elapsed time including deployment and verification.
+
+## R36 acceptance
+Verify existing public.people and Flyway V1 are readable without reset; add/list/strip/Unicode/SQL-string/idempotent replay/conflict/pagination and restart persistence pass against disposable PostgreSQL17. Invalid names/UUID/cursors return400; storage absence503 does not break weather/login. Existing trading tests still pass after connection-parser extraction. React tests cover list/add/error/uncertain retry UUID/pagination and unified menu/navigation; direct /people reload works. Run backend/frontend suites/build and inspect live People list and health, Login providers and unchanged simulation run/control revision. Do not mutate live People/trading state for smoke checks. Record deployment IDs and remaining OAuth/Free hosting limits.
+
+## R37 acceptance
+- Temporary Hello World2/3 branch no longer exists; preserve unified work and source chatbot branch.
+- Chatbot is accessible through Home/menu/direct /chatbot with a free model selector, history, new conversation and supported voice controls.
+- Spring AI fixture tests verify actual request model/history/output cap; reject paid/unknown models, forged roles, oversized input; missing key503, safe upstream failure, no fabricated replies.
+- Production-origin client and React behavior/navigation tests pass; voice mock lifecycle/cleanup pass without requesting a real microphone permission.
+- All backend/PostgreSQL and frontend suites/build pass. Deploy and verify live API/catalog/UI. Check People list and simulation settings/run state are retained without live mutation.
+- Report real-key or browser-voice verification limitations honestly and measured total duration, not only coding/build time.
+
 
 ## R38 acceptance
 Verify distinct configured origins in frontend clients/build. Live weather page must show real normalized data and retained microservice logs must observe its request with the integrated CORS origin. Integrated /api/weather returns404 and /health200. Both Java suites pass (retained weather providers with fixtures; integrated People/PostgreSQL/auth/chat/simulation). Four People records, shared start/control state and balances survive rollout. Cleanup happens only after these checks. Confirm retired services absent from live inventory; retain unrelated playground, repository and database. Missing connector deletion capability or browser authentication must be reported as a concrete remaining blocker.
