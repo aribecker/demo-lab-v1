@@ -117,3 +117,10 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 
 ## R34 acceptance
 Verify Reset clears readings/renews timestamp, valid quotes increment once, failed provider and reads leave counters unchanged, and store recreation preserves timestamp/count. Elapsed duration is nonnegative and server-clock-derived, including pauses. UI renders count/date/duration, ticks without sending commands and handles legacy missing timing. Run backend/frontend suites and production build; deploy backend before frontend without resetting live state.
+
+## R35 integrated acceptance
+- Same deployment exposes /login and /bitcoin via menu/Home and explicit cross-links; profile view also offers simulator navigation.
+- Login/logout/view navigation neither require nor issue simulation commands. Existing balances, metrics and settings persist through rollout.
+- Three providers are shown, disabled until configured, with an honest environment setup explanation. No source-environment auth fallback.
+- Existing OAuth callback/ticket/replay/expiry/logout/CORS checks and simulator persistence tests pass. Add integration navigation tests, run all Java and frontend tests/build, and verify both live routes/provider endpoint. Report missing real OAuth credentials separately from application integration.
+- Record measured start time and final verified delivery time in Buenos Aires; report total elapsed time including deployment and verification.
