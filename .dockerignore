@@ -1,5 +1,5 @@
-**
-!weather-service/
-!weather-service/pom.xml
-!weather-service/src/
-!weather-service/src/**
+**/node_modules
+**/dist
+**/target
+.git
+docs/evidence
