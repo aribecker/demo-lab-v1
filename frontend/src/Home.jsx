@@ -9,6 +9,12 @@ export default function Home() {
       <p className="page-intro__subtitle">A demo application for exploring React, reusable components and a Java microservice. Choose a feature and take a look around.</p>
     </section>
     <section className="home__grid" aria-label="Demo features">
+      <Link className="home__card" to="/specifications">
+        <span className="home__number" aria-hidden="true">08 / SPECIFICATIONS · SDD</span>
+        <h2>Specifications <span aria-hidden="true">↗</span></h2>
+        <p>Read all system specifications with syntax highlighting, adjustable text and original source downloads.</p>
+        <span className="home__action">Open Specifications →</span>
+      </Link>
       <Link className="home__card" to="/database">
         <span className="home__number" aria-hidden="true">07 / DATABASE · EXPLORER</span>
         <h2>Database <span aria-hidden="true">↗</span></h2>

@@ -89,6 +89,7 @@
 
 ## R42 — Specifications viewer
 - [x] Define the complete build-time specs inventory, safe viewer, R41 styling and no-backend boundary before generation.
-- [ ] Ground the current router/Home/static-routes and central CSS.
-- [ ] Generate catalog/viewer, tests and responsive BEM styles.
-- [ ] Run full frontend validation, deploy and verify live direct entry/file content.
+- [x] Ground the current router/Home/static-routes and central CSS.
+- [x] Generate catalog/viewer, tests and responsive BEM styles.
+- [x] Run full frontend validation (116 tests, style contract and production build).
+- [ ] Deploy and verify live direct entry/file content.
