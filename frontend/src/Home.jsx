@@ -9,6 +9,12 @@ export default function Home() {
       <p className="subtitle">A demo application for exploring React, reusable components and a Java microservice. Choose a feature and take a look around.</p>
     </section>
     <section className="feature-grid" aria-label="Demo features">
+      <Link className="feature-card" to="/database">
+        <span className="feature-number" aria-hidden="true">07 / DATABASE · EXPLORER</span>
+        <h2>Database <span aria-hidden="true">↗</span></h2>
+        <p>Browse PostgreSQL schemas and tables, expand rows and inspect each column in a read-only panel.</p>
+        <span className="feature-action">Open Database →</span>
+      </Link>
       <Link className="feature-card" to="/chatbot">
         <span className="feature-number" aria-hidden="true">06 / CHATBOT · SPRING AI</span>
         <h2>Chatbot <span aria-hidden="true">↗</span></h2>

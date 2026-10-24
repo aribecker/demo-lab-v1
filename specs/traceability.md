@@ -106,3 +106,7 @@ Spec checkpoint bd10e4f6f591fc59615b590aa1f1a5b04403ca69. Inspected source chatb
 
 ## R38 current responsibility mapping
 Weather provider/controller/record and fixture coverage now live in weather-microservice/. The retained original Weather service deploys the equivalent weather-service/ mirror on microservices-v008. frontend/src/backendConfig.js and apiOrigins.test.js isolate all non-weather APIs from the Weather origin. Integrated BackendBoundaryTest verifies health, CORS and removal of /api/weather. deploy/integrated-zone.json records the three retained services. Cleanup evidence must distinguish requested retirement from actual confirmed service deletion.
+
+
+## R39 Database explorer
+Database.jsx + databaseClient.js + /database direct route provide schema/table and row/column disclosures. DatabaseExplorerRepository/Controller use shared JDBC configuration in read-only PostgreSQL transactions; catalog metadata validates accessible base tables and quotes identifiers. DatabaseExplorerPostgresTest covers schemas/privileges/identifier quoting, numeric PK ordering and paging, NULL/empty/JSON values, truncation and non-mutation; DatabaseExplorerBoundaryTest checks errors and rejected writes. Database.test.jsx and databaseClient.test.js cover lazy disclosures, pages, retries, value escaping, direct route and independent backend origin. Release/deploy evidence: docs/database-explorer-release.md.

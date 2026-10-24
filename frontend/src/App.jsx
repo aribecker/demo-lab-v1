@@ -5,6 +5,7 @@ import Home from './Home.jsx';
 import Login from './Login.jsx';
 import HelloWorld from './HelloWorld.jsx';
 import People from './People.jsx';
+import Database from './Database.jsx';
 import Chatbot from './Chatbot.jsx';
 import BitcoinTracker from './SharedBitcoinTracker.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
@@ -16,6 +17,7 @@ const destinations = [
   { to: '/components', label: 'Component gallery' },
   { to: '/login', label: 'Login' },
   { to: '/people', label: 'People' },
+  { to: '/database', label: 'Database' },
   { to: '/chatbot', label: 'Chatbot' },
   { to: '/hello-world', label: 'Hello World' },
   { to: '/bitcoin', label: 'Bitcoin tracker' },
@@ -64,6 +66,7 @@ export default function App({ loader, authApi, simulationApi }) {
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login api={authApi} />} />
         <Route path="/people" element={<People />} />
+        <Route path="/database" element={<Database />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/hello-world" element={<HelloWorld />} />
         <Route path="/bitcoin" element={<BitcoinTracker api={simulationApi} />} />
@@ -77,8 +80,8 @@ export default function App({ loader, authApi, simulationApi }) {
     </div>
 
     <footer>
-      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Binance public quotes' : pathname === '/people' ? 'Java API → PostgreSQL' : pathname === '/chatbot' ? 'Spring AI → OpenRouter' : 'Weather microservice → Provider'}</p>
-      <p>Data: {pathname === '/chatbot' ? 'OpenRouter · free text models' : pathname === '/people' ? 'PostgreSQL shared people list' : pathname === '/bitcoin'
+      <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Binance public quotes' : ['/people', '/database'].includes(pathname) ? 'Java API → PostgreSQL' : pathname === '/chatbot' ? 'Spring AI → OpenRouter' : 'Weather microservice → Provider'}</p>
+      <p>Data: {pathname === '/chatbot' ? 'OpenRouter · free text models' : pathname === '/database' ? 'PostgreSQL schemas and tables' : pathname === '/people' ? 'PostgreSQL shared people list' : pathname === '/bitcoin'
         ? <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance</a>
         : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="footer-note">· Times in Buenos Aires</span></p>
     </footer>
