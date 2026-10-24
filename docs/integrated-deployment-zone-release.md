@@ -1,20 +1,20 @@
 # Integrated deployment zone release
 
-Application behavior remains v2.8.0. Only deployment configuration changed, following specification commit e63b17e00ff1bdf39b039d353e522f052e1d1fec, grounding commit f75275bffc8686c940640d8909e0e1d453b354bd, and configuration commit 0dbadf17fc4de89b0c33d12e491280941337e91a.
+The integrated v2.8.0 application is deployed with configuration changes only. Specification: specs/integrated-deployment-zone.md. Grounding: docs/integrated-deployment-zone-grounding.md. Generated deployment configuration: deploy/integrated-zone.json. Existing environments remain unchanged.
 
-## Created services
-- Frontend: https://ariel-demo-integrated.onrender.com ; srv-dbeg1ics728c73c4h61g; deploy dep-dbeg1iks728c73c4h7a0, live.
-- Java/Spring backend: https://ariel-demo-integrated-api.onrender.com ; srv-dbeg1f8ae00c73d1mkrg; deploy dep-dbeg1fgae00c73d1mmg0, live.
-- Source branch: proximo-desarrollo-hello-world. Existing environments unchanged. Free backend plan; static frontend. Backend currently uses default TCP readiness because the connector creation tool cannot specify an HTTP health-check path; GET /health was independently verified200.
+## Live services
+- Frontend: https://ariel-demo-integrated.onrender.com ; srv-dbeg1ics728c73c4h61g ; deploy dep-dbeg1iks728c73c4h7a0.
+- Backend: https://ariel-demo-integrated-api.onrender.com ; srv-dbeg1f8ae00c73d1mkrg ; database activation deploy dep-dbeg8givcj2c73cs0odg, live, source f60e134b818843bc2e859bd039a339b3d9b63094.
+- Both track proximo-desarrollo-hello-world. Free backend in Oregon; static frontend.
 
-## Verified
-101 frontend tests and 43 backend tests passed, no failures. Backend PostgreSQL integration tests used disposable build storage. All eight frontend routes return200, UI v2.8.0 renders, browser navigation works. Production bundle contains the new API origin and no NEXT API origin. Live /health, /api/weather, /auth/providers and /api/chat/models return200 with the correct CORS origin. Chat catalog has18 free models, configured=false. All OAuth providers disabled.
+## Verification
+101 frontend tests and43 backend tests passed in the original rollout; no application code changed for database activation. All eight frontend paths return200. Live /health, weather, auth provider status and chat catalog work with the new origin. Database activation configured SIMULATION_DATABASE_URL exclusively through the backend environment, without committing or recording its secret value.
 
-## Explicit incomplete prerequisite
-The new backend lacks SIMULATION_DATABASE_URL. /api/people/health, /api/people and /api/simulation correctly return503, and UI displays storage unavailable. Persistence has NOT been activated in this new environment. Existing NEXT backend remains connected; read-only checks observed4 people and an active shared simulation without issuing commands or adding rows.
+/api/people/health now returns PostgreSQL UP, /api/people returns the same4 records, and /api/simulation returns the shared active simulation. Control revision, simulation start, balances and trade count were preserved. Readings advanced from 5342 to 5356; the new backend reports schedulingEnabled=true and lastCycleStatus=ok. Browser People page renders the4 existing rows. No reset, added test person or other simulation command was issued.
 
-Owner configuration: open existing ariel-demo-next-api in Render, Environment, copy SIMULATION_DATABASE_URL directly into the same key on ariel-demo-integrated-api, Environment. Save and deploy. Do not send the value in chat or screenshots. Then verify /api/people/health=200, the same4 records, and existing simulation control/run/balances. No reset is required. Do not create another database.
+## Remaining optional setup and hosting behavior
+OAuth providers remain disabled until credentials are configured. Chat catalog has18 free options but sending requires OPENROUTER_API_KEY, as in the prior demo. Free backend can sleep; continuous24/7 execution is not guaranteed. Existing database expiry is unchanged.
 
-The connector cannot read existing secrets; recent Library search/inventory did not locate the mentioned PostgreSQL screenshot. No browser login was retried after the user declined that flow. Optional OAuth and chatbot credentials remain prerequisites as in the prior demo.
+The connector uses default TCP readiness; /health and storage APIs were independently verified. Secret values must remain absent from deployment manifests and frontend variables.
 
-Detailed non-secret checks: docs/evidence/integrated-deployment-zone.json.
+Evidence: docs/evidence/integrated-deployment-zone.json (initial rollout including then-pending storage), docs/evidence/integrated-database-activation.json (successful activation, supersedes the initial storage status).

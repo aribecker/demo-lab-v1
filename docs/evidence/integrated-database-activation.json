@@ -1,0 +1,27 @@
+{
+  "health": {
+    "status": "UP",
+    "database": "PostgreSQL"
+  },
+  "peopleCount": 4,
+  "samePeople": true,
+  "running": true,
+  "sameControlRevision": true,
+  "sameStart": true,
+  "readingsBefore": 5342,
+  "readingsAfter": 5356,
+  "sameBalances": true,
+  "tradeCountBefore": 1,
+  "tradeCountAfter": 1,
+  "execution": {
+    "hostingMode": "free",
+    "schedulingEnabled": true,
+    "pollIntervalMs": 10000,
+    "processStartedAt": "2026-10-24T19:18:46.532949478Z",
+    "lastCycleAt": "2026-10-24T19:19:59.837047534Z",
+    "lastCycleStatus": "ok"
+  },
+  "deployId": "dep-dbeg8givcj2c73cs0odg",
+  "sourceCommit": "f60e134b818843bc2e859bd039a339b3d9b63094",
+  "verifiedAt": "2026-10-24T19:20:43.403Z"
+}
