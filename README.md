@@ -1,4 +1,4 @@
-# Integrated Demo Lab v2.9.0
+# Integrated Demo Lab v2.10.0
 
 Current frontend: https://ariel-demo-integrated.onrender.com
 Application backend: https://ariel-demo-integrated-api.onrender.com
@@ -19,3 +19,7 @@ Canonical configuration: deploy/integrated-zone.json, applied through Render con
 - Weather-Microservice-Dockerfile: canonical weather-only build. The retained service still tracks microservices-v008 and its equivalent generated module at weather-service/ through that branch's Weather-Dockerfile.
 
 SDD order is specification commit, grounding commit, generated implementation/tests, verified deployment and cleanup evidence. Existing source history is preserved in Git.
+
+
+## Database explorer
+/database groups SELECT-accessible PostgreSQL base tables by their actual schema names. Expand a table to load25 rows, then expand a row to inspect every column and its PostgreSQL text/null value. Primary keys/ID sort ascending; tables without a key explicitly use non-guaranteed database default order. Load more and refresh are read-only. Long individual values show a65,536-character truncation marker. The integrated backend reads the existing SIMULATION_DATABASE_URL with no new schema, database, migration or environment value. Deployment details and verification: docs/database-explorer-release.md.

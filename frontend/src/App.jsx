@@ -83,7 +83,7 @@ export default function App({ loader, authApi, simulationApi }) {
       <p><span>React {React.version}</span> <i>→</i> {pathname === '/bitcoin' ? 'Binance public quotes' : ['/people', '/database'].includes(pathname) ? 'Java API → PostgreSQL' : pathname === '/chatbot' ? 'Spring AI → OpenRouter' : 'Weather microservice → Provider'}</p>
       <p>Data: {pathname === '/chatbot' ? 'OpenRouter · free text models' : pathname === '/database' ? 'PostgreSQL schemas and tables' : pathname === '/people' ? 'PostgreSQL shared people list' : pathname === '/bitcoin'
         ? <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance</a>
-        : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="footer-note">· Times in Buenos Aires</span></p>
+        : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="footer-note">{pathname === '/database' ? '· Values returned by PostgreSQL' : '· Times in Buenos Aires'}</span></p>
     </footer>
   </main>;
 }
