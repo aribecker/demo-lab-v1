@@ -6,6 +6,7 @@ import App from '../App.jsx';
 import { sample } from './fixture.js';
 import { sharedSnapshot } from './sharedFixture.js';
 import * as peopleClient from '../peopleClient.js';
+import * as chatClient from '../chatClient.js';
 
 afterEach(() => vi.useRealTimers());
 
@@ -23,6 +24,15 @@ function menuLink(name) {
   fireEvent.click(screen.getByRole('button', { name: 'Menu', exact: true }));
   return screen.getByRole('link', { name, exact: true });
 }
+
+it('opens the integrated chatbot and exposes activation status without touching trading', async () => {
+  vi.spyOn(chatClient,'loadModels').mockResolvedValue({configured:false,models:[{id:'openrouter/free',name:'Automático gratis'}]});
+  const command=vi.fn();
+  render(<MemoryRouter initialEntries={['/chatbot']}><App simulationApi={{read:vi.fn(),command}}/></MemoryRouter>);
+  expect(await screen.findByText(/pendiente de activación/)).toBeInTheDocument();
+  expect(menuLink('Chatbot')).toHaveAttribute('aria-current','page');
+  expect(command).not.toHaveBeenCalled();
+});
 
 it('opens the unified People route and marks its menu destination', async () => {
   vi.spyOn(peopleClient,'listPeople').mockResolvedValue({people:[],nextCursor:null});

@@ -9,6 +9,12 @@ export default function Home() {
       <p className="subtitle">A demo application for exploring React, reusable components and a Java microservice. Choose a feature and take a look around.</p>
     </section>
     <section className="feature-grid" aria-label="Demo features">
+      <Link className="feature-card" to="/chatbot">
+        <span className="feature-number" aria-hidden="true">06 / CHATBOT · SPRING AI</span>
+        <h2>Chatbot <span aria-hidden="true">↗</span></h2>
+        <p>Choose a free text model, keep a conversation and try optional dictation or read-aloud. A server-side OpenRouter API key is required.</p>
+        <span className="feature-action">Open Chatbot →</span>
+      </Link>
       <Link className="feature-card" to="/people">
         <span className="feature-number" aria-hidden="true">05 / PEOPLE · POSTGRESQL</span>
         <h2>People <span aria-hidden="true">↗</span></h2>
