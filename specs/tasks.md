@@ -74,3 +74,14 @@
 - [x] Implement/test durable server loop and shared-client controls (29 backend tests, 81 frontend tests, builds).
 - [ ] Configure backend database access, deploy/verify server, then activate frontend.
 - [ ] Verify two-client state and restart persistence; record release evidence.
+
+
+## Autonomous shared simulator R33
+- [x] Commit updated master requirements/architecture/acceptance before code.
+- [x] Commit code grounding separately.
+- [x] Retain backend-only trading and isolated shared PostgreSQL table.
+- [x] Add scheduler metadata, bounded lock waits, graceful shutdown and gap/resume reference handling.
+- [x] Prove unattended scheduler cycles, restart persistence and unrelated-table preservation with PostgreSQL 17 build tests.
+- [x] Pass 31 backend tests, 82 frontend tests and production build.
+- [x] Verify configured live backend and then activate frontend; process restart preserved shared state.
+- [ ] Owner approval for always-on compute, apply it and verify unattended operation beyond the Free idle limit.

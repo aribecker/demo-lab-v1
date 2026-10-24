@@ -23,3 +23,9 @@ The Docker build additionally starts disposable PostgreSQL 17 and runs the stora
 Activate backend and verify real PostgreSQL before publishing frontend. SIMULATION_DATABASE_URL is backend-only. Live configuration is managed through Render Dashboard/MCP; credentials do not appear in the repository. SIMULATION_HOSTING_MODE defaults to free, and only becomes always-on after the owner approves and applies a non-sleeping compute plan.
 
 Render Free sleeps after 15 idle minutes, so continuous unattended execution is not satisfied on the current plan. No keep-alive workaround or paid upgrade is performed. PostgreSQL trial expires 2026-11-21T03:09:14Z (2026-11-21 00:09:14 Buenos Aires). Preserve the saved row when upgrading/migrating storage.
+
+## Rollout verification, 2026-10-24
+
+Implementation commit: da8ff31f0896b2f510a72e06720e1c7bc184c38b. The Render Docker build passed all 31 Java tests with disposable PostgreSQL 17 (including all 7 shared-state tests). Backend deploy dep-dbe28lc0a7sc7398pg9g became live and returned HTTP 200 from /api/simulation. Real Binance samples progressed automatically; a snapshot at 03:25:34Z contained 7 samples, no provider errors, and scheduler status ok. CORS allows exactly the deployed frontend origin. No Start/Reset command was issued against the live shared state during verification.
+
+Frontend deploy dep-dbe2afff3r2c73cfnl20 was triggered only after PostgreSQL verification. A same-commit backend redeploy dep-dbe2aknf3r2c73cfo36g was triggered to check process restart with preserved state; completion and UI checks are recorded in docs/evidence/autonomous-simulation.json. Current plan remains free; always-on operation is pending owner approval of a paid plan.

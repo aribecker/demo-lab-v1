@@ -19,16 +19,16 @@ export function BitcoinWidget({ tracker, minimum, maximum }) {
     <div className="card-heading"><p className="eyebrow">BTC / USDT</p><span className="bitcoin-mode">{mode}</span></div>
     <div className="bitcoin-quote" aria-live="off">{latest ? money(latest.price) : '—'}<span>USDT per Bitcoin · Binance</span></div>
     <p className={delta < 0 ? 'bitcoin-down' : 'bitcoin-up'}>{latest
-      ? `${delta >= 0 ? '+' : ''}${money(delta)} (${(delta / baseline * 100).toFixed(3)}%) since opening`
+      ? `${delta >= 0 ? '+' : ''}${money(delta)} (${(delta / baseline * 100).toFixed(3)}%) ${tracker.shared ? 'since shared baseline' : 'since opening'}`
       : 'Waiting for the first quote'}</p>
     <dl className="bitcoin-stats">
-      <div><dt>Session low</dt><dd>{range ? money(range.min) : '—'}</dd></div>
-      <div><dt>Session high</dt><dd>{range ? money(range.max) : '—'}</dd></div>
+      <div><dt>{tracker.shared ? 'Shared low' : 'Session low'}</dt><dd>{range ? money(range.min) : '—'}</dd></div>
+      <div><dt>{tracker.shared ? 'Shared high' : 'Session high'}</dt><dd>{range ? money(range.max) : '—'}</dd></div>
       <div><dt>Successful readings</dt><dd>{count}</dd></div>
       <div><dt>Last retrieved · Buenos Aires</dt><dd>{latest ? time(latest.retrievedAt) : '—'}</dd></div>
     </dl>
     <figure className="bitcoin-chart">
-      <figcaption>Session progress · latest {samples.length} readings</figcaption>
+      <figcaption>{tracker.shared ? 'Shared progress' : 'Session progress'} · latest {samples.length} readings</figcaption>
       {samples.length > 1 ? <svg viewBox="0 0 600 180" role="img" aria-label={`Bitcoin session chart, ${samples.length} readings, from ${money(samples[0].price)} to ${money(latest.price)}`}>
         <path d="M30 160H570 M30 20V160" stroke="#365466" fill="none" />
         {chartLimits.map((limit, index) => <g key={index}>
@@ -89,3 +89,4 @@ export default function BitcoinTracker({ loader }) {
         settings={{ capital, setCapital, fee, setFee, minimum, setMinimum, maximum, setMaximum, step, setStep }} /></div>
   </>;
 }
+
