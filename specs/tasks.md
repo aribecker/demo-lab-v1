@@ -85,3 +85,10 @@
 - [x] Pass 31 backend tests, 82 frontend tests and production build.
 - [x] Verify configured live backend and then activate frontend; process restart preserved shared state.
 - [ ] Owner approval for always-on compute, apply it and verify unattended operation beyond the Free idle limit.
+
+
+## R42 — Specifications viewer
+- [x] Define the complete build-time specs inventory, safe viewer, R41 styling and no-backend boundary before generation.
+- [ ] Ground the current router/Home/static-routes and central CSS.
+- [ ] Generate catalog/viewer, tests and responsive BEM styles.
+- [ ] Run full frontend validation, deploy and verify live direct entry/file content.

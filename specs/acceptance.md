@@ -155,3 +155,11 @@ Build the frontend and retain existing Database interaction/routing coverage. Ch
 - CSS class selectors and rendered class tokens follow BEM, including weather phases, chat roles and price direction; ID selectors do not style the UI.
 - Colors are defined only by central tokens; shared typography/spacing/radius tokens drive the UI. Panels/forms/buttons share the same palette and focus treatment; Database remains readable with normal text contrast at least4.5:1 and focus/control boundaries at least3:1.
 - Run existing frontend regressions, a style-contract guard and production build; inspect navigation, Home, Weather, gallery states, Login, Hello World, People, Database expanded rows, Chatbot and Bitcoin on desktop/mobile. Do not mutate production data or simulation controls during verification.
+
+
+## R42 — Specifications viewer acceptance
+- Menu/Home/direct route open the integrated viewer; all Markdown files recursively under specs/ appear automatically, with exact original content and a build-snapshot/historical-context notice.
+- Filename filtering and empty results, bookmark selection/browser history, unknown-path fallback, loading/read error/retry and stale-read isolation are deterministic.
+- Markdown headings/code/URLs/colors/requirements are highlighted with React text spans. Script/HTML strings remain text. Copy/download use the full original source, preserving newlines, not highlighted DOM or line numbers; failures are reported honestly.
+- Font size is bounded and uses BEM modifiers/tokens; source wraps at phone widths with accessible file controls and visible keyboard focus.
+- Test route/catalog/async/actions and escaping, run the existing full frontend suite/style guard/build, inspect the published viewer and direct reload. Production data/controls are not changed.

@@ -110,3 +110,7 @@ Weather provider/controller/record and fixture coverage now live in weather-micr
 
 ## R39 Database explorer
 Database.jsx + databaseClient.js + /database direct route provide schema/table and row/column disclosures. DatabaseExplorerRepository/Controller use shared JDBC configuration in read-only PostgreSQL transactions; catalog metadata validates accessible base tables and quotes identifiers. DatabaseExplorerPostgresTest covers schemas/privileges/identifier quoting, numeric PK ordering and paging, NULL/empty/JSON values, truncation and non-mutation; DatabaseExplorerBoundaryTest checks errors and rejected writes. Database.test.jsx and databaseClient.test.js cover lazy disclosures, pages, retries, value escaping, direct route and independent backend origin. Release/deploy evidence: docs/database-explorer-release.md.
+
+
+## R42 — System specifications viewer
+Requirement source: requirements.md R42; architecture and acceptance R42. Planned mapping: specifications.js discovers specs/**/*.md; Specifications.jsx selects and safely highlights full source; App/Home/static-routes integrate /specifications; styles/specifications.css uses the central R41 entry/tokens. Specifications tests cover catalog completeness, route selection, safe content, stale/error reads and copy/download semantics. Release documentation records actual validation and remaining limits without production data.
