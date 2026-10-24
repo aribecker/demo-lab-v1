@@ -106,3 +106,10 @@ Compact layout verified in deployed frontend 1538a6a9b779d7db669506931e800888242
 - Identical command UUID is applied once; stale control revision receives HTTP409 and refreshed state; scheduled quotes do not cause control conflicts. Concurrent poll/command work cannot overwrite another committed snapshot or execute the same crossing twice.
 - Provider failure records error while preserving balances/last quote; storage failure returns safe503 without fake local success. Missing SIMULATION_DATABASE_URL must not create a volatile simulator.
 - Backend tests use local Binance fixtures and isolated JDBC storage; frontend tests mock shared API. Publish schema and env setup steps. Confirm configured PostgreSQL and both live services before activating the frontend.
+
+## Autonomous execution R33
+- Start against a local market fixture; invoke the real scheduled loop without any GET/client calls and observe persistent quote count and a complete buy/sell cycle. Recreate the service/store and verify exact holdings, settings, ledger and running state.
+- After a >30-second gap or pause/resume, the first successful quote establishes a reference without filling; a subsequent genuine crossing may fill. No repeated slot is processed twice.
+- Run storage/concurrency/idempotence/rollback checks against PostgreSQL in addition to fast H2 tests. Pre-existing unrelated tables remain unchanged.
+- The API reports actual scheduler heartbeat and hosting mode; frontend shows last quote/engine heartbeat and public shared control semantics. All existing frontend/backend tests and production build pass.
+- Deployment activation requires configured PostgreSQL and a successful live snapshot read before frontend rollout. An always-on claim additionally requires a non-sleeping plan and background progress verification with no viewer requests. Record any outstanding plan approval explicitly; no hidden self-pings or upgrades.
