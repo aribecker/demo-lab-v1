@@ -90,3 +90,7 @@ Add only Spring AI openai dependency to the existing Java API; retain JDBC/Flywa
 
 ## Current topology R38
 Browser -> integrated backend for People/simulation/auth/chat using VITE_BACKEND_API_URL; browser -> retained independent Weather microservice using VITE_WEATHER_API_URL. PostgreSQL remains owned by shared integrated persistence. Integrated backend has no weather provider code or weather HTTP endpoint. Canonical independent weather module lives in weather-microservice/; its deployment mirror uses the original service's existing branch and weather-service/ path. Preserve health and common HTTP infrastructure in both independent builds.
+
+
+## R39 Database explorer
+frontend/Database.jsx -> databaseClient.js -> integrated /api/database catalog and /api/database/rows queries through VITE_BACKEND_API_URL. Catalog returns database -> schemas -> tables. A table response contains ordered column metadata and one page of rows with representative summaries and typed text/null cells, allowing row disclosure locally without fetching other tables. Backend DatabaseExplorerRepository opens the existing connection in read-only transactions and resolves tables/columns/keys through PostgreSQL catalogs; no arbitrary SQL endpoint or new persistence is introduced. Source weather module and Render Weather service are unaffected.
