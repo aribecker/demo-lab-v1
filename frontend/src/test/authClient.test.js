@@ -1,13 +1,20 @@
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 beforeEach(() => { vi.resetModules(); sessionStorage.clear(); history.replaceState(null, '', '/login'); });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 const reply = (data, status = 200) => ({ ok: status < 400, status, json: async () => data });
 describe('auth handoff client', () => {
   it('does not silently fall back to the original environment', async () => {
+    vi.stubEnv('VITE_AUTH_API_URL','');vi.stubEnv('VITE_WEATHER_API_URL','');
     const client=await import('../authClient.js');
     expect(client.AUTH_API_URL).not.toContain('ariel-weather-api-iteration-2');
     const fetcher=vi.fn().mockResolvedValue(reply([]));vi.stubGlobal('fetch',fetcher);
     await client.providers();expect(fetcher.mock.calls[0][0]).toBe('/auth/providers');
+  });
+  it('uses the explicitly configured target backend in production', async () => {
+    vi.stubEnv('VITE_AUTH_API_URL','https://ariel-demo-next-api.onrender.com');
+    const fetcher=vi.fn().mockResolvedValue(reply([]));vi.stubGlobal('fetch',fetcher);
+    const client=await import('../authClient.js');await client.providers();
+    expect(fetcher.mock.calls[0][0]).toBe('https://ariel-demo-next-api.onrender.com/auth/providers');
   });
   it('scrubs callback and exchanges once on duplicate initialization', async () => {
     sessionStorage.setItem('demo.auth.verifier', 'a'.repeat(43));
