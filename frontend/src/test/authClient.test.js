@@ -3,6 +3,12 @@ beforeEach(() => { vi.resetModules(); sessionStorage.clear(); history.replaceSta
 afterEach(() => vi.unstubAllGlobals());
 const reply = (data, status = 200) => ({ ok: status < 400, status, json: async () => data });
 describe('auth handoff client', () => {
+  it('does not silently fall back to the original environment', async () => {
+    const client=await import('../authClient.js');
+    expect(client.AUTH_API_URL).not.toContain('ariel-weather-api-iteration-2');
+    const fetcher=vi.fn().mockResolvedValue(reply([]));vi.stubGlobal('fetch',fetcher);
+    await client.providers();expect(fetcher.mock.calls[0][0]).toBe('/auth/providers');
+  });
   it('scrubs callback and exchanges once on duplicate initialization', async () => {
     sessionStorage.setItem('demo.auth.verifier', 'a'.repeat(43));
     history.replaceState(null, '', '/login#ticket=' + 't'.repeat(43));
@@ -42,3 +48,4 @@ describe('auth handoff client', () => {
     expect(location.hash).toBe(''); expect(fetch).not.toHaveBeenCalled();
   });
 });
+

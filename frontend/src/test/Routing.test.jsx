@@ -4,6 +4,7 @@ import { MemoryRouter, useNavigate } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from '../App.jsx';
 import { sample } from './fixture.js';
+import { sharedSnapshot } from './sharedFixture.js';
 
 afterEach(() => vi.useRealTimers());
 
@@ -21,6 +22,23 @@ function menuLink(name) {
   fireEvent.click(screen.getByRole('button', { name: 'Menu', exact: true }));
   return screen.getByRole('link', { name, exact: true });
 }
+
+it('integrates login and trading navigation without resetting the shared simulation', async () => {
+  const authApi={providers:vi.fn().mockResolvedValue([{id:'google',enabled:true}]),
+    initialize:vi.fn().mockResolvedValue({profile:{name:'Ariel',provider:'google',email:'ariel@example.test'},expiresAt:new Date(Date.now()+1800000).toISOString()}),
+    logout:vi.fn(),startLogin:vi.fn()};
+  const state=sharedSnapshot();state.simulation={...state.simulation,phase:'holding_btc',btc:0.123,capital:10000};
+  const simulationApi={read:vi.fn().mockResolvedValue(state),command:vi.fn()};
+  render(<MemoryRouter initialEntries={['/login']}><App authApi={authApi} simulationApi={simulationApi}/></MemoryRouter>);
+  expect(await screen.findByText('ariel@example.test')).toBeInTheDocument();
+  expect(screen.getByRole('link',{name:'Open trading simulator →'})).toHaveAttribute('href','/bitcoin');
+  fireEvent.click(menuLink('Bitcoin tracker'));
+  expect(await screen.findByTestId('btc-balance')).toHaveTextContent('0.12300000 BTC');
+  expect(screen.getByRole('link',{name:'Open login demo →'})).toHaveAttribute('href','/login');
+  fireEvent.click(menuLink('Login'));
+  expect(await screen.findByText('ariel@example.test')).toBeInTheDocument();
+  expect(simulationApi.command).not.toHaveBeenCalled();
+});
 
 describe('routed demo application', () => {
   it('starts at an introduction with feature links and no live weather request', () => {
@@ -128,4 +146,5 @@ describe('routed demo application', () => {
     expect(loader).not.toHaveBeenCalled();
   });
 });
+
 

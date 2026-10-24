@@ -8,7 +8,7 @@ import org.springframework.mock.web.MockHttpSession;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-@SpringBootTest(properties={"auth.google.client-id=test-client","auth.google.client-secret=test-secret","auth.backend-url=https://api.example.test"})
+@SpringBootTest(properties={"auth.google.client-id=test-client","auth.google.client-secret=test-secret","auth.backend-url=https://api.example.test","auth.frontend-url=https://app.example.test"})
 @AutoConfigureMockMvc
 class OAuthBoundaryTest {
  @Autowired MockMvc mvc;
@@ -21,7 +21,7 @@ class OAuthBoundaryTest {
   var authorization=mvc.perform(get("/oauth2/authorization/google").session(session)).andExpect(status().isFound()).andReturn();
   assertThat(authorization.getResponse().getRedirectedUrl()).contains("accounts.google.com","state=","code_challenge=","code_challenge_method=S256").doesNotContain("test-secret");
   mvc.perform(get("/login/oauth2/code/google").session(session).param("code","forged").param("state","wrong"))
-    .andExpect(status().isFound()).andExpect(redirectedUrl("https://ariel-weather-iteration-2.onrender.com/login#auth_error=failed"));
+    .andExpect(status().isFound()).andExpect(redirectedUrl("https://app.example.test/login#auth_error=failed"));
  }
  @Test void bearerSessionRestoresAndRevokesWithoutCookieAuth()throws Exception{
   var p=new DemoSessions.Profile("github","42","Ariel",null,null,null,null);
@@ -31,3 +31,4 @@ class OAuthBoundaryTest {
   mvc.perform(get("/auth/me").header("Authorization","Bearer "+result.token())).andExpect(status().isUnauthorized());
  }
 }
+

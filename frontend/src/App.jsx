@@ -17,7 +17,7 @@ const destinations = [
   { to: '/bitcoin', label: 'Bitcoin tracker' },
 ];
 
-export default function App({ loader }) {
+export default function App({ loader, authApi, simulationApi }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef(null);
   const content = useRef(null);
@@ -58,9 +58,9 @@ export default function App({ loader }) {
         <Route path="/" element={<Home />} />
         <Route path="/weather" element={<WeatherDemo loader={loader} />} />
         <Route path="/components" element={<ComponentGallery />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login api={authApi} />} />
         <Route path="/hello-world" element={<HelloWorld />} />
-        <Route path="/bitcoin" element={<BitcoinTracker />} />
+        <Route path="/bitcoin" element={<BitcoinTracker api={simulationApi} />} />
         <Route path="*" element={<section className="intro">
           <p className="eyebrow">404</p>
           <h1 id="page-heading" tabIndex={-1}>Page not found.</h1>
@@ -78,6 +78,7 @@ export default function App({ loader }) {
     </footer>
   </main>;
 }
+
 
 
 

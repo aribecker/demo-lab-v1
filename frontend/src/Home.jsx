@@ -30,12 +30,13 @@ export default function Home() {
       <Link className="feature-card" to="/login">
         <span className="feature-number" aria-hidden="true">03 / IDENTITY</span>
         <h2>Login <span aria-hidden="true">↗</span></h2>
-        <p>Sign in with Google, GitHub or Microsoft and see the profile you choose to share.</p>
+        <p>Try optional Google, GitHub or Microsoft sign-in alongside the shared trading simulator. Provider setup is required; signing in does not reset the simulation.</p>
         <span className="feature-action">Open Login →</span>
       </Link>
     </section>
     <aside className="home-note"><span className="dot" aria-hidden="true" /><p>Built as a small learning lab. Each feature has its own URL, so you can bookmark it or open it directly.</p></aside>
   </>;
 }
+
 
 

@@ -9,6 +9,13 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthApiTest {
  @Autowired TestRestTemplate http;
+ @Test void loginDemoDoesNotGateOrInitializeSharedSimulation(){
+  assertThat(http.getForEntity("/auth/providers",String.class).getStatusCode().value()).isEqualTo(200);
+  var state=http.getForEntity("/api/simulation",String.class);
+  assertThat(state.getStatusCode().value()).isEqualTo(503);
+  assertThat(state.getBody()).contains("SIMULATION_STORAGE_UNAVAILABLE");
+  assertThat(http.getForEntity("/health",String.class).getStatusCode().value()).isEqualTo(200);
+ }
  @Test void noSecretsStillStartsAndListsAllProviders(){
   var r=http.getForEntity("/auth/providers",String.class);
   assertThat(r.getStatusCode().value()).isEqualTo(200);
@@ -27,3 +34,4 @@ class AuthApiTest {
   h.setOrigin("https://attacker.test");assertThat(http.exchange("/auth/exchange",HttpMethod.OPTIONS,new HttpEntity<>(h),String.class).getStatusCode().value()).isEqualTo(403);
  }
 }
+

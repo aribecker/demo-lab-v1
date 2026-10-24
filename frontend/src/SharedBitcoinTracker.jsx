@@ -34,6 +34,7 @@ export default function SharedBitcoinTracker({ api }) {
     <section className="intro" aria-labelledby="page-heading"><p className="eyebrow">ONE SHARED SIMULATION · VIRTUAL FUNDS</p>
       <h1 id="page-heading" tabIndex={-1}>Bitcoin <span>tracker.</span></h1>
       <p className="subtitle">The same saved balances, controls and run state on every device. Opening this page never restarts the simulation.</p></section>
+    <p className="bitcoin-note"><a className="text-link" href="/login">Open login demo →</a> · Sign-in is optional. This simulation remains shared; login and logout do not reset it.</p>
     <aside className="shared-notice"><strong>Shared demo: controls affect everyone.</strong> Quotes, thresholds and virtual orders are processed on the server. Closing this page does not pause the engine.
       {data?.execution?.hostingMode === 'always-on'
         ? ' Always-on hosting is configured. The engine works without open browsers while the service and database are available.'
