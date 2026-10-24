@@ -98,3 +98,7 @@ frontend/Database.jsx -> databaseClient.js -> integrated /api/database catalog a
 
 ## R40 theme correction
 Confine the visual correction to frontend/src/database.css and the frontend patch version. Match palette values already used in styles.css, people.css and chatbot.css rather than adding an independent light theme. Preserve JSX interactions, client routing and backend contracts.
+
+
+## R41 — Central presentation boundary
+Only frontend/src/main.jsx imports frontend/src/styles/index.css. That entry loads tokens.css, base.css and block modules. specs/design-system.md owns design intent; tokens.css is its executable mapping. Shared BEM blocks provide panels, buttons, fields, notices and introductions; feature blocks own their layout. Modifiers retain their base class and describe presentation states, while aria/disabled remain behavioral semantics. SVG chart presentation belongs to CSS classes. Enforce this boundary with an executable style-contract check and run it with the normal frontend test command. Component files own behavior and content only.

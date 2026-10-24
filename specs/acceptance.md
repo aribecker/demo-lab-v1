@@ -147,3 +147,11 @@ Database appears on Home/menu and opens directly/reloads at /database. PostgreSQ
 
 ## R40 visual verification
 Build the frontend and retain existing Database interaction/routing coverage. Check representative foreground/background contrast pairs, then inspect the deployed panel with a real table and row expanded. Verify dark surfaces, readable headings/values/types/NULL markers and clearly visible controls, consistent with the rest of the application. No additional behavior tests are required for this scoped CSS change.
+
+
+## R41 — Central CSS and BEM acceptance
+- All nine routes and unknown-route fallback retain existing functionality and direct-entry support.
+- Exactly one application CSS import exists in main.jsx; components contain no inline style, style element or literal SVG colors.
+- CSS class selectors and rendered class tokens follow BEM, including weather phases, chat roles and price direction; ID selectors do not style the UI.
+- Colors are defined only by central tokens; shared typography/spacing/radius tokens drive the UI. Panels/forms/buttons share the same palette and focus treatment; Database remains readable with normal text contrast at least4.5:1 and focus/control boundaries at least3:1.
+- Run existing frontend regressions, a style-contract guard and production build; inspect navigation, Home, Weather, gallery states, Login, Hello World, People, Database expanded rows, Chatbot and Bitcoin on desktop/mobile. Do not mutate production data or simulation controls during verification.
