@@ -1,117 +1,21 @@
-# Demo Lab — Iteration 2
+# Integrated Demo Lab v2.9.0
 
-A React demo application with a Home page, live Weather demo and Component gallery. Frontend version **2.1.1** uses React 19.3.1 and React Router 7.18.4. The existing independently deployed Java weather API keeps its 2.0.0 contract.
+Current frontend: https://ariel-demo-integrated.onrender.com
+Application backend: https://ariel-demo-integrated-api.onrender.com
+Independent Weather: https://ariel-sdd-weather-microservice.onrender.com
 
-## Direct routes
+People, the shared trading simulator, login and chatbot use the application backend. Only live weather uses the independent weather service. PostgreSQL remains the same existing database; never reset it during deployment.
 
-- Home: https://ariel-weather-iteration-2.onrender.com/
-- Weather demo: https://ariel-weather-iteration-2.onrender.com/weather
-- Component gallery: https://ariel-weather-iteration-2.onrender.com/components
+## Configuration
+Frontend VITE_BACKEND_API_URL is the integrated backend origin. VITE_WEATHER_API_URL is the independent full /api/weather URL. Optional VITE_AUTH_API_URL and VITE_SIMULATION_API_URL remain explicit overrides. No application API derives its origin from weather anymore. Database/provider secrets belong only on the relevant backend.
 
-The hamburger contains all three destinations. React Router handles client navigation and browser history; Render rewrites unknown static paths to index.html for direct entry/reload. Home introduces the demo and links its features. The gallery showcases the same reusable WeatherWidget used by the live page, with clearly labeled sample Success/Loading/Error states and a local refresh simulation. Only the Weather demo calls the microservice.
+Canonical configuration: deploy/integrated-zone.json, applied through Render connector operations. The obsolete root render.yaml describing NEXT was retired so it cannot accidentally recreate those services. Deployment provenance and pending/confirmed cleanup are recorded in docs/weather-separation-release.md.
 
-## SDD and checkpoint
+## Source layout and local execution
+- frontend/: React v2.9.0; npm ci, npm test, npm run dev.
+- weather-service/: integrated Java backend (historical directory name), no weather endpoint. Run mvn -f weather-service/pom.xml spring-boot:run on8080.
+- weather-microservice/: independent Java weather provider. Run mvn -f weather-microservice/pom.xml spring-boot:run on8081. Vite routes local /api/weather to8081 and all other /api and /auth to8080.
+- Weather-Dockerfile: integrated backend, including disposable PostgreSQL build tests.
+- Weather-Microservice-Dockerfile: canonical weather-only build. The retained service still tracks microservices-v008 and its equivalent generated module at weather-service/ through that branch's Weather-Dockerfile.
 
-Before adding routes, the working single-page application was preserved in commit `541da9ecf1af8ce14eabacad1ab67d100e6d0a16` and [tag v2.0.1](https://github.com/aribecker/0080-prueba-SDD-full-stack/releases/tag/v2.0.1).
-
-The original requirements, architecture and acceptance criteria were directly updated and published in `7bde53b3b4257896b3d18b771d598c3cfb0a84bf` before grounding or routed source generation. No specification patch documents are used. Read [requirements](specs/requirements.md), [architecture](specs/architecture.md), [acceptance](specs/acceptance.md), [grounding/traceability](specs/traceability.md) and [release evidence](docs/release.md). The initial application's specifications-only commit remains `d41ef09988567cbcf63c1ead7462098fb0320d02`.
-
-## Local development
-
-Use Java 17, Maven 3.9+ and Node 22+.
-
-```sh
-mvn -f weather-service/pom.xml spring-boot:run
-```
-
-In another terminal:
-
-```sh
-cd frontend
-npm ci
-npm run dev
-```
-
-Open http://localhost:5173. Vite proxies `/api/weather` to localhost:8080. The microservice queries Open-Meteo and, on failure, MET Norway. All weather is for Buenos Aires. Provider data is labeled as current model data or forecast, with its actual timestamp.
-
-## Validation
-
-```sh
-mvn -B -f weather-service/pom.xml package
-python3 scripts/smoke_jar.py
-cd frontend
-npm ci
-npm test
-npm run build
-```
-
-The Java integration tests and JAR smoke check use local HTTP provider fixtures; no live provider or credentials are needed. Mockito uses its subclass mock maker so the tests do not require JVM agent attachment. Client tests cover lifecycle cleanup, presentation and bounded cold-start retries. `frontend/dist` is the static production build.
-
-## Deployment
-
-`render.yaml` describes the existing Render workspace's two iteration-2 services. Both use branch `iteracion-2`, with component-specific build filters. The Dockerfile's Maven stage compiles and tests the Java source; the final JRE stage receives only its executable JAR.
-
-- React: https://ariel-weather-iteration-2.onrender.com
-- API: https://ariel-weather-api-iteration-2.onrender.com/api/weather
-- Readiness: https://ariel-weather-api-iteration-2.onrender.com/health
-
-Set `VITE_WEATHER_API_URL` to the full deployed API endpoint before building the frontend. Set the API's `ALLOWED_ORIGINS` to the actual frontend origin plus `http://localhost:5173`. These are public demo URLs, not secrets. Provider URLs and `weather.provider-timeout-ms` can be overridden with Spring server configuration.
-
-Render Free can suspend an inactive Java service. The static React page remains independently available and retries startup/network failures for up to 180 seconds or 20 attempts, with a maximum 45-second request and 2–8-second delays. A structured provider failure stops the interaction and enables manual retry. There is no periodic refresh.
-
-The API is intentionally public and has no authentication. CORS configures browser access; it does not stop non-browser clients. No database, separate gateway, login flow or additional backend is part of this iteration.
-
-The 2.1.1 layout reduces vertical spacing across the shell, feature pages and gallery, with additional phone breakpoint adjustments. Text sizes and route behavior remain unchanged. See R14 and release evidence for measurement scope.
-
-
-## Login (frontend v2.2.0)
-
-New route: https://ariel-weather-iteration-2.onrender.com/login
-
-Google, GitHub and Microsoft use the existing Spring server. Each provider remains visibly disabled until its OAuth client ID/secret pair is configured in Render. See [setup and callbacks](docs/login-setup.md). Actual consent shows the shared name, email/account address, platform, account ID and optional photo/locale/public profile. Sessions last 30 minutes and end on backend restart. Provider tokens never reach React and are discarded after userinfo; no account database is introduced. Weather remains public.
-
-For changed hostnames configure AUTH_FRONTEND_URL, AUTH_BACKEND_URL and ALLOWED_ORIGINS on Java. VITE_AUTH_API_URL optionally overrides the frontend auth API origin, otherwise derived from VITE_WEATHER_API_URL. All client secrets stay server-side. Real consent must be verified after registration; automated tests exercise authentication boundaries with local fixtures only.
-
-
-
-## Independent Hello World development branch
-
-Branch: `proximo-desarrollo-hello-world`, based on login checkpoint `9b1104b`. Adds **Hello World** in the hamburger menu at `/hello-world`, retaining the weather microservice, component gallery, compact layout and three login providers.
-
-New environment (configured separately from iteration-2):
-- Frontend: https://ariel-demo-next.onrender.com
-- Hello World: https://ariel-demo-next.onrender.com/hello-world
-- API: https://ariel-demo-next-api.onrender.com
-
-`render.yaml` now describes only these new services. Dashboard/MCP is used for creation; this file records matching deployment settings. OAuth credentials are not copied: activate providers using `docs/login-setup.md` with the new backend callbacks and frontend origin. Existing deployment evidence above describes the source environment.
-
-The new static build emits index entry files for all four subroutes plus a custom 404 document. This supports direct entry/reload using Render static hosting while React Router keeps client navigation and history. A Dashboard rewrite is not required.
-
-
-
-## Bitcoin tracker (frontend v2.3.0, parallel environment)
-
-Open https://ariel-demo-next.onrender.com/bitcoin or choose **Bitcoin tracker** in the hamburger menu/Home. The guided panel retrieves the public Coinbase BTC/USD spot quote on entry and every 10 seconds while running and visible. It includes session change, low/high, a bounded 180-reading chart, recent quotes, pause/resume and manual refresh. Tab visibility and route cleanup stop background requests. Failed updates retain an explicitly stale last quote. Browser retrieval times are not exchange timestamps; quotes may repeat because of provider caching. History is memory-only and resets on leaving the page. No new backend, credentials, database or paid service is added.
-
-Master specification: specs/requirements.md R20–R23, architecture and acceptance updated before generation; separate specifications commit ac7222060ea3221cb06e07528532ae6c72e47b84. Grounding is recorded in specs/traceability.md. Source reference: https://docs.cdp.coinbase.com/coinbase-app/track-apis/prices.
-
-
-## Virtual BTC/USDT simulator (frontend v2.4.0)
-
-The same https://ariel-demo-next.onrender.com/bitcoin now uses public Binance BTCUSDT quotes. **Start simulation** / **Reset & buy** clears counters/history and buys once at the next fresh successful quote with configurable virtual capital (default 1,000 USDT). It sells all BTC on a sampled upward crossing of the maximum, then buys all-in on a downward crossing of the minimum, repeating with available proceeds. No account connection, real funds or order API exists.
-
-Adjust buy/sell limits with arrows or +/− while running; edits alone never fill orders. The configurable fee defaults to Binance standard 0.1%, deducted in received BTC on buys and received USDT on sells. Separate asset fee totals and a USDT-at-execution equivalent avoid double deduction. Capital and fee edits apply on Reset. The panel shows balances, equity, after-fee P/L and the latest 100 fictitious trades. History is in memory, not persisted. Sampling at 10 seconds can miss intraperiod crossings; fills assume sampled price with no spread/slippage/lot-size rules. BNB/VIP discounts and promotions are excluded from this configurable estimate.
-
-SDD: master requirements R24–R28 and architecture/acceptance published first in 579aa057a0f8b0368302a214dd18106c69cd87fe; grounding in specs/traceability.md. Public data and fee sources: https://developers.binance.com/en/docs/products/spot/rest-api, https://www.binance.com/en/fee/trading, https://www.binance.com/en/support/faq/detail/e85d6e703b874674840122196b89780a. Local validation: all 70 frontend tests passed and production build succeeded.
-
-
-## Cash-only Reset (v2.4.1; supersedes v2.4.0 startup behavior)
-Default capital is now 10,000 USDT. Start/Reset restores the configured USDT balance and zero BTC, fees and trades, without buying. The first fresh quote establishes the crossing reference even if already below the minimum. A later crossing from at/above the minimum to strictly below it buys; subsequent upward maximum crossings sell, repeating with the available balance. Capital remains configurable. All fee and sampling assumptions above still apply. Master specifications were updated before implementation in b1329a3a7705b37d521b2abbc78033d29b77bc2c.
-
-
-## Shared simulation v2.5.0 (storage-gated rollout)
-The Bitcoin feature uses one durable server-owned state across browsers/devices, including Start/paused/holding state, all controls, balances, fees and history. No view lifecycle starts or resets it. The server polls public Binance prices while running and awake; clients poll/read snapshots. See docs/shared-simulation-setup.md for database setup, rollout order, public shared-control semantics, Free sleep and database expiry limits. Missing storage returns503 instead of creating a volatile local substitute. Keep the existing live frontend until the configured backend is verified. The original per-browser historical runs cannot be imported from a central source that never existed.
-
-
-## Autonomous simulator v2.5.1
-The backend owns pricing, limits, fees, trades and durable state; the web page is a monitor/control panel. Dedicated storage remains in bitcoin_shared.simulation_state inside the existing People database. Engine heartbeat and hosting status are visible. Restart/downtime reference handling prevents fabricated catch-up trades. See docs/shared-simulation-release.md and docs/shared-simulation-setup.md. Continuous operation requires non-sleeping hosting; the existing Free plan cannot provide it.
+SDD order is specification commit, grounding commit, generated implementation/tests, verified deployment and cleanup evidence. Existing source history is preserved in Git.

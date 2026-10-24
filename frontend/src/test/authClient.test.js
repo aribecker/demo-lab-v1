@@ -4,7 +4,7 @@ afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 const reply = (data, status = 200) => ({ ok: status < 400, status, json: async () => data });
 describe('auth handoff client', () => {
   it('does not silently fall back to the original environment', async () => {
-    vi.stubEnv('VITE_AUTH_API_URL','');vi.stubEnv('VITE_WEATHER_API_URL','');
+    vi.stubEnv('VITE_AUTH_API_URL','');vi.stubEnv('VITE_BACKEND_API_URL','');vi.stubEnv('VITE_WEATHER_API_URL','');
     const client=await import('../authClient.js');
     expect(client.AUTH_API_URL).not.toContain('ariel-weather-api-iteration-2');
     const fetcher=vi.fn().mockResolvedValue(reply([]));vi.stubGlobal('fetch',fetcher);

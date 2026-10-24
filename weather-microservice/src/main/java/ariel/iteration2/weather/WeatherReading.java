@@ -7,3 +7,4 @@ public record WeatherReading(
         double humidityPercent, double windKmh, Instant observedAt, Instant requestedAt,
         String timezone, String provider, String providerUrl, String dataType, String requestId) {
 }
+

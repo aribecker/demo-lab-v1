@@ -1,5 +1,5 @@
-const weather = import.meta.env.VITE_WEATHER_API_URL;
-export const CHAT_API_URL = (weather?.startsWith('http') ? new URL(weather).origin : '').replace(/\/$/, '');
+import { BACKEND_API_URL } from './backendConfig.js';
+export const CHAT_API_URL = BACKEND_API_URL;
 async function request(path, signal, body) {
   const controller = new AbortController();
   const abort = () => controller.abort();

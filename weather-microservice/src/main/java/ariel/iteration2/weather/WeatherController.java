@@ -30,3 +30,4 @@ class WeatherController {
                 "requestId", request.getAttribute(RequestLogFilter.REQUEST_ID), "retryable", false));
     }
 }
+

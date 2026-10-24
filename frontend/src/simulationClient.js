@@ -1,7 +1,6 @@
+import { BACKEND_API_URL } from './backendConfig.js';
 const configured = import.meta.env.VITE_SIMULATION_API_URL;
-const weather = import.meta.env.VITE_WEATHER_API_URL;
-export const SIMULATION_URL = configured || (weather?.startsWith('http')
-  ? `${new URL(weather).origin}/api/simulation` : '/api/simulation');
+export const SIMULATION_URL = configured || `${BACKEND_API_URL}/api/simulation`;
 
 export function validateSnapshot(state) {
   if (state?.schemaVersion !== 1 || !Number.isSafeInteger(state.revision) || !Number.isSafeInteger(state.controlRevision)
@@ -36,3 +35,4 @@ async function request(url, options = {}) {
 }
 export const readSimulation = ({ signal } = {}) => request(SIMULATION_URL, { signal });
 export const sendSimulationCommand = command => request(`${SIMULATION_URL}/commands`, { method: 'POST', body: JSON.stringify(command) });
+

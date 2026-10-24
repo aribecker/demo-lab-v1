@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 class RequestLogFilter extends OncePerRequestFilter {
-    static final String REQUEST_ID = "weather.requestId";
+    static final String REQUEST_ID = "app.requestId";
     private static final Logger LOG = LoggerFactory.getLogger(RequestLogFilter.class);
 
     @Override
@@ -32,3 +32,4 @@ class RequestLogFilter extends OncePerRequestFilter {
         }
     }
 }
+

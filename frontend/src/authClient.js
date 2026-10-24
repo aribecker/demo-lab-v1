@@ -1,8 +1,5 @@
-const weatherApi = import.meta.env.VITE_WEATHER_API_URL;
-export const AUTH_API_URL = (
-  import.meta.env.VITE_AUTH_API_URL ||
-  (weatherApi?.startsWith("http") ? new URL(weatherApi).origin : "")
-).replace(/\/$/, "");
+import { BACKEND_API_URL } from './backendConfig.js';
+export const AUTH_API_URL = (import.meta.env.VITE_AUTH_API_URL || BACKEND_API_URL).replace(/\/$/, '');
 const API = AUTH_API_URL;
 const TOKEN = "demo.auth.token",
   VERIFIER = "demo.auth.verifier";

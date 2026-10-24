@@ -161,3 +161,4 @@ class WeatherService {
         ProvidersUnavailable(boolean timedOut) { this.timedOut = timedOut; }
     }
 }
+

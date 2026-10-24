@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"simulation.database-url=", "simulation.scheduling-enabled=false"})
 class SimulationBoundaryTest {
     @Autowired TestRestTemplate client;
-    @Test void missingDatabaseDoesNotCreateVolatileSimulationOrBreakWeatherHealth() {
+    @Test void missingDatabaseDoesNotCreateVolatileSimulationOrBreakBackendHealth() {
         var response=client.getForEntity("/api/simulation",String.class);
         assertEquals(503,response.getStatusCode().value());
         assertTrue(response.getBody().contains("SIMULATION_STORAGE_UNAVAILABLE"));
@@ -17,3 +17,4 @@ class SimulationBoundaryTest {
         assertEquals(200,client.getForEntity("/health",String.class).getStatusCode().value());
     }
 }
+

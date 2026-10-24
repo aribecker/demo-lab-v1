@@ -53,10 +53,14 @@
       },
       {
         "key": "VITE_WEATHER_API_URL",
-        "value": "https://ariel-demo-integrated-api.onrender.com/api/weather"
+        "value": "https://ariel-sdd-weather-microservice.onrender.com/api/weather"
       },
       {
         "key": "VITE_AUTH_API_URL",
+        "value": "https://ariel-demo-integrated-api.onrender.com"
+      },
+      {
+        "key": "VITE_BACKEND_API_URL",
         "value": "https://ariel-demo-integrated-api.onrender.com"
       }
     ]
@@ -75,5 +79,16 @@
     "Render connector creation manifest; not Blueprint syntax.",
     "Secrets are deliberately omitted; never configure database URLs in VITE variables.",
     "No change to application logic or existing services."
-  ]
+  ],
+  "retainedWeather": {
+    "serviceId": "srv-db2rlbnlk1mc738gjtfg",
+    "name": "ariel-sdd-weather-microservice",
+    "url": "https://ariel-sdd-weather-microservice.onrender.com",
+    "branch": "microservices-v008",
+    "canonicalModule": "weather-microservice",
+    "deploymentMirror": "weather-service",
+    "dockerfilePath": "./Weather-Dockerfile",
+    "canonicalDockerfile": "./Weather-Microservice-Dockerfile",
+    "databaseRequired": false
+  }
 }

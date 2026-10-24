@@ -20,7 +20,7 @@ class WebConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    HttpClient providerClient() {
+    HttpClient backendHttpClient() {
         return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build();
     }
 
@@ -36,4 +36,5 @@ class WebConfiguration implements WebMvcConfigurer {
                 .exposedHeaders("X-Request-Id").allowCredentials(false).maxAge(600);
     }
 }
+
 

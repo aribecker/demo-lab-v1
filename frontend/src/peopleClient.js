@@ -1,5 +1,5 @@
-const backend = import.meta.env.VITE_WEATHER_API_URL;
-export const PEOPLE_API_URL = (backend?.startsWith('http') ? new URL(backend).origin : '').replace(/\/$/, '');
+import { BACKEND_API_URL } from './backendConfig.js';
+export const PEOPLE_API_URL = BACKEND_API_URL;
 async function request(path, { signal, body } = {}) {
   const response = await fetch(`${PEOPLE_API_URL}/api/people${path}`, {
     method: body ? 'POST' : 'GET', signal, credentials: 'omit', cache: 'no-store',
