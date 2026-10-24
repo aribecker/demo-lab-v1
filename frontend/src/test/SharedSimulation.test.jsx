@@ -114,3 +114,15 @@ it('shows backend heartbeat and the actual hosting limitation', async () => {
   expect(screen.getByText(/engine works without open browsers/)).toBeInTheDocument();
 });
 
+it('shows saved run readings, Buenos Aires start time and ticking duration without commands', async () => {
+  vi.useFakeTimers();
+  const state=sharedSnapshot();state.runMetrics={readingCount:27,startedAt:'2026-10-24T03:00:00Z',elapsedSeconds:3661};
+  const b=backend(state);render(<SharedBitcoinTracker api={b.api} />);await flush();
+  expect(screen.getByTestId('run-readings')).toHaveTextContent('27');
+  expect(screen.getByText('24/10/2026, 00:00:00')).toBeInTheDocument();
+  expect(screen.getByTestId('run-elapsed')).toHaveTextContent('0d 01:01:01');
+  await act(()=>vi.advanceTimersByTimeAsync(1000));
+  expect(screen.getByTestId('run-elapsed')).toHaveTextContent('0d 01:01:02');
+  expect(b.api.command).not.toHaveBeenCalled();
+});
+

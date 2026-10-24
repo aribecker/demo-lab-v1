@@ -37,6 +37,7 @@ public final class SimulationEngine {
         validate(s.settings);
         var sim = s.simulation;
         if (!sim.phase.equals("inactive")) {
+            if (sim.startedAt != null) sim.readingCount++;
             Double previous = sim.previousPrice;
             sim.previousPrice = price; sim.lastSequence = s.count;
             if (previous != null && sim.phase.equals("holding_usdt") && previous >= s.settings.minimum && price < s.settings.minimum)
@@ -62,3 +63,4 @@ public final class SimulationEngine {
         sim.phase = buy ? "holding_btc" : "holding_usdt";
     }
 }
+

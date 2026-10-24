@@ -21,6 +21,8 @@ public class SharedState {
         public Double minimum, maximum;
     }
     public static class Simulation {
+        public String startedAt;
+        public long readingCount;
         public String phase = "inactive";
         public double capital, feePercent, usdt, btc, feesBtc, feesUsdt, feesEquivalent;
         public long tradeCount, lastSequence;
@@ -31,3 +33,4 @@ public class SharedState {
         double received, double fee, String spentAsset, String receivedAsset, String feeAsset,
         double feeEquivalent, String reason) {}
 }
+

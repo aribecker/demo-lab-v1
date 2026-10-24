@@ -1,8 +1,25 @@
-import React, { useId } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 
 const usdt = value => `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 5 })} USDT`;
 const btc = value => `${value.toFixed(8)} BTC`;
 const assetAmount = (value, asset) => asset === 'BTC' ? btc(value) : usdt(value);
+
+function RunMetrics({ metrics }) {
+  const [elapsed, setElapsed] = useState(metrics.elapsedSeconds);
+  useEffect(() => {
+    setElapsed(metrics.elapsedSeconds);
+    if (metrics.elapsedSeconds == null) return;
+    const received = Date.now();
+    const timer = setInterval(() => setElapsed(metrics.elapsedSeconds + Math.floor((Date.now() - received) / 1000)), 1000);
+    return () => clearInterval(timer);
+  }, [metrics]);
+  const duration = elapsed == null ? '—' : `${Math.floor(elapsed / 86400)}d ${String(Math.floor(elapsed / 3600) % 24).padStart(2, '0')}:${String(Math.floor(elapsed / 60) % 60).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
+  return <dl className="simulation-summary" aria-label="Simulation run metrics">
+    <div><dt>Rate readings · since Start / Reset</dt><dd data-testid="run-readings">{metrics.readingCount ?? '—'}</dd></div>
+    <div><dt>Simulation started · Buenos Aires</dt><dd>{metrics.startedAt ? new Date(metrics.startedAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' }) : 'Available after Start / Reset'}</dd></div>
+    <div><dt>Elapsed since Start / Reset · includes pauses</dt><dd data-testid="run-elapsed">{duration}</dd></div>
+  </dl>;
+}
 
 function LimitInput({ label, value, setValue, step, onCommit }) {
   const id = useId();
@@ -17,7 +34,7 @@ function LimitInput({ label, value, setValue, step, onCommit }) {
   </span></div>;
 }
 
-export default function SimulationPanel({ simulation: s, settings, latest, start, valid, limitsValid, autoLimits, shared, onCommit }) {
+export default function SimulationPanel({ simulation: s, settings, latest, start, valid, limitsValid, autoLimits, shared, onCommit, runMetrics }) {
   const { capital, setCapital, fee, setFee, minimum, setMinimum, maximum, setMaximum, step, setStep } = settings;
   const equity = s.usdt + s.btc * (latest?.price ?? 0);
   const started = s.phase !== 'inactive';
@@ -28,6 +45,7 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
   return <aside className="simulation-card" aria-labelledby="simulation-title">
     <p className="eyebrow">VIRTUAL FUNDS · NO REAL ORDERS</p><h2 id="simulation-title">Trading simulator</h2>
     <p className="bitcoin-note">Start holding USDT. Buy only on a downward crossing below the minimum; then sell on an upward crossing above the maximum.</p>
+    {shared && <RunMetrics metrics={runMetrics ?? { readingCount: null, startedAt: null, elapsedSeconds: null }} />}
     <div className="simulation-balances">
       <div><span>USDT balance</span><strong data-testid="usdt-balance">{usdt(s.usdt)}</strong></div>
       <div><span>Bitcoin balance</span><strong data-testid="btc-balance">{btc(s.btc)}</strong></div>
@@ -59,3 +77,4 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
     <p className="bitcoin-note">Fee estimate: <a href="https://www.binance.com/en/fee/trading" target="_blank" rel="noreferrer">Binance standard spot 0.1%</a>, configurable. <a href="https://www.binance.com/en/support/faq/detail/e85d6e703b874674840122196b89780a" target="_blank" rel="noreferrer">Fees are deducted from the received asset</a>. No BNB/VIP discounts, pair promotions, spread, slippage or lot-size rules are modeled. Ten-second sampling can miss crossings. {shared ? 'Shared state is saved on the server; leaving the page changes nothing.' : 'Session data resets when you leave.'}</p>
   </aside>;
 }
+

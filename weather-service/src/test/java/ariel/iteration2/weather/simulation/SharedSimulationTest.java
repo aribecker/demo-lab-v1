@@ -139,6 +139,23 @@ class SharedSimulationTest {
         clock.advance();price.set("100000");service.tick();
         clock.advance();price.set("102000");assertEquals(2,service.tick().simulation.tradeCount);
     }
+    @Test void runMetricsResetPersistAndUseServerTime() throws Exception {
+        service.tick();assertEquals(0L,service.runMetrics(service.read()).readingCount());
+        assertNull(service.runMetrics(service.read()).startedAt());
+        var reset=action("reset","");String start=reset.simulation.startedAt;
+        assertEquals(clock.instant().toString(),start);assertEquals(0,reset.simulation.readingCount);
+        service.tick();clock.advance();service.tick();
+        assertEquals(2,service.read().simulation.readingCount);
+        action("running",",\"running\":false");clock.advance();service.tick();
+        var restored=new SimulationStore(database,json);restored.initialize();var saved=restored.read();
+        assertEquals(start,saved.simulation.startedAt);assertEquals(2,saved.simulation.readingCount);
+        assertEquals(20L,service.runMetrics(saved).elapsedSeconds());
+        service.read();assertEquals(2,service.read().simulation.readingCount);
+        action("running",",\"running\":true");price.set("NaN");service.tick();
+        assertEquals(2,service.read().simulation.readingCount);
+        reset=action("reset","");assertEquals(0,reset.simulation.readingCount);
+        assertNotEquals(start,reset.simulation.startedAt);assertEquals(0L,service.runMetrics(reset).elapsedSeconds());
+    }
     static class MutableClock extends Clock {
         final AtomicReference<Instant> now=new AtomicReference<>(Instant.parse("2026-10-22T12:00:00Z"));
         void advance(){now.updateAndGet(t->t.plusSeconds(10));}

@@ -18,6 +18,7 @@ public class SimulationController {
     private ResponseEntity<JsonNode> ok(SharedState state) {
         ObjectNode snapshot = json.valueToTree(state);
         snapshot.set("execution", json.valueToTree(service.execution()));
+        snapshot.set("runMetrics", json.valueToTree(service.runMetrics(state)));
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(snapshot);
     }
     @ExceptionHandler(SimulationStore.StorageUnavailable.class)

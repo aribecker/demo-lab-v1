@@ -48,7 +48,7 @@ export default function SharedBitcoinTracker({ api }) {
       <div className="bitcoin-workspace"><BitcoinWidget minimum={data.settings.minimum} maximum={data.settings.maximum}
         tracker={{ ...data, shared: true, visible: true, pending: shared.pending,
           toggle: () => shared.send('running', { running: !data.running }), refresh: () => shared.send('refresh') }} />
-        <SimulationPanel simulation={data.simulation} latest={data.samples.at(-1)} start={start}
+        <SimulationPanel simulation={data.simulation} runMetrics={data.runMetrics} latest={data.samples.at(-1)} start={start}
           valid={validRun(numeric(draft.capital), numeric(draft.fee)) && numeric(draft.step) > 0}
           limitsValid={validLimits(numeric(draft.minimum), numeric(draft.maximum))}
           autoLimits={data.settings.minimum == null && draft.minimum === '' && draft.maximum === ''}

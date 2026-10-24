@@ -38,6 +38,13 @@ public class SimulationService {
         if (store.configured()) try { store.initialize(); } catch (SimulationStore.StorageUnavailable ignored) { }
     }
     public SharedState read() { return store.read(); }
+    public record RunMetrics(Long readingCount, String startedAt, Long elapsedSeconds) {}
+    public RunMetrics runMetrics(SharedState state) {
+        var sim = state.simulation;
+        if (sim.startedAt == null) return new RunMetrics(sim.phase.equals("inactive") ? 0L : null, null, null);
+        return new RunMetrics(sim.readingCount, sim.startedAt,
+            Math.max(0, Duration.between(Instant.parse(sim.startedAt), clock.instant()).getSeconds()));
+    }
     @Scheduled(fixedDelayString="${simulation.poll-ms:10000}", initialDelayString="${simulation.initial-delay-ms:1000}")
     public void scheduledTick() {
         if (!scheduling) return;
@@ -95,6 +102,7 @@ public class SimulationService {
                 case "reset" -> {
                     if (command.has("changes")) settings(s,command.get("changes"));
                     SimulationEngine.reset(s);
+                    s.simulation.startedAt=clock.instant().toString();
                 }
                 case "running" -> {
                     if (!command.path("running").isBoolean()) throw new IllegalArgumentException("Running must be true or false.");
