@@ -9,4 +9,4 @@
 @import "./people.css" layer(blocks);
 @import "./chat.css" layer(blocks);
 @import "./database.css" layer(blocks);
-@import "./shared.css" layer(shared);
+@import "./shared.css";

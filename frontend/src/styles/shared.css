@@ -1,3 +1,4 @@
+@layer base {
 /* Shared BEM blocks composed by every feature. */
 .panel { border:var(--border-width) solid var(--color-panel-border); border-radius:var(--radius-16px); background:linear-gradient(135deg,var(--color-surface),var(--color-surface-end)); color:var(--color-text); }
 .button { min-height:var(--control-height); padding:var(--space-12) var(--space-16); border:var(--border-width) solid var(--color-button-border); border-radius:var(--radius-7px); background:var(--color-button); color:var(--color-button-text); font:inherit; font-size:var(--text-12px); font-weight:var(--weight-medium); cursor:pointer; }
@@ -13,6 +14,8 @@
 .text--negative { color:var(--color-negative); }
 :where(.panel) :focus-visible { outline:var(--focus-width) solid var(--color-focus); outline-offset:var(--focus-offset); }
 
+}
+@layer shared {
 :where(.panel) .button { border-color:var(--color-button-border); background:var(--color-button); color:var(--color-button-text); }
 :where(.panel) .button--primary { background:var(--color-accent); color:var(--color-on-accent); }
 :where(.panel) .button:hover:enabled { background:var(--color-surface-hover); border-color:var(--color-accent); }
@@ -21,3 +24,5 @@
 
 .button[aria-pressed="true"],.button[aria-expanded="true"] { background:var(--color-surface-hover); border-color:var(--color-accent); color:var(--color-button-text); }
 .button:focus-visible,.field:focus-visible { outline:var(--focus-width) solid var(--color-focus); outline-offset:var(--focus-offset); }
+
+}
