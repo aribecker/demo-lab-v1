@@ -143,3 +143,7 @@ Verify distinct configured origins in frontend clients/build. Live weather page 
 
 ## R39 acceptance
 Database appears on Home/menu and opens directly/reloads at /database. PostgreSQL integration fixture uses multiple schemas/tables, PK ordering, names, NULL, empty string, JSON, large values, unusual quoted identifiers and SQL-like input. Confirm system schemas/views/inaccessible targets cannot be browsed, paging/limits work and reads do not mutate fixtures. HTTP tests reject invalid pagination/write methods, fail safely without storage and leave /health working. UI tests cover lazy table expansion, row/column disclosure, schema grouping, loading/error retry, empty tables, Load more, value escaping and direct routing. Run existing suites and production build; deploy integrated backend then frontend, verify actual public/bitcoin_shared tables and preserved4 People rows/simulation state without writes. Record SDD commits and deployment IDs. Cleanup remains deferred by user.
+
+
+## R40 visual verification
+Build the frontend and retain existing Database interaction/routing coverage. Check representative foreground/background contrast pairs, then inspect the deployed panel with a real table and row expanded. Verify dark surfaces, readable headings/values/types/NULL markers and clearly visible controls, consistent with the rest of the application. No additional behavior tests are required for this scoped CSS change.

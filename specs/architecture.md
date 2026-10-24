@@ -94,3 +94,7 @@ Browser -> integrated backend for People/simulation/auth/chat using VITE_BACKEND
 
 ## R39 Database explorer
 frontend/Database.jsx -> databaseClient.js -> integrated /api/database catalog and /api/database/rows queries through VITE_BACKEND_API_URL. Catalog returns database -> schemas -> tables. A table response contains ordered column metadata and one page of rows with representative summaries and typed text/null cells, allowing row disclosure locally without fetching other tables. Backend DatabaseExplorerRepository opens the existing connection in read-only transactions and resolves tables/columns/keys through PostgreSQL catalogs; no arbitrary SQL endpoint or new persistence is introduced. Source weather module and Render Weather service are unaffected.
+
+
+## R40 theme correction
+Confine the visual correction to frontend/src/database.css and the frontend patch version. Match palette values already used in styles.css, people.css and chatbot.css rather than adding an independent light theme. Preserve JSX interactions, client routing and backend contracts.
