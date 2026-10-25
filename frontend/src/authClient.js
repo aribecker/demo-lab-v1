@@ -107,3 +107,12 @@ export async function logout() {
   if (token) await request("logout", { token, body: {} });
   sessionStorage.removeItem(TOKEN);
 }
+
+export function bearerHeaders() {
+  const token=sessionStorage.getItem(TOKEN);
+  return token?{Authorization:`Bearer ${token}`} : {};
+}
+export function accessDenied(status) {
+  if(status===401)sessionStorage.removeItem(TOKEN);
+  if(status===401||status===403)window.dispatchEvent(new Event('demo:access-denied'));
+}

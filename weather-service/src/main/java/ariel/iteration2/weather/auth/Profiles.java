@@ -10,6 +10,6 @@ final class Profiles {
     static DemoSessions.Profile from(String provider, Map<String,Object> a) {
         return new DemoSessions.Profile(provider,text(a,"sub","id"),
             text(a,"name","displayName","login"),text(a,"email","mail","userPrincipalName"),
-            url(text(a,"picture","avatar_url")),text(a,"locale"),url(text(a,"html_url")));
+            url(text(a,"picture","avatar_url")),text(a,"locale"),url(text(a,"html_url")),provider.equals("google") && Boolean.TRUE.equals(a.get("email_verified")));
     }
 }

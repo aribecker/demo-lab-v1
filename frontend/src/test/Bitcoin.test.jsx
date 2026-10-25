@@ -109,12 +109,12 @@ describe('Bitcoin tracking lifecycle', () => {
     render(<MemoryRouter><App /></MemoryRouter>);
     expect(fetcher).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
-    fireEvent.click(screen.getByRole('link', { name: 'Bitcoin tracker', exact: true }));
+    fireEvent.click(screen.getByRole('link', { name: 'Bitcoin Tracker', exact: true }));
     await flush();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bitcoin tracker.');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bitcoin Tracker.');
     expect(fetcher).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
-    expect(screen.getByRole('link', { name: 'Bitcoin tracker', exact: true })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Bitcoin Tracker', exact: true })).toHaveAttribute('aria-current', 'page');
     fireEvent.click(screen.getByRole('link', { name: 'Home', exact: true }));
     await act(() => vi.advanceTimersByTimeAsync(20000));
     expect(fetcher).toHaveBeenCalledTimes(1);

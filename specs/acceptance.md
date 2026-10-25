@@ -169,3 +169,6 @@ Verify existing People/state schemas and records unchanged; additive Flyway migr
 
 ## R45 acceptance
 View All follows every cursor, appends without duplicates, reports progress, stops at the end and cancels/ignores stale requests on view changes/collapse. Retry resumes the failed page without discarding loaded rows; Refresh respects the active view. Summary is computed over the whole DB success history, not loaded browser pages. Test sub-minute chains, exact60-second split, microsecond boundary, failed/incomplete non-bridging, equal timestamps, single readings, dates across midnight and period pagination. Test real HTTP and PostgreSQL as well as UI view switching, empty/error/cancel states. No new SQL migrations, control commands or provider calls on history reads.
+
+## R46 acceptance
+See `simulator-access.md` for the full matrix. Anonymous direct entry shows a login icon/link; another account receives a personal greeting and the authorization-denied message; only the verified Google owner sees the simulator menu and controls. Public tracker contains market data/history only. Enforce 401/403 before protected reads/commands, including Database Explorer raw state; validate logout, expiry and denial. Preserve saved state and verify deployment without issuing production commands.

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-export default function Home() {
+export default function Home({canUseSimulator=false}) {
   return <>
     <section className="page-intro page-intro--home" aria-labelledby="page-heading">
       <p className="text__eyebrow">ONE APP · A FEW SMALL EXPERIMENTS</p>
@@ -33,10 +33,11 @@ export default function Home() {
         <p>Add sample names and browse the persistent people list in the same application as Login and the trading simulator.</p>
         <span className="home__action">Open People →</span>
       </Link>
+      {canUseSimulator&&<Link className="home__card" to="/trading-simulator"><span className="home__number">OWNER ACCESS · VIRTUAL FUNDS</span><h2>Trading Simulator ↗</h2><p>Manage the saved simulation, strategy, balances and tracking decisions.</p><span className="home__action">Open Trading Simulator →</span></Link>}
       <Link className="home__card" to="/bitcoin">
         <span className="home__number" aria-hidden="true">04 / MARKET WATCH</span>
         <h2>Bitcoin tracker <span aria-hidden="true">↗</span></h2>
-        <p>Follow BTC/USDT every 10 seconds and simulate buy/sell crossings with virtual balances, adjustable limits and fees.</p>
+        <p>Follow BTC/USDT market prices, charts and the complete saved reading history.</p>
         <span className="home__action">Open Bitcoin tracker →</span>
       </Link>
       <Link className="home__card" to="/weather">
@@ -54,7 +55,7 @@ export default function Home() {
       <Link className="home__card" to="/login">
         <span className="home__number" aria-hidden="true">03 / IDENTITY</span>
         <h2>Login <span aria-hidden="true">↗</span></h2>
-        <p>Try optional Google, GitHub or Microsoft sign-in alongside the shared trading simulator. Provider setup is required; signing in does not reset the simulation.</p>
+        <p>Sign in to see your profile. Trading Simulator access is reserved for the authorized Google account.</p>
         <span className="home__action">Open Login →</span>
       </Link>
     </section>

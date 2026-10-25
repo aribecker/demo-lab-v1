@@ -149,3 +149,6 @@ Follow specs/database.md for existing and new tables, constraints, indexes, inde
 
 ## R45 — View All history and compact activity periods
 Implement the R45 contract in specs/database.md. Expose Latest25 / View All / Resumido inside the existing history box. View All retrieves the complete retained query history automatically in bounded pages with progress/cancellation/retry. Resumido groups the full successful-reading history by consecutive gaps strictly below one minute and shows actual From/To and count, with older-period paging. Preserve timestamps/tenths, existing tables, global simulation state and read-only behavior. Specification → grounding → generation/tests → integrated deploy and live verification.
+
+## R46 — Separate public tracker and owner-only simulator
+`simulator-access.md` is the authoritative R46 contract. It supersedes earlier public-simulator access statements: `/bitcoin` is public market data; `/trading-simulator` and its APIs require the verified Google owner `aribecker2@gmail.com`. Navigation, direct entry, identity lifecycle and the raw database-state access path enforce the same server permission. Existing persisted state and schema are unchanged.

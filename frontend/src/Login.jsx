@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import * as defaultApi from "./authClient.js";
+import { AuthProvider, useAuth } from "./AuthContext.jsx";
 const labels = { google: "Google", github: "GitHub", microsoft: "Microsoft" };
-export default function Login({ api = defaultApi }) {
+export default function Login({api=defaultApi}) {
+  const existing=useAuth();
+  return existing?<LoginContent/>:<AuthProvider api={api}><LoginContent/></AuthProvider>;
+}
+function LoginContent() {
+  const auth=useAuth(),api=auth.api,session=auth.session;
+
   const [choices, setChoices] = useState(null),
-    [session, setSession] = useState(null),
     [busy, setBusy] = useState(true),
     [error, setError] = useState(""),
     [providerError, setProviderError] = useState(""),
@@ -26,43 +32,17 @@ export default function Login({ api = defaultApi }) {
     api
       .providers()
       .then((p) => {
-        if (active) setChoices(p);
+        if (active) {setChoices(p);setBusy(false);}
       })
       .catch(() => {
-        if (active)
-          setProviderError(
+        if (active) {setBusy(false);setProviderError(
             "Could not load sign-in options. The server may be waking up.",
-          );
-      });
-    api
-      .initialize()
-      .then((s) => {
-        if (active) setSession(s);
-      })
-      .catch((e) => {
-        if (active) setError(e.message);
-      })
-      .finally(() => {
-        if (active) setBusy(false);
+          );}
       });
     return () => {
       active = false;
     };
   }, [api]);
-  useEffect(() => {
-    if (!session?.expiresAt) return;
-    const expire = () => {
-      setSession(null);
-      setError("Your session expired. Please sign in again.");
-    };
-    const delay = Date.parse(session.expiresAt) - Date.now();
-    if (delay <= 0) {
-      expire();
-      return;
-    }
-    const timer = setTimeout(expire, Math.min(delay, 2147483647));
-    return () => clearTimeout(timer);
-  }, [session]);
   async function signIn(id) {
     setBusy(true);
     setError("");
@@ -77,8 +57,7 @@ export default function Login({ api = defaultApi }) {
     setBusy(true);
     setError("");
     try {
-      await api.logout();
-      setSession(null);
+      await auth.logout();
     } catch {
       setError(
         "Sign-out could not be confirmed. Your session is still shown; please retry.",
@@ -88,6 +67,7 @@ export default function Login({ api = defaultApi }) {
     }
   }
   const user = session?.profile;
+  const loading=busy||auth.busy;
   return (
     <>
       <section className="page-intro" aria-labelledby="page-heading">
@@ -112,21 +92,21 @@ export default function Login({ api = defaultApi }) {
         </p>
       </section>
       <aside className="notice">
-        <strong>Optional login demo.</strong> The trading simulator is public
-        and shared. Signing in or out does not reset balances, change its
-        controls or create a private simulation.
+        <strong>Account access.</strong> Bitcoin Tracker is public. Trading Simulator is reserved for the authorized Google account.
+        Signing in or out preserves the saved simulation.
+        {auth.canUseSimulator&&<p><a className="text__link" href="/trading-simulator">Open Trading Simulator →</a></p>}
         <p>
           <a className="text__link" href="/bitcoin">
-            Open trading simulator →
+            Open Bitcoin Tracker →
           </a>
         </p>
       </aside>
-      {error && (
+      {(error||auth.error) && (
         <p className="notice notice--warning" role="alert">
-          {error}
+          {error||auth.error}
         </p>
       )}
-      {busy && <p role="status">{user ? "Signing out…" : "Connecting…"}</p>}
+      {loading && <p role="status">{user ? "Signing out…" : "Connecting…"}</p>}
       {user ? (
         <section className="panel auth__profile" aria-label="Your profile">
           <div className="auth__person">
@@ -178,7 +158,7 @@ export default function Login({ api = defaultApi }) {
               </div>
             )}
           </dl>
-          <button className="button auth__button" disabled={busy} onClick={signOut}>
+          <button className="button auth__button" disabled={loading} onClick={signOut}>
             Sign out of demo
           </button>
           <p className="auth__note">
@@ -197,7 +177,7 @@ export default function Login({ api = defaultApi }) {
                 <div className="auth__provider" key={id}>
                   <button
                     className="button auth__button"
-                    disabled={busy || !enabled}
+                    disabled={loading || !enabled}
                     onClick={() => signIn(id)}
                   >
                     Continue with {name} <span aria-hidden="true">↗</span>
@@ -228,7 +208,7 @@ export default function Login({ api = defaultApi }) {
           {choices && !choices.some((p) => p.enabled) && (
             <p className="auth__note">
               Sign-in is pending provider configuration for this environment.
-              The shared trading simulator is available while setup is pending.
+              Bitcoin Tracker remains available while setup is pending.
             </p>
           )}
           <p className="auth__note">

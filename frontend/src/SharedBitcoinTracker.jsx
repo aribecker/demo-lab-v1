@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BitcoinWidget } from './BitcoinTracker.jsx';
 import SimulationPanel from './SimulationPanel.jsx';
 import useSharedSimulation from './useSharedSimulation.js';
 import { validLimits, validRun } from './simulation.js';
 import AdaptiveTracking, { AdaptiveSettings, adaptiveDefaults, adaptiveFields } from './AdaptiveTracking.jsx';
-import RateQueryHistory from './RateQueryHistory.jsx';
 
 const formFrom = s => ({ ...Object.fromEntries(Object.entries(adaptiveDefaults).map(([key, value]) => [key, String(s[key] ?? value)])), capital: String(s.capital), fee: String(s.feePercent),
   minimum: s.minimum == null ? '' : String(s.minimum), maximum: s.maximum == null ? '' : String(s.maximum), step: String(s.step) });
@@ -37,10 +35,10 @@ export default function SharedBitcoinTracker({ api }) {
   const data = shared.data;
   return <>
     <section className="page-intro" aria-labelledby="page-heading"><p className="text__eyebrow">ONE SHARED SIMULATION · VIRTUAL FUNDS</p>
-      <h1 className="page-intro__title" id="page-heading" tabIndex={-1}>Bitcoin <span>tracker.</span></h1>
+      <h1 className="page-intro__title" id="page-heading" tabIndex={-1}>Trading <span>Simulator.</span></h1>
       <p className="page-intro__subtitle">The same saved balances, controls and run state on every device. Opening this page never restarts the simulation.</p></section>
-    <p className="bitcoin__note"><a className="text__link" href="/login">Open login demo →</a> · Sign-in is optional. This simulation remains shared; login and logout do not reset it.</p>
-    <aside className="notice"><strong>Shared demo: controls affect everyone.</strong> Quotes, thresholds and virtual orders are processed on the server. Closing this page does not pause the engine.
+    <p className="bitcoin__note"><a className="text__link" href="/login">Open login demo →</a> · Only the authorized Google account can use this simulator. Login and logout do not reset its saved state.</p>
+    <aside className="notice"><strong>Owner-only demo · virtual funds.</strong> Quotes, thresholds and virtual orders are processed on the server. Closing this page does not pause the engine.
       {data?.execution?.hostingMode === 'always-on'
         ? ' Always-on hosting is configured. The engine works without open browsers while the service and database are available.'
         : ' This deployment uses sleep-capable hosting: Render Free stops processing after idle suspension. Continuous unattended operation requires an always-on plan.'}
@@ -52,10 +50,10 @@ export default function SharedBitcoinTracker({ api }) {
         ? new Date(data.execution.lastCycleAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' }) : 'Waiting'} · Target interval: {data.execution.pollIntervalMs / 1000}s</p>}
       {data.running && data.lastPollAt > 0 && Date.now() - data.lastPollAt > 30000 && <p className="notice notice--error">The last server quote is over 30 seconds old. The backend may be waking up or its provider may be unavailable. Balances are the last saved state.</p>}
       <AdaptiveTracking data={data} />
-      <div className="bitcoin__workspace"><BitcoinWidget minimum={data.settings.minimum} maximum={data.settings.maximum}
-        rateHistory={<RateQueryHistory summary={data.rateQueries} loader={api?.history} periodLoader={api?.historyPeriods} />}
-        tracker={{ ...data, shared: true, visible: true, pending: shared.pending,
-          toggle: () => shared.send('running', { running: !data.running }), refresh: () => shared.send('refresh') }} />
+      <p className="bitcoin__note"><a className="text__link" href="/bitcoin">Open Bitcoin Tracker →</a></p>
+      <div className="bitcoin__actions"><button className="button" disabled={shared.pending} onClick={()=>shared.send('running',{running:!data.running})}>{data.running?'Pause tracking':'Resume tracking'}</button>
+        <button className="button" disabled={shared.pending||!data.running} onClick={()=>shared.send('refresh')}>Refresh now</button></div>
+      <div className="simulation__workspace">
         <SimulationPanel simulation={data.simulation} runMetrics={data.runMetrics} latest={data.samples.at(-1)} start={start}
           valid={validRun(numeric(draft.capital), numeric(draft.fee)) && numeric(draft.step) > 0 && adaptiveFields.every(([key]) => {
             const value=numeric(draft[key]); return Number.isFinite(value) && value >= (key === 'minimumMovePercent' ? 0.01 : 0.1) && value <= (key === 'minimumMovePercent' ? 10 : 20);

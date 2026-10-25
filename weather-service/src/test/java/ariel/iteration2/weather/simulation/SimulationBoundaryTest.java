@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SimulationBoundaryTest {
     @Autowired TestRestTemplate client;
     @Test void missingDatabaseDoesNotCreateVolatileSimulationOrBreakBackendHealth() {
-        var response=client.getForEntity("/api/simulation",String.class);
+        var response=client.getForEntity("/api/bitcoin",String.class);
         assertEquals(503,response.getStatusCode().value());
         assertTrue(response.getBody().contains("SIMULATION_STORAGE_UNAVAILABLE"));
         assertTrue(response.getHeaders().getCacheControl().contains("no-store"));

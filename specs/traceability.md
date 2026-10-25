@@ -114,3 +114,6 @@ Database.jsx + databaseClient.js + /database direct route provide schema/table a
 
 ## R42 — System specifications viewer
 Requirement source: requirements.md R42; architecture and acceptance R42. Planned mapping: specifications.js discovers specs/**/*.md; Specifications.jsx selects and safely highlights full source; App/Home/static-routes integrate /specifications; styles/specifications.css uses the central R41 entry/tokens. Specifications tests cover catalog completeness, route selection, safe content, stale/error reads and copy/download semantics. Release documentation records actual validation and remaining limits without production data.
+
+## R46 mapping
+Source: simulator-access.md. Grounding: docs/simulator-access-grounding.md. Server: Profiles, DemoSessions, SimulatorAccess/Configuration, BitcoinMarketController. Frontend: AuthContext, SimulatorGate, App, Home, Login, MarketTracker, SharedBitcoinTracker and bearer-aware clients. Tests: SimulatorAccessTest.java, public RateQueryApiTest.java, SimulatorAccess.test.jsx and existing login/shared-state/routing/client regressions. Existing database schema and engine remain authoritative and unchanged.

@@ -13,9 +13,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class DemoSessions {
     public record Profile(String provider, String accountId, String name, String email,
-                          String picture, String locale, String profileUrl) {}
-    public record Session(Profile profile, Instant expiresAt) {}
-    public record Exchange(String token, Profile profile, Instant expiresAt) {}
+                          String picture, String locale, String profileUrl, boolean emailVerified) {
+        public Profile(String provider,String accountId,String name,String email,String picture,String locale,String profileUrl) {
+            this(provider,accountId,name,email,picture,locale,profileUrl,false);
+        }
+    }
+    public record Session(Profile profile, Instant expiresAt, boolean canUseSimulator) {
+        public Session(Profile profile,Instant expiresAt) { this(profile,expiresAt,SimulatorAccess.allowed(profile)); }
+    }
+    public record Exchange(String token, Profile profile, Instant expiresAt, boolean canUseSimulator) {
+        public Exchange(String token,Profile profile,Instant expiresAt) { this(token,profile,expiresAt,SimulatorAccess.allowed(profile)); }
+    }
     private record Ticket(Profile profile, String challenge, Instant expiresAt) {}
     private final Map<String, Ticket> tickets = new ConcurrentHashMap<>();
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();

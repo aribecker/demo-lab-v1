@@ -1,4 +1,4 @@
-import { SIMULATION_URL } from './simulationClient.js';
+import { MARKET_URL } from './marketClient.js';
 
 async function readHistory(kind, { before, signal, limit=25 } = {}) {
   const params=new URLSearchParams({ limit:String(limit) });
@@ -8,7 +8,7 @@ async function readHistory(kind, { before, signal, limit=25 } = {}) {
   signal?.addEventListener('abort',abort,{once:true});if(signal?.aborted)controller.abort();
   const timeout=setTimeout(abort,12000);
   try {
-    const response=await fetch(`${SIMULATION_URL}/${kind}?${params}`,{signal:controller.signal,cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
+    const response=await fetch(`${MARKET_URL}/${kind}?${params}`,{signal:controller.signal,cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
     if(!response.ok)throw new Error(`History unavailable (HTTP ${response.status}). Retry when the backend is ready.`);
     const page=await response.json();
     const cursorValid=page?.nextCursor==null || (Number.isSafeInteger(page.nextCursor)&&page.nextCursor>0);

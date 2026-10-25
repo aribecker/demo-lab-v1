@@ -6,7 +6,7 @@ import { EMPTY_SIMULATION, simulationReducer, validLimits, validRun } from './si
 const money = value => `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 const time = value => new Date(value).toLocaleTimeString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' });
 
-export function BitcoinWidget({ tracker, minimum, maximum, rateHistory }) {
+export function BitcoinWidget({ tracker, minimum, maximum, rateHistory, readOnly=false }) {
   const { samples, baseline, range, count, error, pending, running, visible, toggle, refresh } = tracker;
   const latest = samples.at(-1);
   const delta = latest ? latest.price - baseline : 0;
@@ -44,8 +44,8 @@ export function BitcoinWidget({ tracker, minimum, maximum, rateHistory }) {
     <p role="status" className="bitcoin__status">{error ? `${error}${latest ? ' Showing the last successful quote — stale.' : ' No quote available yet.'}`
       : !running ? 'Tracking paused. Resume to get a fresh quote.' : !visible ? 'Automatic updates pause while this tab is hidden.'
         : pending ? 'Retrieving a Binance quote…' : tracker.shared ? 'Server checks Binance every 10 seconds while running and awake.' : 'Automatic refresh every 10 seconds while this page is visible.'}</p>
-    <div className="bitcoin__actions"><button className="button" onClick={toggle}>{running ? 'Pause tracking' : 'Resume tracking'}</button>
-      <button className="button" onClick={refresh} disabled={pending || !running || !visible}>Refresh now</button></div>
+    {!readOnly && <div className="bitcoin__actions"><button className="button" onClick={toggle}>{running ? 'Pause tracking' : 'Resume tracking'}</button>
+      <button className="button" onClick={refresh} disabled={pending || !running || !visible}>Refresh now</button></div>}
     <p className="bitcoin__note">Source: <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance BTC/USDT spot price</a>. Retrieval time is {tracker.shared ? 'the server retrieval time' : "your browser's time"}, not an exchange timestamp. Prices may repeat; provider caching can delay updates.</p>
     <details className="bitcoin__history"><summary>Recent readings (latest 10)</summary><table><caption>Successful quotes retrieved in this session</caption><thead><tr><th scope="col">Retrieved · Buenos Aires</th><th scope="col">BTC / USDT</th></tr></thead><tbody>
       {samples.slice(-10).reverse().map((point, i) => <tr key={`${point.retrievedAt}-${i}`}><td>{time(point.retrievedAt)}</td><td>{money(point.price)}</td></tr>)}

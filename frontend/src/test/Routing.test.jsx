@@ -42,23 +42,6 @@ it('opens the unified People route and marks its menu destination', async () => 
   expect(menuLink('People')).toHaveAttribute('aria-current','page');
 });
 
-it('integrates login and trading navigation without resetting the shared simulation', async () => {
-  const authApi={providers:vi.fn().mockResolvedValue([{id:'google',enabled:true}]),
-    initialize:vi.fn().mockResolvedValue({profile:{name:'Ariel',provider:'google',email:'ariel@example.test'},expiresAt:new Date(Date.now()+1800000).toISOString()}),
-    logout:vi.fn(),startLogin:vi.fn()};
-  const state=sharedSnapshot();state.simulation={...state.simulation,phase:'holding_btc',btc:0.123,capital:10000};
-  const simulationApi={read:vi.fn().mockResolvedValue(state),command:vi.fn()};
-  render(<MemoryRouter initialEntries={['/login']}><App authApi={authApi} simulationApi={simulationApi}/></MemoryRouter>);
-  expect(await screen.findByText('ariel@example.test')).toBeInTheDocument();
-  expect(screen.getByRole('link',{name:'Open trading simulator →'})).toHaveAttribute('href','/bitcoin');
-  fireEvent.click(menuLink('Bitcoin tracker'));
-  expect(await screen.findByTestId('btc-balance')).toHaveTextContent('0.12300000 BTC');
-  expect(screen.getByRole('link',{name:'Open login demo →'})).toHaveAttribute('href','/login');
-  fireEvent.click(menuLink('Login'));
-  expect(await screen.findByText('ariel@example.test')).toBeInTheDocument();
-  expect(simulationApi.command).not.toHaveBeenCalled();
-});
-
 describe('routed demo application', () => {
   it('starts at an introduction with feature links and no live weather request', () => {
     const { loader } = open();

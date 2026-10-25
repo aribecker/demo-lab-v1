@@ -8,7 +8,10 @@ import People from './People.jsx';
 import Database from './Database.jsx';
 import Specifications from './Specifications.jsx';
 import Chatbot from './Chatbot.jsx';
-import BitcoinTracker from './SharedBitcoinTracker.jsx';
+import TradingSimulator from './SharedBitcoinTracker.jsx';
+import MarketTracker from './MarketTracker.jsx';
+import SimulatorGate from './SimulatorGate.jsx';
+import { AuthProvider, AuthRouteCheck, useAuth } from './AuthContext.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
 
@@ -22,10 +25,15 @@ const destinations = [
   { to: '/specifications', label: 'Specifications' },
   { to: '/chatbot', label: 'Chatbot' },
   { to: '/hello-world', label: 'Hello World' },
-  { to: '/bitcoin', label: 'Bitcoin tracker' },
+  { to: '/bitcoin', label: 'Bitcoin Tracker' },
+  { to: '/trading-simulator', label: 'Trading Simulator', restricted: true },
 ];
 
-export default function App({ loader, authApi, simulationApi }) {
+export default function App(props) {
+  return <AuthProvider api={props.authApi}><AuthRouteCheck/><AppContent {...props}/></AuthProvider>;
+}
+function AppContent({ loader, authApi, simulationApi, marketApi }) {
+  const {canUseSimulator}=useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef(null);
   const content = useRef(null);
@@ -52,7 +60,7 @@ export default function App({ loader, authApi, simulationApi }) {
             <span className="app-shell__hamburger" aria-hidden="true"><span /><span /><span /></span>
           </button>
           <nav className="app-shell__menu" id="main-navigation" aria-label="Main navigation" hidden={!menuOpen}>
-            {destinations.map(({ to, label }) => <NavLink className={({ isActive }) => `app-shell__menu-link${isActive ? ' app-shell__menu-link--active' : ''}`} key={to} to={to} end
+            {destinations.filter(item=>!item.restricted||canUseSimulator).map(({ to, label }) => <NavLink className={({ isActive }) => `app-shell__menu-link${isActive ? ' app-shell__menu-link--active' : ''}`} key={to} to={to} end
               onClick={() => setMenuOpen(false)}>{label}</NavLink>)}
           </nav>
         </div>
@@ -63,7 +71,7 @@ export default function App({ loader, authApi, simulationApi }) {
 
     <div ref={content} className="app-shell__content">
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home canUseSimulator={canUseSimulator} />} />
         <Route path="/weather" element={<WeatherDemo loader={loader} />} />
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login api={authApi} />} />
@@ -72,7 +80,8 @@ export default function App({ loader, authApi, simulationApi }) {
         <Route path="/specifications" element={<Specifications />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/hello-world" element={<HelloWorld />} />
-        <Route path="/bitcoin" element={<BitcoinTracker api={simulationApi} />} />
+        <Route path="/bitcoin" element={<MarketTracker api={marketApi} />} />
+        <Route path="/trading-simulator" element={<SimulatorGate><TradingSimulator api={simulationApi}/></SimulatorGate>} />
         <Route path="*" element={<section className="page-intro">
           <p className="text__eyebrow">404</p>
           <h1 className="page-intro__title" id="page-heading" tabIndex={-1}>Page not found.</h1>

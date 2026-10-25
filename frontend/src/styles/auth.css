@@ -10,3 +10,5 @@
 
 
 
+
+.auth__login-icon { display:block; font-size:var(--text-30px); margin-bottom:var(--space-16); }

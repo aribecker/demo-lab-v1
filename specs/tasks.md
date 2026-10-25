@@ -93,3 +93,10 @@
 - [x] Generate catalog/viewer, tests and responsive BEM styles.
 - [x] Run full frontend validation (116 tests, style contract and production build).
 - [ ] Deploy and verify live direct entry/file content.
+
+## R46 — Separate tracker and restricted simulator
+- [x] Commit authoritative specification before grounding and code.
+- [x] Commit grounding separately.
+- [x] Implement shared identity/capability, separate routes/menu, server API restriction and public market projection.
+- [x] Cover owner/non-owner/anonymous, expiry/logout/denial and database-state bypass with tests.
+- [ ] Complete full validation, deploy backend then frontend and verify live behavior without production commands.
