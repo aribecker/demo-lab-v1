@@ -13,16 +13,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class TreasuryAccessTest {
  @Autowired MockMvc mvc;
- @Autowired DemoSessions sessions;
- String token(String email,boolean verified){String v="v".repeat(43);var p=new DemoSessions.Profile("google","123","Ariel",email,null,null,null,verified);return sessions.exchange(sessions.issue(p,DemoSessions.digest(v)),v).token();}
- @Test void protectsReadsWritesAndAttachments()throws Exception {
-  for(String path:new String[]{"/api/treasury/institutions","/api/treasury/institutions/x/entries/x/attachments/x","/api/treasury/institutions/x/balance?cutoff=2026-10-25"}){
-   mvc.perform(get(path)).andExpect(status().isUnauthorized()).andExpect(content().encoding("UTF-8")).andExpect(jsonPath("$.message").value("Iniciá sesión con Google para acceder a la tesorería.")).andExpect(header().string("Cache-Control","no-store"));
-   mvc.perform(get(path).header("Authorization","Bearer "+token("someone@gmail.com",true))).andExpect(status().isForbidden());
-  }
-  mvc.perform(post("/api/treasury/institutions").contentType("application/json").content("{}")).andExpect(status().isUnauthorized());
-  mvc.perform(get("/api/treasury/institutions").header("Authorization","Bearer "+token("aribecker2@gmail.com",false))).andExpect(status().isForbidden());
-  mvc.perform(get("/api/treasury/institutions").header("Authorization","Bearer "+token("aribecker2@gmail.com",true))).andExpect(status().isOk());
+ @Test void allowsTreasuryWithoutLoginButKeepsOtherFeaturesProtected()throws Exception {
+  mvc.perform(get("/api/treasury/institutions")).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"));
+  var created=mvc.perform(post("/api/treasury/institutions").contentType("application/json").content("{\"name\":\"Acceso directo\",\"code\":\"DIRECT\",\"theme_id\":\"generic\",\"active\":true}"))
+   .andExpect(status().isOk()).andReturn();
+  String id=new com.fasterxml.jackson.databind.ObjectMapper().readTree(created.getResponse().getContentAsString()).get("id").asText();
+  mvc.perform(get("/api/treasury/institutions/"+id+"/members")).andExpect(status().isOk());
+  mvc.perform(get("/api/treasury/institutions/"+id+"/accounts")).andExpect(status().isOk());
+  mvc.perform(get("/api/treasury/institutions/"+id+"/entries")).andExpect(status().isOk());
+  mvc.perform(get("/api/treasury/institutions/"+id+"/balance").param("cutoff","2026-10-25")).andExpect(status().isOk());
+  mvc.perform(get("/api/treasury/institutions/"+id+"/journal").param("from","2026-10-01").param("to","2026-10-25")).andExpect(status().isOk());
+  mvc.perform(get("/api/treasury/institutions/"+id+"/entries/missing/attachments/missing")).andExpect(status().isNotFound());
+  mvc.perform(get("/api/simulation")).andExpect(status().isUnauthorized());
+  mvc.perform(get("/auth/me")).andExpect(status().isUnauthorized());
  }
  @Test void allowsOnlyConfiguredTreasuryOriginAndCallback()throws Exception {
   mvc.perform(options("/api/treasury/institutions").header("Origin","https://ariel-treasury.onrender.com").header("Access-Control-Request-Method","POST").header("Access-Control-Request-Headers","authorization,content-type"))
