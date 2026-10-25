@@ -18,7 +18,7 @@ public class TreasuryAccess implements WebMvcConfigurer,HandlerInterceptor {
   String header=request.getHeader("Authorization");
   var session=sessions.find(header!=null&&header.startsWith("Bearer ")?header.substring(7):null);
   if(session!=null&&SimulatorAccess.allowed(session.profile())){request.setAttribute("treasury.actor",session.profile().email());return true;}
-  response.setStatus(session==null?401:403);response.setContentType("application/json");
+  response.setStatus(session==null?401:403);response.setCharacterEncoding("UTF-8");response.setContentType("application/json");
   response.getWriter().write(session==null?"{\"message\":\"Iniciá sesión con Google para acceder a la tesorería.\"}":"{\"message\":\"Tu cuenta no tiene acceso a esta tesorería.\"}");return false;
  }
 }

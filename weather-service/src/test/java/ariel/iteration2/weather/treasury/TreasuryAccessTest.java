@@ -17,7 +17,7 @@ class TreasuryAccessTest {
  String token(String email,boolean verified){String v="v".repeat(43);var p=new DemoSessions.Profile("google","123","Ariel",email,null,null,null,verified);return sessions.exchange(sessions.issue(p,DemoSessions.digest(v)),v).token();}
  @Test void protectsReadsWritesAndAttachments()throws Exception {
   for(String path:new String[]{"/api/treasury/institutions","/api/treasury/institutions/x/entries/x/attachments/x","/api/treasury/institutions/x/balance?cutoff=2026-10-25"}){
-   mvc.perform(get(path)).andExpect(status().isUnauthorized()).andExpect(header().string("Cache-Control","no-store"));
+   mvc.perform(get(path)).andExpect(status().isUnauthorized()).andExpect(content().encoding("UTF-8")).andExpect(jsonPath("$.message").value("Iniciá sesión con Google para acceder a la tesorería.")).andExpect(header().string("Cache-Control","no-store"));
    mvc.perform(get(path).header("Authorization","Bearer "+token("someone@gmail.com",true))).andExpect(status().isForbidden());
   }
   mvc.perform(post("/api/treasury/institutions").contentType("application/json").content("{}")).andExpect(status().isUnauthorized());
