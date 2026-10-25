@@ -55,4 +55,13 @@ describe('Flujos de tesorería',()=>{
   localStorage.setItem('treasury.institution','m');mount('/members');await screen.findByRole('heading',{name:'Miembros',level:1});fireEvent.click(screen.getByRole('button',{name:'Cambiar institución'}));await screen.findByRole('heading',{name:'Elegí una institución',level:1});expect(localStorage.getItem('treasury.institution')).toBeNull();fireEvent.click(screen.getByRole('button',{name:'Seleccionar Mariners'}));await screen.findByRole('heading',{name:'Mariners',level:1});
  });
 
+ it('editar el tema de la institución activa aplica el skin nuevo sin perder el contexto',async()=>{
+  const fallback=api.request.getMockImplementation();let changed=false;localStorage.setItem('treasury.institution','m');
+  api.request.mockImplementation((path,opts)=>{if(path==='/api/treasury/institutions/m'&&opts?.body){changed=true;return Promise.resolve({id:'m'});}if(path==='/api/treasury/institutions')return Promise.resolve([{...inst,theme_id:changed?'scottish':'mariners'}]);return fallback(path,opts);});
+  mount('/institutions');await waitFor(()=>expect(document.querySelector('.app')).toHaveAttribute('data-theme','mariners'));
+  fireEvent.click(screen.getByRole('button',{name:'Editar'}));fireEvent.change(screen.getByLabelText('Diseño'),{target:{value:'scottish'}});fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));
+  await waitFor(()=>expect(document.querySelector('.app')).toHaveAttribute('data-theme','scottish'));expect(screen.getByLabelText('Institución activa')).toHaveValue('m');
+  fireEvent.click(screen.getByRole('button',{name:'Abrir menú'}));fireEvent.click(screen.getByRole('link',{name:'Miembros'}));await screen.findByRole('heading',{name:'Miembros',level:1});expect(document.querySelector('.app')).toHaveAttribute('data-theme','scottish');
+ });
+
 });

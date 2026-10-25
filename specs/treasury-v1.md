@@ -25,3 +25,11 @@ The owner explicitly requested removing login and exposing all options in a hamb
 5. Creating an institution refreshes the catalog and selects the returned institution ID automatically. Editing the selected institution refreshes its name/theme without dropping the selection.
 6. The selected institution home shows its workspace actions. A dedicated “Cambiar institución” action returns to the institution chooser; no generic multi-institution dashboard replaces a valid active workspace.
 7. Regression acceptance: choose -> Members -> save member -> Accounts -> Members keeps the same institution and theme; new browser component lifecycle restores the saved institution; catalog refresh never flashes the chooser; switching uses only the new institution's endpoints; invalid persisted IDs require a fresh selection and never fall back silently to another institution.
+
+## Complete institutional skins — 2026-10-25
+The selected institution's persisted theme_id controls a complete visual skin, not only the primary button color. All theme tokens live in the centralized BEM stylesheet and cover canvas, surfaces, borders, header, navigation, text, focus, form controls, tables, typography and corner treatment. Keep the same navigation and accounting behavior.
+- Clásico/generic: warm ivory workspace, light header, navy/gold accents, serif headings and restrained corners.
+- Mariners: cool blue workspace, dark marine-blue header with white text, blue-tinted surfaces and borders, sans-serif headings and rounder controls/cards. Preserve readable dropdown options and focused controls. It must be visibly distinct from Clásico on Members even with no records and the hamburger closed.
+- Scottish: green/cream palette. Club: burgundy/rose palette. Unselected chooser uses the generic skin.
+- Apply a theme immediately when choosing another institution; preserve it on navigation, catalog refresh, reload and editing the active institution. The stored theme assignment must not be changed as part of this correction.
+Acceptance: switch Eureka (generic) -> Santos Patronos (mariners) on the same Members page. Verify different computed workspace/header colors, heading font and panel radius, then verify the theme survives reload. Confirm primary controls and header text remain readable in both skins.
