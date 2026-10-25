@@ -3,8 +3,9 @@ import { BitcoinWidget } from './BitcoinTracker.jsx';
 import SimulationPanel from './SimulationPanel.jsx';
 import useSharedSimulation from './useSharedSimulation.js';
 import { validLimits, validRun } from './simulation.js';
+import AdaptiveTracking, { AdaptiveSettings, adaptiveDefaults, adaptiveFields } from './AdaptiveTracking.jsx';
 
-const formFrom = s => ({ capital: String(s.capital), fee: String(s.feePercent),
+const formFrom = s => ({ ...Object.fromEntries(Object.entries(adaptiveDefaults).map(([key, value]) => [key, String(s[key] ?? value)])), capital: String(s.capital), fee: String(s.feePercent),
   minimum: s.minimum == null ? '' : String(s.minimum), maximum: s.maximum == null ? '' : String(s.maximum), step: String(s.step) });
 const numeric = value => value.trim() ? Number(value) : NaN;
 
@@ -17,15 +18,18 @@ export default function SharedBitcoinTracker({ api }) {
   const edit = key => value => { draftVersion.current++; setDirty(true); setDraft(old => ({ ...old, [key]: value })); };
   const commit = async (key, value) => {
     const field = key === 'fee' ? 'feePercent' : key;
-    if (!Number.isFinite(numeric(value))) return;
-    if (shared.data?.settings[field] === numeric(value)) return;
+    const parsed=key === 'strategy' ? value : numeric(value);
+    if (key !== 'strategy' && !Number.isFinite(parsed)) return;
+    if (shared.data?.settings[field] === parsed) return;
     const version = draftVersion.current;
-    const ok = await shared.send('settings', { changes: { [field]: numeric(value) } });
+    const ok = await shared.send('settings', { changes: { [field]: parsed } });
     if (ok && version === draftVersion.current) setDirty(false);
   };
   const start = async () => {
     const version = draftVersion.current;
     const changes = { capital: numeric(draft.capital), feePercent: numeric(draft.fee), step: numeric(draft.step) };
+    changes.strategy=draft.strategy;
+    for (const [key] of adaptiveFields) changes[key]=numeric(draft[key]);
     if (draft.minimum !== '' || draft.maximum !== '') { changes.minimum = numeric(draft.minimum); changes.maximum = numeric(draft.maximum); }
     if (await shared.send('reset', { changes }) && version === draftVersion.current) setDirty(false);
   };
@@ -46,14 +50,18 @@ export default function SharedBitcoinTracker({ api }) {
       {data.execution && <p className="bitcoin__note">Backend engine: {data.execution.schedulingEnabled ? data.execution.lastCycleStatus : 'disabled'} · Last scheduler cycle: {data.execution.lastCycleAt
         ? new Date(data.execution.lastCycleAt).toLocaleString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' }) : 'Waiting'} · Target interval: {data.execution.pollIntervalMs / 1000}s</p>}
       {data.running && data.lastPollAt > 0 && Date.now() - data.lastPollAt > 30000 && <p className="notice notice--error">The last server quote is over 30 seconds old. The backend may be waking up or its provider may be unavailable. Balances are the last saved state.</p>}
+      <AdaptiveTracking data={data} />
       <div className="bitcoin__workspace"><BitcoinWidget minimum={data.settings.minimum} maximum={data.settings.maximum}
         tracker={{ ...data, shared: true, visible: true, pending: shared.pending,
           toggle: () => shared.send('running', { running: !data.running }), refresh: () => shared.send('refresh') }} />
         <SimulationPanel simulation={data.simulation} runMetrics={data.runMetrics} latest={data.samples.at(-1)} start={start}
-          valid={validRun(numeric(draft.capital), numeric(draft.fee)) && numeric(draft.step) > 0}
+          valid={validRun(numeric(draft.capital), numeric(draft.fee)) && numeric(draft.step) > 0 && adaptiveFields.every(([key]) => {
+            const value=numeric(draft[key]); return Number.isFinite(value) && value >= (key === 'minimumMovePercent' ? 0.01 : 0.1) && value <= (key === 'minimumMovePercent' ? 10 : 20);
+          })}
           limitsValid={validLimits(numeric(draft.minimum), numeric(draft.maximum))}
           autoLimits={data.settings.minimum == null && draft.minimum === '' && draft.maximum === ''}
           settings={{ ...draft, setCapital: edit('capital'), setFee: edit('fee'), setMinimum: edit('minimum'), setMaximum: edit('maximum'), setStep: edit('step') }}
+          strategySettings={<AdaptiveSettings draft={draft} edit={edit} commit={commit} pending={shared.pending} />}
           shared onCommit={commit} />
       </div>
       {dirty && <p className="bitcoin__note">You have input drafts. Valid edits save on leaving a field; +/− applies immediately. Invalid drafts are not applied to the shared engine.</p>}

@@ -34,17 +34,18 @@ function LimitInput({ label, value, setValue, step, onCommit }) {
   </span></div>;
 }
 
-export default function SimulationPanel({ simulation: s, settings, latest, start, valid, limitsValid, autoLimits, shared, onCommit, runMetrics }) {
+export default function SimulationPanel({ simulation: s, settings, latest, start, valid, limitsValid, autoLimits, shared, onCommit, runMetrics, strategySettings }) {
   const { capital, setCapital, fee, setFee, minimum, setMinimum, maximum, setMaximum, step, setStep } = settings;
   const equity = s.usdt + s.btc * (latest?.price ?? 0);
   const started = s.phase !== 'inactive';
   const funded = started;
-  const mode = !started ? 'Ready to start' : !limitsValid ? 'Invalid limits — orders suspended'
+  const adaptive=s.strategy === 'adaptive';
+  const mode = adaptive ? (s.tracking?.decision ?? 'Waiting for adaptive server tracking') : !started ? 'Ready to start' : !limitsValid ? 'Invalid limits — orders suspended'
     : s.phase === 'holding_btc' ? 'Holding BTC · waiting for an upward sell crossing'
       : s.previousPrice === null ? 'Holding USDT · waiting for the first reference quote' : 'Holding USDT · waiting for a downward buy crossing';
   return <aside className="panel simulation__panel" aria-labelledby="simulation-title">
     <p className="text__eyebrow">VIRTUAL FUNDS · NO REAL ORDERS</p><h2 id="simulation-title">Trading simulator</h2>
-    <p className="bitcoin__note">Start holding USDT. Buy only on a downward crossing below the minimum; then sell on an upward crossing above the maximum.</p>
+    <p className="bitcoin__note">{adaptive ? 'Adaptive run: wait for a dip and confirmed rebound, then follow the peak with protective exits. See the decision panel above.' : 'Start holding USDT. Buy only on a downward crossing below the minimum; then sell on an upward crossing above the maximum.'}</p>
     {shared && <RunMetrics metrics={runMetrics ?? { readingCount: null, startedAt: null, elapsedSeconds: null }} />}
     <div className="simulation__balances">
       <div><span>USDT balance</span><strong data-testid="usdt-balance">{usdt(s.usdt)}</strong></div>
@@ -55,7 +56,9 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
       <div><dt>Portfolio value · latest quote</dt><dd>{usdt(equity)}</dd></div><div><dt>P/L after fees</dt><dd className={equity - s.capital < 0 && funded ? 'text text--negative' : 'text text--positive'}>{usdt(funded ? equity - s.capital : 0)}</dd></div>
       <div><dt>Simulated trades</dt><dd data-testid="trade-count">{s.tradeCount}</dd></div></dl>
     <p className="simulation__state" aria-live="polite">{mode}</p>
-    <fieldset className="simulation__settings"><legend>Live thresholds · USDT per BTC</legend>
+    {strategySettings}
+    <fieldset className="simulation__settings"><legend>Classic live thresholds · USDT per BTC</legend>
+      {adaptive && <p className="bitcoin__note">These classic reference lines do not control adaptive entries or exits.</p>}
       <LimitInput label="Buy minimum" value={minimum} setValue={setMinimum} step={Number(step)} onCommit={onCommit && (value => onCommit('minimum', value))} />
       <LimitInput label="Sell maximum" value={maximum} setValue={setMaximum} step={Number(step)} onCommit={onCommit && (value => onCommit('maximum', value))} />
       <label className="simulation__field">Adjustment step · USDT<input className="field" type="number" min="0.01" step="1" value={step} onChange={e => setStep(e.target.value)} onBlur={e => onCommit?.('step',e.target.value)} /></label>
@@ -68,7 +71,7 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
       <label className="simulation__field">Trading fee · % per order<input className="field" type="number" min="0" max="5" step="0.01" value={fee} onChange={e => setFee(e.target.value)} onBlur={e => onCommit?.('fee',e.target.value)} /></label>
       {!valid && <p className="text text--negative" role="alert">Use capital above zero (up to 1 trillion USDT) and a fee from 0% to 5%.</p>}
       <button className="button button--primary simulation__start" type="button" disabled={!valid || (!limitsValid && !autoLimits)} onClick={start}>{started ? 'Reset simulation' : 'Start simulation'}</button>
-      <p className="bitcoin__note">Reset restores the configured USDT, clears BTC, fees, trades and chart, and waits. The first quote sets a reference; a later downward crossing buys.</p>
+      <p className="bitcoin__note">Reset restores the configured USDT, clears BTC, fees, trades and chart, and waits. Adaptive starts indicator warmup; Classic waits for a downward crossing after its first reference.</p>
       {started && <p className="bitcoin__note">Active run: {usdt(s.capital)} initial capital · {s.feePercent}% fee. Capital/fee edits take effect only after Reset.</p>}
     </fieldset>
     <details className="bitcoin__history"><summary>Simulated trades · latest 100</summary><div className="simulation__ledger"><table><caption>Fictitious executions at sampled prices</caption><thead><tr><th scope="col">Order / price</th><th scope="col">Spent → received</th><th scope="col">Fee deducted</th></tr></thead><tbody>

@@ -6,6 +6,12 @@ import java.time.Instant;
 public final class SimulationEngine {
     private SimulationEngine() {}
     public static void validate(Settings s) {
+        if (!java.util.Set.of("classic","adaptive").contains(s.strategy==null?"":s.strategy))
+            throw new IllegalArgumentException("Choose classic or adaptive strategy.");
+        for(double value:new double[]{s.dipAtr,s.reboundAtr,s.trailAtr,s.lossAtr})
+            if(!Double.isFinite(value)||value<0.1||value>20) throw new IllegalArgumentException("ATR multiples must be between 0.1 and 20.");
+        if(!Double.isFinite(s.minimumMovePercent)||s.minimumMovePercent<0.01||s.minimumMovePercent>10)
+            throw new IllegalArgumentException("Minimum movement must be between 0.01% and 10%.");
         if (!Double.isFinite(s.capital) || s.capital <= 0 || s.capital > 1e12
             || !Double.isFinite(s.feePercent) || s.feePercent < 0 || s.feePercent > 5
             || !Double.isFinite(s.step) || s.step <= 0 || s.step > 1e9) throw new IllegalArgumentException("Invalid capital, fee or step.");
@@ -16,6 +22,11 @@ public final class SimulationEngine {
     public static void reset(SharedState s) {
         validate(s.settings);
         s.simulation = new Simulation();
+        var sim=s.simulation;
+        sim.strategy=s.settings.strategy;
+        sim.dipAtr=s.settings.dipAtr;sim.reboundAtr=s.settings.reboundAtr;
+        sim.trailAtr=s.settings.trailAtr;sim.lossAtr=s.settings.lossAtr;
+        sim.minimumMovePercent=s.settings.minimumMovePercent;
         s.simulation.phase = "holding_usdt";
         s.simulation.capital = s.settings.capital;
         s.simulation.feePercent = s.settings.feePercent;
@@ -26,6 +37,11 @@ public final class SimulationEngine {
     public static void quote(SharedState s, double price, Instant now) {
         if (!s.running) return;
         if (!Double.isFinite(price) || price <= 0 || price > 1e12) throw new IllegalArgumentException("Invalid market quote.");
+        if (s.lastPollAt>0 && now.toEpochMilli()<=s.lastPollAt) return;
+        if (s.lastPollAt>0 && now.toEpochMilli()-s.lastPollAt>30000) {
+            s.simulation.previousPrice=null;
+            AdaptiveTrading.interrupt(s.simulation);
+        }
         var q = new Quote(price, now.toString());
         s.samples.add(q); if (s.samples.size() > 180) s.samples.remove(0);
         s.count++; s.baseline = s.baseline == null ? price : s.baseline;
@@ -40,14 +56,22 @@ public final class SimulationEngine {
             if (sim.startedAt != null) sim.readingCount++;
             Double previous = sim.previousPrice;
             sim.previousPrice = price; sim.lastSequence = s.count;
-            if (previous != null && sim.phase.equals("holding_usdt") && previous >= s.settings.minimum && price < s.settings.minimum)
-                trade(s, q, true);
+            if (sim.strategy.equals("adaptive")) {
+                String reason=AdaptiveTrading.evaluate(sim,price,now);
+                if(reason!=null) {
+                    boolean buy=sim.phase.equals("holding_usdt");
+                    trade(s,q,buy,reason);
+                    if(buy) AdaptiveTrading.bought(sim,price);else AdaptiveTrading.sold(sim,reason);
+                }
+            }
+            else if (previous != null && sim.phase.equals("holding_usdt") && previous >= s.settings.minimum && price < s.settings.minimum)
+                trade(s, q, true, "Crossed below minimum");
             else if (previous != null && sim.phase.equals("holding_btc") && previous <= s.settings.maximum && price > s.settings.maximum)
-                trade(s, q, false);
+                trade(s, q, false, "Crossed above maximum");
         }
         s.lastPollAt = now.toEpochMilli(); s.error = "";
     }
-    private static void trade(SharedState s, Quote q, boolean buy) {
+    private static void trade(SharedState s, Quote q, boolean buy, String reason) {
         var sim = s.simulation;
         double spent = buy ? sim.usdt : sim.btc;
         double gross = buy ? spent / q.price() : spent * q.price();
@@ -56,7 +80,7 @@ public final class SimulationEngine {
         sim.tradeCount++;
         sim.trades.add(new Trade(sim.tradeCount, buy ? "BUY" : "SELL", q.price(), q.retrievedAt(), spent, net, fee,
             buy ? "USDT" : "BTC", buy ? "BTC" : "USDT", buy ? "BTC" : "USDT", equivalent,
-            buy ? "Crossed below minimum" : "Crossed above maximum"));
+            reason));
         if (sim.trades.size() > 100) sim.trades.remove(0);
         sim.usdt = buy ? 0 : net; sim.btc = buy ? net : 0;
         sim.feesBtc += buy ? fee : 0; sim.feesUsdt += buy ? 0 : fee; sim.feesEquivalent += equivalent;

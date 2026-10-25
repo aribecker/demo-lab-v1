@@ -13,3 +13,25 @@
 @media(max-width:820px) { .bitcoin__workspace { grid-template-columns:1fr; }.bitcoin__workspace .bitcoin__quote { font-size:clamp(26px,6vw,40px); }.simulation__panel { padding:18px; } }
 
 
+
+/* R43: teaching cards share the application's central palette and BEM boundary. */
+.simulation__tracking { margin:var(--space-20) 0; padding:var(--space-20); min-width:0; }
+.simulation__tracking h2 { font-size:var(--text-21px); }
+.simulation__tracking p { line-height:1.65; font-size:var(--text-13px); }
+.simulation__steps { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-12); list-style:none; padding:0; }
+.simulation__steps li { padding:var(--space-12); border:var(--border-width) solid var(--color-border); border-radius:var(--radius-8px); background:var(--color-surface-inset); }
+.simulation__steps strong,.simulation__steps span { display:block; font-size:var(--text-13px); line-height:1.6; }
+.simulation__steps span { color:var(--color-text-secondary); margin-top:var(--space-8); }
+.simulation__decision { padding:var(--space-16); border-left:var(--focus-width) solid var(--color-accent); background:var(--color-surface-raised); }
+.simulation__lesson { margin-top:var(--space-16); padding:var(--space-12); border:var(--border-width) solid var(--color-border); border-radius:var(--radius-8px); }
+.simulation__lesson summary { cursor:pointer; font-size:var(--text-16px); font-weight:var(--weight-medium); }
+.simulation__metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-12); }
+.simulation__metric { background:var(--color-surface-inset); padding:var(--space-12); border-radius:var(--radius-6px); min-width:0; }
+.simulation__metric dt { color:var(--color-text-secondary); font-size:var(--text-12px); }
+.simulation__metric dd { margin:var(--space-8) 0; font-size:var(--text-18px); color:var(--color-accent); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.simulation__metric p { margin:0; font-size:var(--text-12px); color:var(--color-text-secondary); }
+.simulation__progress { display:block; width:100%; margin-top:var(--space-16); accent-color:var(--color-accent); }
+.simulation__explanation { display:block; margin-top:var(--space-8); font-size:var(--text-12px); line-height:1.6; color:var(--color-text-secondary); }
+.simulation__select { width:100%; margin-top:var(--space-8); }
+@media(max-width:820px) { .simulation__steps,.simulation__metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:540px) { .simulation__tracking { padding:var(--space-12); }.simulation__steps,.simulation__metrics { grid-template-columns:1fr; } }

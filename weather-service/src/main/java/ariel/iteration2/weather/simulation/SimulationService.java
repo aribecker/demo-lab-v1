@@ -108,7 +108,7 @@ public class SimulationService {
                     if (!command.path("running").isBoolean()) throw new IllegalArgumentException("Running must be true or false.");
                     boolean resume = !s.running && command.path("running").asBoolean();
                     s.running=command.path("running").asBoolean();
-                    if (resume) { s.nextPollAt=0; s.simulation.previousPrice=null; }
+                    if (resume) { s.nextPollAt=0; s.simulation.previousPrice=null; AdaptiveTrading.interrupt(s.simulation); }
                 }
                 case "refresh" -> {
                     if (!s.running) throw new IllegalArgumentException("Resume tracking before refreshing.");
@@ -126,6 +126,10 @@ public class SimulationService {
         var fields=changes.fields();
         while(fields.hasNext()) {
             var field=fields.next();
+            if(field.getKey().equals("strategy")) {
+                if(!field.getValue().isTextual()) throw new IllegalArgumentException("Strategy must be text.");
+                s.settings.strategy=field.getValue().asText();continue;
+            }
             if (!field.getValue().isNumber() || !Double.isFinite(field.getValue().asDouble())) throw new IllegalArgumentException("Settings must be finite numbers.");
             double value=field.getValue().asDouble();
             switch(field.getKey()) {
@@ -134,6 +138,11 @@ public class SimulationService {
                 case "minimum" -> s.settings.minimum=value;
                 case "maximum" -> s.settings.maximum=value;
                 case "step" -> s.settings.step=value;
+                case "dipAtr" -> s.settings.dipAtr=value;
+                case "reboundAtr" -> s.settings.reboundAtr=value;
+                case "trailAtr" -> s.settings.trailAtr=value;
+                case "lossAtr" -> s.settings.lossAtr=value;
+                case "minimumMovePercent" -> s.settings.minimumMovePercent=value;
                 default -> throw new IllegalArgumentException("Unknown setting.");
             }
         }

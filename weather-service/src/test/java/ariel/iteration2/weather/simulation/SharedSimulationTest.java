@@ -37,7 +37,9 @@ class SharedSimulationTest {
             statement.execute("CREATE TABLE IF NOT EXISTS public.unrelated_people_fixture(id integer primary key)");
             statement.execute("INSERT INTO public.unrelated_people_fixture SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM public.unrelated_people_fixture WHERE id=1)");
         }
-        store=new SimulationStore(database,json); store.initialize(); service=service(store);
+        store=new SimulationStore(database,json); store.initialize();
+        store.locked(s->{s.settings.strategy="classic";return s;}); // Legacy strategy regression fixture.
+        service=service(store);
     }
     @AfterEach void close() { market.stop(0); }
     SimulationService service(SimulationStore data) {
@@ -155,6 +157,33 @@ class SharedSimulationTest {
         assertEquals(2,service.read().simulation.readingCount);
         reset=action("reset","");assertEquals(0,reset.simulation.readingCount);
         assertNotEquals(start,reset.simulation.startedAt);assertEquals(0L,service.runMetrics(reset).elapsedSeconds());
+    }
+    @Test void adaptiveConfigurationAndTrackingAreDurableAndNextRunOnly() throws Exception {
+        action("reset",",\"changes\":{\"strategy\":\"adaptive\",\"trailAtr\":2.5}");
+        for(int i=0;i<=126;i++) { price.set("100");service.tick();clock.advance(); }
+        price.set("99.7");service.tick();clock.advance();
+        price.set("99.95");service.tick();
+        assertEquals(1,service.read().simulation.tradeCount);
+        var previousStop=service.read().simulation.tracking.trailingStop;
+        action("settings",",\"changes\":{\"strategy\":\"classic\",\"trailAtr\":10}");
+        var restarted=new SimulationStore(database,json);restarted.initialize();var saved=restarted.read();
+        assertEquals("adaptive",saved.simulation.strategy);assertEquals(2.5,saved.simulation.trailAtr);
+        assertEquals("classic",saved.settings.strategy);assertEquals(previousStop,saved.simulation.tracking.trailingStop);
+        action("running",",\"running\":false");action("running",",\"running\":true");
+        assertFalse(service.read().simulation.tracking.ready);
+        assertEquals(previousStop,service.read().simulation.tracking.trailingStop);
+        clock.advance();price.set("90");service.tick();assertEquals(2,service.read().simulation.tradeCount);
+        var reset=action("reset","");assertEquals("classic",reset.simulation.strategy);assertEquals(10,reset.simulation.trailAtr);
+    }
+    @Test void invalidAdaptiveSettingsRollBackAndDuplicateResetDoesNotReplay() throws Exception {
+        var cmd=command(UUID.randomUUID().toString(),0,"reset",",\"changes\":{\"strategy\":\"adaptive\"}");
+        service.command(cmd);service.tick();var before=service.read();
+        service.command(cmd);assertEquals(before.count,service.read().count);
+        for(String invalid:List.of("{\"strategy\":\"unknown\"}","{\"trailAtr\":0}","{\"minimumMovePercent\":11}","{\"strategy\":5}")) {
+            assertThrows(IllegalArgumentException.class,()->action("settings",",\"changes\":"+invalid));
+            assertEquals(before.controlRevision,service.read().controlRevision);
+            assertEquals("adaptive",service.read().settings.strategy);assertEquals(2,service.read().settings.trailAtr);
+        }
     }
     static class MutableClock extends Clock {
         final AtomicReference<Instant> now=new AtomicReference<>(Instant.parse("2026-10-22T12:00:00Z"));
