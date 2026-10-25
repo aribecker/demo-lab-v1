@@ -143,3 +143,6 @@ Add Specifications to the shared menu, Home and direct /specifications route. Sh
 
 ## R43 — Adaptive trading and visible decision tracking
 Implement specs/adaptive-trading.md as the current authority for adaptive entry/exit rules, minute-candle ATR, trend filter, next-run configuration and the didactic server-state panel. Keep legacy active runs classic, preserve durable state, and validate/deploy integrated services only.
+
+## R44 — Durable market-query history and relational schema authority
+Follow specs/database.md for existing and new tables, constraints, indexes, independent Flyway metadata, request audit lifecycle and paginated API. Preserve existing structures and simulation state. Record every actual Bitcoin provider attempt with timestamp and exact decimal result or safe error category; preserve across Reset. Add a green inline expandable lifetime-history tag by the reading count, full date/time with tenths, all rows via pagination and an honest activity-gap explanation. Specification → code/database grounding → migration/code → unit and real PostgreSQL integration tests → integrated frontend/backend deployment → read-only live verification. No production Reset during release.
