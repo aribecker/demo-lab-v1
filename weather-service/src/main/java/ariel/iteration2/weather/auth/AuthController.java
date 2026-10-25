@@ -16,11 +16,12 @@ public class AuthController {
     }
     @GetMapping("/providers") public List<AuthConfiguration.Provider> providers() { return registrations.providers(); }
     @GetMapping("/start/{provider}")
-    public ResponseEntity<?> start(@PathVariable String provider,@RequestParam String challenge,HttpServletRequest request) {
+    public ResponseEntity<?> start(@PathVariable String provider,@RequestParam String challenge,@RequestParam(required=false) String app,HttpServletRequest request) {
         if(registrations.findByRegistrationId(provider)==null) return ResponseEntity.status(503).body(Map.of("error","provider_not_configured"));
         if(!challenge.matches("[A-Za-z0-9_-]{43}")) return ResponseEntity.badRequest().body(Map.of("error","invalid_request"));
         var old=request.getSession(false);if(old!=null)old.invalidate();
         request.getSession(true).setAttribute("demo.challenge",challenge);
+        if("treasury".equals(app))request.getSession().setAttribute("demo.treasury",Boolean.TRUE);
         return ResponseEntity.status(302).header("Location","/oauth2/authorization/"+provider).build();
     }
     public record ExchangeRequest(String ticket,String verifier) {}
