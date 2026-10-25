@@ -26,6 +26,10 @@ class AuthApiTest {
  @Test void rejectsForgedExchangeAndUnauthenticatedProfile(){
   assertThat(http.postForEntity("/auth/exchange",Map.of("ticket","x".repeat(43),"verifier","y".repeat(43)),String.class).getStatusCode().value()).isEqualTo(400);
   assertThat(http.getForEntity("/auth/me",String.class).getStatusCode().value()).isEqualTo(401);
+  var headers=new HttpHeaders();headers.setBearerAuth("x".repeat(43));
+  var unavailable=http.exchange("/auth/me",HttpMethod.GET,new HttpEntity<>(headers),String.class);
+  assertThat(unavailable.getStatusCode().value()).isEqualTo(503);
+  assertThat(unavailable.getBody()).contains("auth_storage_unavailable").doesNotContain("SQLException","jdbc:");
   assertThat(http.getForEntity("/auth/start/unknown?challenge="+"x".repeat(43),String.class).getStatusCode().value()).isEqualTo(503);
  }
  @Test void exactOriginCorsAcceptsBearerAndRejectsForeignOrigin(){

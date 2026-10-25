@@ -4,4 +4,4 @@ import { afterEach, vi } from 'vitest';
 
 window.scrollTo = vi.fn();
 
-afterEach(cleanup);
+afterEach(()=>{cleanup();localStorage.clear();sessionStorage.clear();});

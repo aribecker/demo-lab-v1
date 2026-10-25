@@ -19,17 +19,18 @@ export function AuthProvider({ api=defaultApi, children }) {
   useEffect(()=>{
     const focus=()=>refresh(false,true);
     const denied=()=>{setSession(null);refresh();};
-    window.addEventListener('focus',focus);window.addEventListener('demo:access-denied',denied);
+    const storage=event=>{if(event.key==='demo.auth.token'||event.key===null){setSession(null);refresh();}};
+    window.addEventListener('storage',storage);window.addEventListener('focus',focus);window.addEventListener('demo:access-denied',denied);
     const timer=session?setInterval(focus,30000):null;
-    return()=>{window.removeEventListener('focus',focus);window.removeEventListener('demo:access-denied',denied);clearInterval(timer);};
+    return()=>{window.removeEventListener('storage',storage);window.removeEventListener('focus',focus);window.removeEventListener('demo:access-denied',denied);clearInterval(timer);};
   },[refresh,session]);
   useEffect(()=>{
     if(!session?.expiresAt)return;
-    const expire=()=>{generation.current++;setSession(null);setBusy(false);setError('Your session expired. Please sign in again.');};
+    const expire=()=>{api.clearSession?.();generation.current++;setSession(null);setBusy(false);setError('Your session expired. Please sign in again.');};
     const delay=Date.parse(session.expiresAt)-Date.now();
     if(!Number.isFinite(delay)||delay<=0){expire();return;}
     const timer=setTimeout(expire,Math.min(delay,2147483647));return()=>clearTimeout(timer);
-  },[session]);
+  },[session,api]);
   const logout=async()=>{await api.logout();generation.current++;setSession(null);setError('');};
   return <AuthContext.Provider value={{api,session,busy,error,refresh,logout,canUseSimulator:!busy&&session?.canUseSimulator===true}}>{children}</AuthContext.Provider>;
 }

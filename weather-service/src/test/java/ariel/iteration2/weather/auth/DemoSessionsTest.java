@@ -7,7 +7,7 @@ class DemoSessionsTest {
     static final String VERIFIER="a".repeat(43);
     final DemoSessions.Profile profile=new DemoSessions.Profile("google","123","Ariel","ariel@example.test",null,null,null);
     @Test void exchangeIsBoundAndSingleUseAndLogoutRevokes(){
-        var store=new DemoSessions(Clock.systemUTC());
+        var store=SessionFixtures.sessions(Clock.systemUTC());
         String ticket=store.issue(profile,DemoSessions.digest(VERIFIER));
         assertThatThrownBy(()->store.exchange(ticket,"b".repeat(43))).isInstanceOf(IllegalArgumentException.class);
         var result=store.exchange(ticket,VERIFIER);
@@ -21,14 +21,14 @@ class DemoSessionsTest {
         public ZoneId getZone(){return ZoneOffset.UTC;}public Clock withZone(ZoneId z){return this;}public Instant instant(){return now;}
     }
     @Test void expiresTicketsAndSessions(){
-        var clock=new MutableClock();var store=new DemoSessions(clock);
+        var clock=new MutableClock();var store=SessionFixtures.sessions(clock);
         String expired=store.issue(profile,DemoSessions.digest(VERIFIER));clock.now=clock.now.plusSeconds(60);
         assertThatThrownBy(()->store.exchange(expired,VERIFIER)).isInstanceOf(IllegalArgumentException.class);
         var result=store.exchange(store.issue(profile,DemoSessions.digest(VERIFIER)),VERIFIER);
-        clock.now=clock.now.plusSeconds(1800);assertThat(store.find(result.token())).isNull();
+        clock.now=clock.now.plusSeconds(DemoSessions.LIFETIME_SECONDS);assertThat(store.find(result.token())).isNull();
     }
     @Test void validatesInputAndBoundsTicketMemory(){
-        var store=new DemoSessions(Clock.systemUTC());
+        var store=SessionFixtures.sessions(Clock.systemUTC());
         assertThatThrownBy(()->store.issue(profile,"bad")).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(()->store.exchange(null,null)).isInstanceOf(IllegalArgumentException.class);
         for(int i=0;i<1000;i++)store.issue(profile,DemoSessions.digest(VERIFIER));

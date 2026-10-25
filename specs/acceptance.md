@@ -172,3 +172,6 @@ View All follows every cursor, appends without duplicates, reports progress, sto
 
 ## R46 acceptance
 See `simulator-access.md` for the full matrix. Anonymous direct entry shows a login icon/link; another account receives a personal greeting and the authorization-denied message; only the verified Google owner sees the simulator menu and controls. Public tracker contains market data/history only. Enforce 401/403 before protected reads/commands, including Database Explorer raw state; validate logout, expiry and denial. Preserve saved state and verify deployment without issuing production commands.
+
+## R47 acceptance
+Closing/reopening the browser and restarting the API preserve an unrevoked login for up to seven days. Sign out revokes it across tabs and API instances. Expiry/401 clears browser token; temporary failures retain it for retry and fail closed. PostgreSQL stores hashes, not raw tokens; auth_private cannot be browsed. Owner-only simulator access and all existing persisted data are unchanged. See persistent-login.md for the full test and rollout contract.

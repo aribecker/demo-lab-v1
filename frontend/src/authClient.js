@@ -53,12 +53,12 @@ export async function startLogin(provider) {
   );
 }
 export async function profile() {
-  const token = sessionStorage.getItem(TOKEN);
+  const token = localStorage.getItem(TOKEN);
   if (!token) return null;
   try {
     return await request("me", { token });
   } catch (e) {
-    if (e.status === 401) sessionStorage.removeItem(TOKEN);
+    if (e.status === 401) localStorage.removeItem(TOKEN);
     throw e;
   }
 }
@@ -86,7 +86,7 @@ async function restore() {
         "This login has expired. Please start again in this tab.",
       );
     const result = await request("exchange", { body: { ticket, verifier } });
-    sessionStorage.setItem(TOKEN, result.token);
+    localStorage.setItem(TOKEN, result.token);
     return result;
   }
   return profile();
@@ -103,16 +103,18 @@ export function initialize() {
 }
 export const providers = () => request("providers");
 export async function logout() {
-  const token = sessionStorage.getItem(TOKEN);
+  const token = localStorage.getItem(TOKEN);
   if (token) await request("logout", { token, body: {} });
-  sessionStorage.removeItem(TOKEN);
+  localStorage.removeItem(TOKEN);
 }
 
 export function bearerHeaders() {
-  const token=sessionStorage.getItem(TOKEN);
+  const token=localStorage.getItem(TOKEN);
   return token?{Authorization:`Bearer ${token}`} : {};
 }
 export function accessDenied(status) {
-  if(status===401)sessionStorage.removeItem(TOKEN);
+  if(status===401)localStorage.removeItem(TOKEN);
   if(status===401||status===403)window.dispatchEvent(new Event('demo:access-denied'));
 }
+
+export function clearSession() { localStorage.removeItem(TOKEN); }

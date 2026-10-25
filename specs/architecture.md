@@ -109,3 +109,6 @@ A frontend specification catalog uses Vite import.meta.glob('../../specs/**/*.md
 
 ## R46 — Identity boundary and market projection
 See `simulator-access.md`. AuthProvider shares server identity/capabilities across navigation, Login and SimulatorGate. DemoSessions/Profiles retain a verified Google email; SimulatorAccess computes the owner permission and intercepts private simulator APIs and raw simulation-state row reads. BitcoinMarketController returns an explicit public projection with no trading settings, balances or ledger. MarketTracker reads this projection and audit history; SharedBitcoinTracker now owns only the protected simulator. No database migration or OAuth callback change.
+
+## R47 — Durable authentication
+AuthSessionStore uses JDBC and its own Flyway stream in auth_private. DemoSessions retains only short-lived exchange tickets in memory; token hashes, validated profiles and absolute expiry/revocation persist in PostgreSQL. Frontend localStorage holds only the opaque application token; sessionStorage retains PKCE verifier. AuthProvider validates on startup and listens for token storage events. auth_private is excluded by the Database Explorer shared catalog/target query. See persistent-login.md and database.md.

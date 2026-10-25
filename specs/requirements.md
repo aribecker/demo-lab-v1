@@ -152,3 +152,6 @@ Implement the R45 contract in specs/database.md. Expose Latest25 / View All / Re
 
 ## R46 — Separate public tracker and owner-only simulator
 `simulator-access.md` is the authoritative R46 contract. It supersedes earlier public-simulator access statements: `/bitcoin` is public market data; `/trading-simulator` and its APIs require the verified Google owner `aribecker2@gmail.com`. Navigation, direct entry, identity lifecycle and the raw database-state access path enforce the same server permission. Existing persisted state and schema are unchanged.
+
+## R47 — Persistent login
+`persistent-login.md` defines seven-day browser and PostgreSQL session persistence, explicit revocation, cross-tab updates and private authentication tables. It supersedes the old in-memory 30-minute lifetime; R46 owner authorization remains unchanged. No Google configuration change is required.

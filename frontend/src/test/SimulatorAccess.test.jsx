@@ -7,7 +7,7 @@ import {sharedSnapshot} from './sharedFixture.js';
 import {sendSimulationCommand,readSimulation} from '../simulationClient.js';
 import {readMarket} from '../marketClient.js';
 const owner={profile:{provider:'google',name:'Ariel Becker',email:'aribecker2@gmail.com'},canUseSimulator:true,expiresAt:new Date(Date.now()+1800000).toISOString()};
-const client=session=>({initialize:vi.fn().mockResolvedValue(session),profile:vi.fn().mockResolvedValue(session),providers:vi.fn().mockResolvedValue([{id:'google',enabled:true}]),logout:vi.fn().mockResolvedValue(null)});
+const client=session=>({clearSession:vi.fn(()=>localStorage.removeItem('demo.auth.token')),initialize:vi.fn().mockResolvedValue(session),profile:vi.fn().mockResolvedValue(session),providers:vi.fn().mockResolvedValue([{id:'google',enabled:true}]),logout:vi.fn().mockResolvedValue(null)});
 const backend=()=>({read:vi.fn().mockResolvedValue(sharedSnapshot()),command:vi.fn()});
 function menu(){fireEvent.click(screen.getByRole('button',{name:'Menu',exact:true}));}
 function open(session,path='/trading-simulator') {
@@ -40,10 +40,10 @@ it('logging out removes owner navigation and direct access immediately',async()=
  b.authApi.profile.mockResolvedValue(null);menu();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();expect(b.simulationApi.command).not.toHaveBeenCalled();
 });
 it('expiry removes mounted private data and menu',async()=>{
- vi.useFakeTimers();open({...owner,expiresAt:new Date(Date.now()+1000).toISOString()});
+ vi.useFakeTimers();localStorage.setItem('demo.auth.token','expiring-token');open({...owner,expiresAt:new Date(Date.now()+1000).toISOString()});
  await act(async()=>{await Promise.resolve();});expect(screen.getByTestId('usdt-balance')).toBeInTheDocument();
  await act(()=>vi.advanceTimersByTimeAsync(1001));expect(screen.queryByTestId('usdt-balance')).not.toBeInTheDocument();expect(screen.getByText(/session expired/)).toBeInTheDocument();
- menu();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();
+ expect(localStorage.getItem('demo.auth.token')).toBeNull();menu();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();
 });
 it('failed verification stays closed and allows retry',async()=>{
  const api=client(null);api.initialize.mockRejectedValue(new Error('Cannot verify session'));
@@ -56,7 +56,12 @@ it('server denial clears mounted data and rechecks the session',async()=>{
  act(()=>window.dispatchEvent(new Event('demo:access-denied')));expect(await screen.findByText('Please sign in to use this feature.')).toBeInTheDocument();expect(screen.queryByTestId('usdt-balance')).not.toBeInTheDocument();
 });
 it('simulator requests carry bearer tokens and public market does not',async()=>{
- sessionStorage.setItem('demo.auth.token','opaque-token');const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>sharedSnapshot()});vi.stubGlobal('fetch',fetcher);
+ localStorage.setItem('demo.auth.token','opaque-token');const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>sharedSnapshot()});vi.stubGlobal('fetch',fetcher);
  await readSimulation();await sendSimulationCommand({type:'running'});await readMarket();
  expect(fetcher.mock.calls[0][1].headers.Authorization).toBe('Bearer opaque-token');expect(fetcher.mock.calls[1][1].headers.Authorization).toBe('Bearer opaque-token');expect(fetcher.mock.calls[2][1].headers.Authorization).toBeUndefined();
+});
+it('cross-tab logout removes private content without resetting the simulator',async()=>{
+ const b=open(owner);await screen.findByTestId('usdt-balance');b.authApi.profile.mockResolvedValue(null);
+ act(()=>window.dispatchEvent(new StorageEvent('storage',{key:'demo.auth.token',newValue:null})));
+ expect(await screen.findByText('Please sign in to use this feature.')).toBeInTheDocument();expect(screen.queryByTestId('usdt-balance')).not.toBeInTheDocument();expect(b.simulationApi.command).not.toHaveBeenCalled();
 });

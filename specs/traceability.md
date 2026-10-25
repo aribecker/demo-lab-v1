@@ -117,3 +117,6 @@ Requirement source: requirements.md R42; architecture and acceptance R42. Planne
 
 ## R46 mapping
 Source: simulator-access.md. Grounding: docs/simulator-access-grounding.md. Server: Profiles, DemoSessions, SimulatorAccess/Configuration, BitcoinMarketController. Frontend: AuthContext, SimulatorGate, App, Home, Login, MarketTracker, SharedBitcoinTracker and bearer-aware clients. Tests: SimulatorAccessTest.java, public RateQueryApiTest.java, SimulatorAccess.test.jsx and existing login/shared-state/routing/client regressions. Existing database schema and engine remain authoritative and unchanged.
+
+## R47 mapping
+persistent-login.md + database.md → docs/persistent-login-grounding.md → AuthSessionStore, db/auth-migration/V1, DemoSessions, AuthStorageErrors, authClient, AuthContext and Login. Verification: AuthSessionStoreTest (including disposable PostgreSQL), DemoSessionsTest, AuthApiTest, OAuthBoundaryTest, SimulatorAccessTest, authClient.test.js and SimulatorAccess.test.jsx. All prior frontend/backend regressions remain required.

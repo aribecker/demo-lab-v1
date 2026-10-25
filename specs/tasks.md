@@ -100,3 +100,10 @@
 - [x] Implement shared identity/capability, separate routes/menu, server API restriction and public market projection.
 - [x] Cover owner/non-owner/anonymous, expiry/logout/denial and database-state bypass with tests.
 - [x] Complete full validation, deploy backend then frontend and verify live behavior without production commands.
+
+## R47 — Persistent login
+- [x] Specify browser/session lifetime and new tables before grounding/code.
+- [x] Ground existing bearer, PKCE, session, JDBC and explorer boundaries.
+- [x] Implement durable hash-only sessions, browser persistence, revocation and cross-tab identity updates.
+- [x] Pass local frontend/style/build and Java tests; PostgreSQL tests run in Render's disposable build database.
+- [ ] Deploy API then frontend, verify migration/privacy and publish owner activation steps.

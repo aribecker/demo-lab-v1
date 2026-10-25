@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
-beforeEach(() => { vi.resetModules(); sessionStorage.clear(); history.replaceState(null, '', '/login'); });
+beforeEach(() => { vi.resetModules(); localStorage.clear(); sessionStorage.clear(); history.replaceState(null, '', '/login'); });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 const reply = (data, status = 200) => ({ ok: status < 400, status, json: async () => data });
 describe('auth handoff client', () => {
@@ -27,7 +27,7 @@ describe('auth handoff client', () => {
     await Promise.all([one, two]);
     expect(fetcher).toHaveBeenCalledOnce();
     expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({ ticket: 't'.repeat(43), verifier: 'a'.repeat(43) });
-    expect(sessionStorage.getItem('demo.auth.token')).toBe('demo-token');
+    expect(localStorage.getItem('demo.auth.token')).toBe('demo-token');
     expect(sessionStorage.getItem('demo.auth.verifier')).toBeNull();
     expect(fetcher.mock.calls[0][1].credentials).toBe('omit');
   });
@@ -39,14 +39,14 @@ describe('auth handoff client', () => {
     expect(location.hash).toBe(''); expect(fetch).not.toHaveBeenCalled();
   });
   it('clears expired token but retains it when logout fails', async () => {
-    sessionStorage.setItem('demo.auth.token', 'token');
+    localStorage.setItem('demo.auth.token', 'token');
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(reply({}, 401)).mockRejectedValueOnce(new Error('offline')));
     const client = await import('../authClient.js');
     await expect(client.profile()).rejects.toThrow('expired');
-    expect(sessionStorage.getItem('demo.auth.token')).toBeNull();
-    sessionStorage.setItem('demo.auth.token', 'token');
+    expect(localStorage.getItem('demo.auth.token')).toBeNull();
+    localStorage.setItem('demo.auth.token', 'token');
     await expect(client.logout()).rejects.toThrow('offline');
-    expect(sessionStorage.getItem('demo.auth.token')).toBe('token');
+    expect(localStorage.getItem('demo.auth.token')).toBe('token');
   });
   it('handles cancellation without fetching or exposing details', async () => {
     history.replaceState(null, '', '/login#auth_error=failed'); vi.stubGlobal('fetch', vi.fn());
@@ -56,3 +56,19 @@ describe('auth handoff client', () => {
   });
 });
 
+
+it('restores the saved session after a fresh client lifecycle with empty sessionStorage',async()=>{
+  localStorage.setItem('demo.auth.token','persistent-token');sessionStorage.clear();
+  const saved={profile:{name:'Ariel Becker'},canUseSimulator:true,expiresAt:'2026-11-01T12:00:00Z'};
+  const fetcher=vi.fn().mockResolvedValue(reply(saved));vi.stubGlobal('fetch',fetcher);
+  const first=await import('../authClient.js');expect(await first.initialize()).toEqual(saved);
+  vi.resetModules();sessionStorage.clear();const fresh=await import('../authClient.js');expect(await fresh.initialize()).toEqual(saved);
+  expect(fetcher.mock.calls.every(call=>call[1].headers.Authorization==='Bearer persistent-token')).toBe(true);
+  expect(localStorage.getItem('demo.auth.token')).toBe('persistent-token');
+});
+it('confirmed logout removes persistent token and failed restore preserves it for retry',async()=>{
+  localStorage.setItem('demo.auth.token','persistent-token');
+  const fetcher=vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(reply(null,204));vi.stubGlobal('fetch',fetcher);
+  const client=await import('../authClient.js');await expect(client.profile()).rejects.toThrow('offline');expect(localStorage.getItem('demo.auth.token')).toBe('persistent-token');
+  await client.logout();expect(localStorage.getItem('demo.auth.token')).toBeNull();
+});

@@ -56,9 +56,9 @@ class SimulatorAccessTest {
  @Test void expiredSessionCannotBeUsedAndVerifiedClaimIsStrict() {
   var fixed=Clock.fixed(Instant.parse("2026-10-25T00:00:00Z"),ZoneOffset.UTC);
   class Moving extends Clock {Instant now=fixed.instant();public ZoneId getZone(){return ZoneOffset.UTC;}public Clock withZone(ZoneId z){return this;}public Instant instant(){return now;}}
-  var clock=new Moving();var store=new DemoSessions(clock);String v="a".repeat(43);
+  var clock=new Moving();var store=SessionFixtures.sessions(clock);String v="a".repeat(43);
   var result=store.exchange(store.issue(profile("google","aribecker2@gmail.com",true),DemoSessions.digest(v)),v);
-  assertThat(result.canUseSimulator()).isTrue();clock.now=clock.now.plusSeconds(1801);assertThat(store.find(result.token())).isNull();
+  assertThat(result.canUseSimulator()).isTrue();clock.now=clock.now.plusSeconds(DemoSessions.LIFETIME_SECONDS+1);assertThat(store.find(result.token())).isNull();
   assertThat(SimulatorAccess.allowed(Profiles.from("google",Map.of("email","aribecker2@gmail.com","email_verified",true)))).isTrue();
   assertThat(SimulatorAccess.allowed(Profiles.from("google",Map.of("email","aribecker2@gmail.com","email_verified","true")))).isFalse();
   assertThat(SimulatorAccess.allowed(Profiles.from("google",Map.of("email","aribecker2@gmail.com")))).isFalse();

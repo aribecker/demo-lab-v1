@@ -26,10 +26,11 @@ public class DemoSessions {
     }
     private record Ticket(Profile profile, String challenge, Instant expiresAt) {}
     private final Map<String, Ticket> tickets = new ConcurrentHashMap<>();
-    private final Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private final AuthSessionStore sessions;
+    public static final long LIFETIME_SECONDS=7*24*60*60;
     private final SecureRandom random = new SecureRandom();
     private final Clock clock;
-    public DemoSessions(Clock clock) { this.clock = clock; }
+    public DemoSessions(Clock clock,AuthSessionStore sessions) { this.clock = clock;this.sessions=sessions; }
     public static String digest(String value) {
         try {
             return Base64.getUrlEncoder().withoutPadding().encodeToString(
@@ -43,7 +44,6 @@ public class DemoSessions {
     private void prune() {
         Instant now = clock.instant();
         tickets.values().removeIf(t -> !t.expiresAt().isAfter(now));
-        sessions.values().removeIf(s -> !s.expiresAt().isAfter(now));
     }
     public synchronized String issue(Profile profile, String challenge) {
         prune();
@@ -60,15 +60,14 @@ public class DemoSessions {
         Ticket found = tickets.get(digest(ticket));
         if (found == null || !MessageDigest.isEqual(found.challenge().getBytes(StandardCharsets.US_ASCII),
                 digest(verifier).getBytes(StandardCharsets.US_ASCII))) throw new IllegalArgumentException("Invalid login request");
-        if (sessions.size() >= 1000) throw new IllegalArgumentException("Please try again later");
+        String token = randomToken(); Instant createdAt=clock.instant(),expiry = createdAt.plusSeconds(LIFETIME_SECONDS);
+        sessions.save(digest(token),found.profile(),createdAt,expiry);
         tickets.remove(digest(ticket));
-        String token = randomToken(); Instant expiry = clock.instant().plusSeconds(1800);
-        sessions.put(digest(token), new Session(found.profile(), expiry));
         return new Exchange(token, found.profile(), expiry);
     }
     public Session find(String token) {
         prune();
-        return token == null || !token.matches("[A-Za-z0-9_-]{43}") ? null : sessions.get(digest(token));
+        return token == null || !token.matches("[A-Za-z0-9_-]{43}") ? null : sessions.find(digest(token),clock.instant());
     }
-    public void revoke(String token) { if (token != null) sessions.remove(digest(token)); }
+    public void revoke(String token) { if (token != null && token.matches("[A-Za-z0-9_-]{43}")) sessions.revoke(digest(token),clock.instant()); }
 }

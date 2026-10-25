@@ -87,7 +87,7 @@ function LoginContent() {
         </h1>
         <p className="page-intro__subtitle">
           {user
-            ? "Here is the profile you shared with this demo."
+            ? "Here is the profile you shared. This browser remembers your login for up to 7 days."
             : "Try Google, GitHub or Microsoft sign-in in the same application as the trading simulator."}
         </p>
       </section>
@@ -212,7 +212,7 @@ function LoginContent() {
             </p>
           )}
           <p className="auth__note">
-            Only the profile details you authorize are shown. Your password
+            This browser remembers your login for up to 7 days. Sign out to end this session. Only the profile details you authorize are shown. Your password
             stays with your platform.
           </p>
         </section>
