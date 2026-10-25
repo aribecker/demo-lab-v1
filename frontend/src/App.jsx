@@ -92,8 +92,8 @@ function AppContent({ loader, authApi, simulationApi, marketApi }) {
     </div>
 
     <footer className="app-shell__footer">
-      <p><span>React {React.version}</span> <i>→</i> {pathname === '/specifications' ? 'SDD → Bundled specifications' : pathname === '/bitcoin' ? 'Binance public quotes' : ['/people', '/database'].includes(pathname) ? 'Java API → PostgreSQL' : pathname === '/chatbot' ? 'Spring AI → OpenRouter' : 'Weather microservice → Provider'}</p>
-      <p>Data: {pathname === '/specifications' ? 'Repository specs · build snapshot' : pathname === '/chatbot' ? 'OpenRouter · free text models' : pathname === '/database' ? 'PostgreSQL schemas and tables' : pathname === '/people' ? 'PostgreSQL shared people list' : pathname === '/bitcoin'
+      <p><span>React {React.version}</span> <i>→</i> {pathname === '/specifications' ? 'SDD → Bundled specifications' : pathname === '/trading-simulator' ? 'Java API → Authorized simulation' : pathname === '/bitcoin' ? 'Binance public quotes' : ['/people', '/database'].includes(pathname) ? 'Java API → PostgreSQL' : pathname === '/chatbot' ? 'Spring AI → OpenRouter' : 'Weather microservice → Provider'}</p>
+      <p>Data: {pathname === '/specifications' ? 'Repository specs · build snapshot' : pathname === '/chatbot' ? 'OpenRouter · free text models' : pathname === '/database' ? 'PostgreSQL schemas and tables' : pathname === '/people' ? 'PostgreSQL shared people list' : ['/bitcoin', '/trading-simulator'].includes(pathname)
         ? <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance</a>
         : <><a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.met.no/" target="_blank" rel="noreferrer">MET Norway</a></>} <span className="app-shell__footer-note">{pathname === '/specifications' ? '· Read-only source' : pathname === '/database' ? '· Values returned by PostgreSQL' : '· Times in Buenos Aires'}</span></p>
     </footer>

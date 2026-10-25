@@ -99,4 +99,4 @@
 - [x] Commit grounding separately.
 - [x] Implement shared identity/capability, separate routes/menu, server API restriction and public market projection.
 - [x] Cover owner/non-owner/anonymous, expiry/logout/denial and database-state bypass with tests.
-- [ ] Complete full validation, deploy backend then frontend and verify live behavior without production commands.
+- [x] Complete full validation, deploy backend then frontend and verify live behavior without production commands.
