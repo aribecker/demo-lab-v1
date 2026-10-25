@@ -1,0 +1,21 @@
+import React from 'react';
+import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
+import {render,screen,fireEvent,waitFor,cleanup} from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
+import {MemoryRouter} from 'react-router';
+vi.mock('./api.js',()=>({restore:vi.fn(),request:vi.fn(),login:vi.fn(),logout:vi.fn(),root:id=>`/api/treasury/institutions/${id}`,download:vi.fn()}));
+import * as api from './api.js';
+import {App} from './main.jsx';
+const inst={id:'m',name:'Mariners',code:'MAR',theme_id:'mariners',active:true};
+const accounts=[{id:'cash',code:'1',name:'Caja pesos',active:true,allows_posting:true,type:'ASSET',currency_policy:'ARS'},{id:'income',code:'4',name:'Cuotas',active:true,allows_posting:true,type:'INCOME',currency_policy:'BOTH'}];
+const owner={canUseSimulator:true,profile:{name:'Ariel Becker'}};
+function mount(route){return render(<MemoryRouter initialEntries={[route]}><App/></MemoryRouter>);}
+beforeEach(()=>{vi.clearAllMocks();localStorage.clear();api.restore.mockResolvedValue(owner);api.request.mockImplementation(async path=>{if(path.endsWith('/institutions'))return [inst];if(path.endsWith('/themes'))return [{id:'mariners',name:'Mariners'}];if(path.endsWith('/accounts'))return accounts;if(path.endsWith('/members'))return [];if(path.endsWith('/entries'))return [];throw new Error('Unexpected '+path);});});
+afterEach(cleanup);
+describe('Flujos de tesorería',()=>{
+ it('requiere login y reutiliza Google',async()=>{api.restore.mockResolvedValue(null);mount('/');await screen.findByText('Bienvenido a tu tesorería');fireEvent.click(screen.getByText('Continuar con Google'));expect(api.login).toHaveBeenCalledOnce();expect(api.request).not.toHaveBeenCalled();});
+ it('rechaza otra cuenta sin cargar datos contables',async()=>{api.restore.mockResolvedValue({canUseSimulator:false,profile:{name:'Otra persona'}});mount('/entries');expect(await screen.findByText(/Tu cuenta no está autorizada/)).toBeInTheDocument();expect(api.request).not.toHaveBeenCalled();});
+ it('seleccionar institución cambia su skin y habilita las vistas',async()=>{mount('/');await screen.findByText('Cada institución, su propio espacio.');await screen.findByRole('heading',{name:'Mariners'});fireEvent.change(screen.getByLabelText('Institución activa'),{target:{value:'m'}});expect(await screen.findByRole('heading',{name:'Mariners',level:1})).toBeInTheDocument();expect(document.querySelector('.app')).toHaveAttribute('data-theme','mariners');});
+ it('solo habilita contabilizar cuando ARS y USD balancean',async()=>{localStorage.setItem('treasury.institution','m');mount('/entry');await screen.findByRole('heading',{name:'Nuevo asiento'});await waitFor(()=>expect(screen.getByLabelText('Cuenta línea 1').options).toHaveLength(3));const post=screen.getByRole('button',{name:'Contabilizar asiento'});expect(post).toBeDisabled();fireEvent.change(screen.getByLabelText('Cuenta línea 1'),{target:{value:'cash'}});fireEvent.change(screen.getByLabelText('Cuenta línea 2'),{target:{value:'income'}});fireEvent.change(screen.getByLabelText('Debe línea 1'),{target:{value:'123,45'}});fireEvent.change(screen.getByLabelText('Haber línea 2'),{target:{value:'123,45'}});expect(post).toBeEnabled();fireEvent.change(screen.getByLabelText('Moneda línea 2'),{target:{value:'USD'}});expect(post).toBeDisabled();});
+ it('carga campos de miembro y envía la institución seleccionada',async()=>{localStorage.setItem('treasury.institution','m');mount('/members');await screen.findByRole('heading',{name:'Miembros'});fireEvent.click(screen.getByRole('button',{name:'Agregar miembro'}));fireEvent.change(screen.getByLabelText('Nombre *'),{target:{value:'Ariel'}});fireEvent.change(screen.getByLabelText('Apellido *'),{target:{value:'Becker'}});fireEvent.change(screen.getByLabelText('Residencia'),{target:{value:'CABA'}});fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));await waitFor(()=>expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions/m/members',{body:expect.objectContaining({first_name:'Ariel',last_name:'Becker',residence:'CABA'})}));});
+});

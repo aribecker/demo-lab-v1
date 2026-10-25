@@ -29,8 +29,15 @@ class WebConfiguration implements WebMvcConfigurer {
         return Clock.systemUTC();
     }
 
+    private String[] treasuryOrigins() {
+        return java.util.stream.Stream.concat(Arrays.stream(origins), java.util.stream.Stream.of("https://ariel-treasury.onrender.com")).distinct().toArray(String[]::new);
+    }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        for(String path : new String[]{"/api/treasury/**", "/auth/**"})
+            registry.addMapping(path).allowedOrigins(treasuryOrigins()).allowedMethods("GET","POST","OPTIONS")
+                .allowedHeaders("Accept","Content-Type","Authorization").allowCredentials(false).maxAge(600);
         registry.addMapping("/**").allowedOrigins(origins).allowedMethods("GET", "POST", "OPTIONS")
                 .allowedHeaders("Accept", "Content-Type", "X-Request-Id", "Authorization")
                 .exposedHeaders("X-Request-Id").allowCredentials(false).maxAge(600);

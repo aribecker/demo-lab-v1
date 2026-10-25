@@ -62,19 +62,23 @@ public class AuthConfiguration {
                 .successHandler((request,response,authentication) -> {
                     var session = request.getSession(false);
                     String challenge = session == null ? null : (String)session.getAttribute("demo.challenge");
+                    String callback = session != null && Boolean.TRUE.equals(session.getAttribute("demo.treasury"))
+                        ? "https://ariel-treasury.onrender.com" : frontend;
                     var auth = (OAuth2AuthenticationToken)authentication;
-                    String target = frontend+"/login#auth_error=failed";
+                    String target = callback+"/login#auth_error=failed";
                     try {
                         var p = Profiles.from(auth.getAuthorizedClientRegistrationId(), auth.getPrincipal().getAttributes());
-                        target = frontend+"/login#ticket="+sessions.issue(p,challenge);
+                        target = callback+"/login#ticket="+sessions.issue(p,challenge);
                     } catch (IllegalArgumentException ignored) { }
                     if (session != null) session.invalidate();
                     response.setHeader("Cache-Control","no-store");
                     response.setHeader("Referrer-Policy","no-referrer");
                     response.sendRedirect(target);
                 }).failureHandler((request,response,error) -> {
-                    var session=request.getSession(false);if(session!=null)session.invalidate();
-                    response.sendRedirect(frontend+"/login#auth_error=failed");
+                    var session=request.getSession(false);
+                    String callback=session!=null && Boolean.TRUE.equals(session.getAttribute("demo.treasury"))?"https://ariel-treasury.onrender.com":frontend;
+                    if(session!=null)session.invalidate();
+                    response.sendRedirect(callback+"/login#auth_error=failed");
                 }));
         }
         return http.build();

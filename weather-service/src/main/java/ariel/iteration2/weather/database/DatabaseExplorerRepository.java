@@ -22,7 +22,7 @@ public class DatabaseExplorerRepository {
         SELECT c.oid,n.nspname,c.relname FROM pg_catalog.pg_class c
         JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
         WHERE c.relkind IN ('r','p') AND left(n.nspname,3) <> 'pg_'
-          AND n.nspname <> 'information_schema' AND n.nspname <> 'auth_private'
+          AND n.nspname <> 'information_schema' AND n.nspname <> 'auth_private' AND n.nspname <> 'treasury'
           AND has_schema_privilege(n.oid,'USAGE') AND has_table_privilege(c.oid,'SELECT')
         """;
 
