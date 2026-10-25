@@ -53,7 +53,7 @@ export default function SharedBitcoinTracker({ api }) {
       {data.running && data.lastPollAt > 0 && Date.now() - data.lastPollAt > 30000 && <p className="notice notice--error">The last server quote is over 30 seconds old. The backend may be waking up or its provider may be unavailable. Balances are the last saved state.</p>}
       <AdaptiveTracking data={data} />
       <div className="bitcoin__workspace"><BitcoinWidget minimum={data.settings.minimum} maximum={data.settings.maximum}
-        rateHistory={<RateQueryHistory summary={data.rateQueries} loader={api?.history} />}
+        rateHistory={<RateQueryHistory summary={data.rateQueries} loader={api?.history} periodLoader={api?.historyPeriods} />}
         tracker={{ ...data, shared: true, visible: true, pending: shared.pending,
           toggle: () => shared.send('running', { running: !data.running }), refresh: () => shared.send('refresh') }} />
         <SimulationPanel simulation={data.simulation} runMetrics={data.runMetrics} latest={data.samples.at(-1)} start={start}

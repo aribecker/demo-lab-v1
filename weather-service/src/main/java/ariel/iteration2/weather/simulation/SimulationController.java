@@ -17,6 +17,9 @@ public class SimulationController {
     @GetMapping("/rate-queries") public ResponseEntity<RateQueryHistory.Page> rateQueries(@RequestParam(required=false) Long before,@RequestParam(defaultValue="25") int limit) {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(service.rateQueries(before,limit));
     }
+    @GetMapping("/rate-periods") public ResponseEntity<RateQueryHistory.PeriodPage> ratePeriods(@RequestParam(required=false) Long before,@RequestParam(defaultValue="25") int limit) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(service.ratePeriods(before,limit));
+    }
     @PostMapping("/commands") public ResponseEntity<JsonNode> command(@RequestBody JsonNode command) { return ok(service.command(command)); }
     private ResponseEntity<JsonNode> ok(SharedState state) {
         ObjectNode snapshot = json.valueToTree(state);

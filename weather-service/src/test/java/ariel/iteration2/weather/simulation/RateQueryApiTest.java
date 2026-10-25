@@ -36,4 +36,15 @@ class RateQueryApiTest {
         assertEquals(200,r.getStatusCode().value());assertEquals(before,r.getBody().path("rateQueries").path("total").asLong());
         assertEquals(before,store.history().summary().total());
     }
+    @Test void activityPeriodsEndpointIsReadOnlyAndNoStore() {
+        long id=store.history().begin(Instant.parse("2026-10-26T00:00:00Z"));
+        store.history().complete(id,Instant.parse("2026-10-26T00:00:00Z"),new BigDecimal("81000"),200,null);
+        long count=store.history().summary().total(),revision=store.read().controlRevision;
+        var r=client.getForEntity("/api/simulation/rate-periods?limit=1",JsonNode.class);
+        assertEquals(200,r.getStatusCode().value());assertTrue(r.getHeaders().getCacheControl().contains("no-store"));
+        assertEquals(1,r.getBody().path("periods").size());assertTrue(r.getBody().path("successfulReadings").asLong()>0);
+        assertEquals(count,store.history().summary().total());assertEquals(revision,store.read().controlRevision);
+        assertEquals(400,client.getForEntity("/api/simulation/rate-periods?before=abc",String.class).getStatusCode().value());
+    }
+
 }

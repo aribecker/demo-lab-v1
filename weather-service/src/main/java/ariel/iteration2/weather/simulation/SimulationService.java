@@ -70,6 +70,7 @@ public class SimulationService {
     }
     public RateQueryHistory.Summary rateSummary() { return store.history().summary(); }
     public RateQueryHistory.Page rateQueries(Long before,int limit) { return store.history().page(before,limit); }
+    public RateQueryHistory.PeriodPage ratePeriods(Long before,int limit) { return store.history().periods(before,limit); }
     private void poll(SharedState s) {
         Instant now = clock.instant();
         s.nextPollAt = now.toEpochMilli() + 10000;

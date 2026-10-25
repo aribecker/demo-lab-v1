@@ -37,3 +37,4 @@
 .bitcoin__history-scroll table { width:100%; min-width:460px; }
 .bitcoin__history-scroll th,.bitcoin__history-scroll td { vertical-align:top; font-size:var(--text-12px); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .bitcoin__history-scroll small { color:var(--color-text-secondary); font-size:var(--text-11px); }
+.bitcoin__history-toolbar { display:flex; flex-wrap:wrap; gap:var(--space-8); margin:var(--space-12) 0; }

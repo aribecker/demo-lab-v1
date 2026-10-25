@@ -83,4 +83,37 @@ class RateQueryHistoryTest {
         assertThrows(IllegalArgumentException.class,()->history.complete(id,now,null,null,"secret/raw exception"));
         assertEquals(1,history.summary().failed());assertEquals(0,history.summary().successful());
     }
+    private void success(Instant at) {long id=history.begin(at);history.complete(id,at,new BigDecimal("81000"),200,null);}
+    @Test void periodsUseStrictGapsAndDoNotBridgeFailuresAcrossMidnight() {
+        Instant base=Instant.parse("2026-10-25T23:59:30Z");
+        success(base);success(base.plusSeconds(40));success(base.plusSeconds(80));
+        long error=history.begin(base.plusSeconds(110));history.complete(error,base.plusSeconds(110),null,500,"HTTP_ERROR");
+        history.begin(base.plusSeconds(120));
+        success(base.plusSeconds(140));success(base.plusSeconds(140));
+        var page=history.periods(null,25);
+        assertEquals(2,page.totalPeriods());assertEquals(5,page.successfulReadings());
+        assertEquals(base.plusSeconds(140),page.periods().get(0).from());assertEquals(2,page.periods().get(0).readingCount());
+        assertEquals(base,page.periods().get(1).from());assertEquals(base.plusSeconds(80),page.periods().get(1).to());assertEquals(3,page.periods().get(1).readingCount());
+        assertEquals(7,history.summary().total());
+    }
+    @Test void periodBoundaryUsesStoredMicrosecondsRatherThanRoundedDisplay() {
+        success(now);success(now.plusSeconds(59).plusNanos(999999000));
+        success(now.plusSeconds(119).plusNanos(999999000));
+        var page=history.periods(null,25);assertEquals(2,page.totalPeriods());
+        assertEquals(1,page.periods().get(0).readingCount());assertEquals(2,page.periods().get(1).readingCount());
+    }
+    @Test void periodsCoverEntireHistoryAndPageWithoutDuplicates() {
+        for(int i=0;i<30;i++)success(now.plusSeconds(i*120));
+        var first=history.periods(null,2);var second=history.periods(first.nextCursor(),2);
+        assertEquals(30,first.totalPeriods());assertEquals(30,first.successfulReadings());
+        assertTrue(second.periods().get(0).id()<first.nextCursor());
+        var all=history.periods(null,100);assertEquals(30,all.periods().size());assertNull(all.nextCursor());
+        assertEquals(all.periods().get(0).from(),all.periods().get(0).to());
+        assertThrows(IllegalArgumentException.class,()->history.periods(0L,25));
+        assertThrows(IllegalArgumentException.class,()->history.periods(null,101));
+    }
+    @Test void emptyPeriodsHaveHonestZeroTotals() {
+        var page=history.periods(null,25);assertTrue(page.periods().isEmpty());assertEquals(0,page.totalPeriods());assertEquals(0,page.successfulReadings());
+    }
+
 }

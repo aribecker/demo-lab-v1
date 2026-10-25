@@ -16,6 +16,12 @@ public final class RateQueryHistory {
     public record Query(long id,Instant requestedAt,Instant completedAt,String provider,String symbol,
         String status,String price,Integer httpStatus,String errorCode) {}
     public record Page(List<Query> queries,Long nextCursor,Summary summary) {}
+    public record Period(long id,Instant from,Instant to,long readingCount) {}
+    public record PeriodPage(List<Period> periods,Long nextCursor,long totalPeriods,long successfulReadings) {}
+    private static final String PERIODS = "WITH ordered AS (SELECT id,requested_at,LAG(requested_at) OVER (ORDER BY requested_at,id) AS previous_at FROM bitcoin_shared.rate_queries WHERE status='SUCCESS'), "
+        + "marked AS (SELECT id,requested_at,CASE WHEN previous_at IS NULL OR requested_at >= previous_at + INTERVAL '1' MINUTE THEN 1 ELSE 0 END AS boundary FROM ordered), "
+        + "grouped AS (SELECT requested_at,SUM(boundary) OVER (ORDER BY requested_at,id ROWS UNBOUNDED PRECEDING) AS period_id FROM marked), "
+        + "periods AS (SELECT period_id,MIN(requested_at) AS period_from,MAX(requested_at) AS period_to,COUNT(*) AS reading_count FROM grouped GROUP BY period_id) ";
     public RateQueryHistory(DatabaseConnections connections) { this.connections=connections; }
     public synchronized void initialize() {
         if(ready) return;
@@ -81,5 +87,24 @@ public final class RateQueryHistory {
         }catch(SQLException failure){throw new SimulationStore.StorageUnavailable();}
     }
     private static Instant instant(ResultSet r,int index) throws SQLException {Timestamp time=r.getTimestamp(index);return time==null?null:time.toInstant();}
+    public PeriodPage periods(Long before,int limit) {
+        if(before!=null && before<=0 || limit<1 || limit>100)throw new IllegalArgumentException("Use a positive cursor and page size from 1 to 100.");
+        requireReady();
+        try(var c=connections.open()) {
+            c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setReadOnly(true);c.setAutoCommit(false);
+            long total,count;
+            try(var st=c.createStatement()) {
+                st.setQueryTimeout(10);
+                try(var r=st.executeQuery(PERIODS+"SELECT COUNT(*),COALESCE(SUM(reading_count),0) FROM periods")) { r.next();total=r.getLong(1);count=r.getLong(2); }
+            }
+            List<Period> rows=new ArrayList<>();
+            try(var st=c.prepareStatement(PERIODS+"SELECT period_id,period_from,period_to,reading_count FROM periods"+(before==null?"":" WHERE period_id < ?")+" ORDER BY period_id DESC LIMIT ?")) {
+                st.setQueryTimeout(10);int i=1;if(before!=null)st.setLong(i++,before);st.setInt(i,limit+1);
+                try(var r=st.executeQuery()){while(r.next())rows.add(new Period(r.getLong(1),instant(r,2),instant(r,3),r.getLong(4)));}
+            }
+            boolean more=rows.size()>limit;if(more)rows.remove(rows.size()-1);c.commit();
+            return new PeriodPage(rows,more?rows.get(rows.size()-1).id():null,total,count);
+        }catch(SQLException failure){throw new SimulationStore.StorageUnavailable();}
+    }
     private void requireReady(){if(!ready)throw new SimulationStore.StorageUnavailable();}
 }
