@@ -13,10 +13,13 @@ public class SimulationStore {
     private final DatabaseConnections connections;
     private final ObjectMapper json;
     private volatile boolean ready;
+    private final RateQueryHistory history;
     public SimulationStore(String connection, ObjectMapper json) {
         this.json = json;
         this.connections = new DatabaseConnections(connection);
+        this.history = new RateQueryHistory(connections);
     }
+    public RateQueryHistory history() { return history; }
     public boolean configured() { return connections.configured(); }
     public synchronized void initialize() {
         if (ready) return;
@@ -29,6 +32,7 @@ public class SimulationStore {
                 insert.setString(1,json.writeValueAsString(new SharedState()));
                 try { insert.executeUpdate(); } catch (SQLException race) { if (!"23505".equals(race.getSQLState())) throw race; }
             }
+            history.initialize();
             ready = true;
         } catch (Exception failure) {
             LOG.warn("Simulation storage initialization failed (SQL state: {}).", failure instanceof SQLException sql ? sql.getSQLState() : "unavailable");

@@ -4,6 +4,7 @@ import SimulationPanel from './SimulationPanel.jsx';
 import useSharedSimulation from './useSharedSimulation.js';
 import { validLimits, validRun } from './simulation.js';
 import AdaptiveTracking, { AdaptiveSettings, adaptiveDefaults, adaptiveFields } from './AdaptiveTracking.jsx';
+import RateQueryHistory from './RateQueryHistory.jsx';
 
 const formFrom = s => ({ ...Object.fromEntries(Object.entries(adaptiveDefaults).map(([key, value]) => [key, String(s[key] ?? value)])), capital: String(s.capital), fee: String(s.feePercent),
   minimum: s.minimum == null ? '' : String(s.minimum), maximum: s.maximum == null ? '' : String(s.maximum), step: String(s.step) });
@@ -52,6 +53,7 @@ export default function SharedBitcoinTracker({ api }) {
       {data.running && data.lastPollAt > 0 && Date.now() - data.lastPollAt > 30000 && <p className="notice notice--error">The last server quote is over 30 seconds old. The backend may be waking up or its provider may be unavailable. Balances are the last saved state.</p>}
       <AdaptiveTracking data={data} />
       <div className="bitcoin__workspace"><BitcoinWidget minimum={data.settings.minimum} maximum={data.settings.maximum}
+        rateHistory={<RateQueryHistory summary={data.rateQueries} loader={api?.history} />}
         tracker={{ ...data, shared: true, visible: true, pending: shared.pending,
           toggle: () => shared.send('running', { running: !data.running }), refresh: () => shared.send('refresh') }} />
         <SimulationPanel simulation={data.simulation} runMetrics={data.runMetrics} latest={data.samples.at(-1)} start={start}

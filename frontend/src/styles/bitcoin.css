@@ -27,3 +27,13 @@
 .bitcoin__threshold--sell { stroke:var(--color-negative); }
 .bitcoin__series { fill:none; stroke:var(--color-accent); stroke-width:3; stroke-linejoin:round; }
 
+
+/* R44 durable query history; status is expressed as text as well as color. */
+.bitcoin__history-stat { grid-column:1 / -1; min-width:0; }
+.bitcoin__rate-history { margin-top:var(--space-8); min-width:0; }
+.bitcoin__history-tag { color:var(--color-positive); border-color:var(--color-positive); white-space:normal; }
+.bitcoin__history-box { margin-top:var(--space-12); padding:var(--space-12); border:var(--border-width) solid var(--color-border); border-radius:var(--radius-8px); background:var(--color-surface-inset); }
+.bitcoin__history-scroll { max-width:100%; max-height:420px; overflow:auto; margin:var(--space-12) 0; }
+.bitcoin__history-scroll table { width:100%; min-width:460px; }
+.bitcoin__history-scroll th,.bitcoin__history-scroll td { vertical-align:top; font-size:var(--text-12px); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.bitcoin__history-scroll small { color:var(--color-text-secondary); font-size:var(--text-11px); }

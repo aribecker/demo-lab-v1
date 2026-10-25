@@ -185,6 +185,56 @@ class SharedSimulationTest {
             assertEquals("adaptive",service.read().settings.strategy);assertEquals(2,service.read().settings.trailAtr);
         }
     }
+    @Test void recordsExactSuccessAndInvalidResponsesAndSurvivesResetAndRestart() throws Exception {
+        long baseline=service.rateSummary().total();
+        price.set("81234.123456789012");service.tick();
+        var first=service.rateQueries(null,1).queries().get(0);
+        assertEquals("81234.123456789012",first.price());assertEquals("SUCCESS",first.status());
+        assertEquals(clock.instant(),first.requestedAt());assertEquals(clock.instant(),first.completedAt());assertEquals(200,first.httpStatus());
+        clock.advance();price.set("NaN");service.tick();
+        var failed=service.rateQueries(null,1).queries().get(0);
+        assertEquals("ERROR",failed.status());assertEquals("INVALID_RESPONSE",failed.errorCode());assertNull(failed.price());
+        assertEquals(baseline+2,service.rateSummary().total());
+        action("reset","");assertEquals(baseline+2,service.rateSummary().total());
+        var restored=new SimulationStore(database,json);restored.initialize();
+        assertEquals(baseline+2,restored.history().summary().total());
+        assertEquals(failed.id(),restored.history().page(null,1).queries().get(0).id());
+    }
+    @Test void historyAndSnapshotReadsReplayAndPauseDoNotQueryMarket() throws Exception {
+        long baseline=service.rateSummary().total();
+        action("reset","");service.tick();int calls=hits.get();
+        service.read();service.rateSummary();service.rateQueries(null,25);
+        var pause=command(UUID.randomUUID().toString(),service.read().controlRevision,"running",",\"running\":false");
+        service.command(pause);service.command(pause);clock.advance();service.tick();
+        assertEquals(calls,hits.get());assertEquals(baseline+1,service.rateSummary().total());
+    }
+    @Test void providerHttpAndTransportFailuresAreDurableWithoutQuotes() throws Exception {
+        market.removeContext("/price");
+        market.createContext("/price",exchange->{hits.incrementAndGet();exchange.sendResponseHeaders(429,-1);exchange.close();});
+        long count=service.read().count;service.tick();
+        var failed=service.rateQueries(null,1).queries().get(0);
+        assertEquals(429,failed.httpStatus());assertEquals("HTTP_ERROR",failed.errorCode());assertEquals(count,service.read().count);
+        market.stop(0);clock.advance();service.tick();
+        failed=service.rateQueries(null,1).queries().get(0);
+        assertEquals("TRANSPORT_ERROR",failed.errorCode());assertNull(failed.httpStatus());assertEquals(count,service.read().count);
+    }
+    @Test void reservationIsCommittedBeforeHttpAndStorageFailureBlocksProvider() throws Exception {
+        market.removeContext("/price");
+        var observed=new AtomicReference<RateQueryHistory.Query>();
+        market.createContext("/price",exchange->{
+            observed.set(store.history().page(null,1).queries().get(0));hits.incrementAndGet();
+            byte[] body="{\"symbol\":\"BTCUSDT\",\"price\":\"81000\"}".getBytes();
+            exchange.sendResponseHeaders(200,body.length);exchange.getResponseBody().write(body);exchange.close();
+        });
+        service.tick();assertEquals("IN_PROGRESS",observed.get().status());assertNull(observed.get().completedAt());
+        assertEquals("SUCCESS",service.rateQueries(null,1).queries().get(0).status());
+        int calls=hits.get();clock.advance();
+        try(var c=java.sql.DriverManager.getConnection(database);var st=c.createStatement()){st.execute("DROP TABLE bitcoin_shared.rate_queries");}
+        assertThrows(SimulationStore.StorageUnavailable.class,()->service.tick());assertEquals(calls,hits.get());
+        // Restore this disposable shared PostgreSQL fixture for the next test.
+        try(var c=java.sql.DriverManager.getConnection(database);var st=c.createStatement()){st.execute("DROP TABLE bitcoin_shared.\"rate_query_schema_history\"");}
+        new SimulationStore(database,json).initialize();
+    }
     static class MutableClock extends Clock {
         final AtomicReference<Instant> now=new AtomicReference<>(Instant.parse("2026-10-22T12:00:00Z"));
         void advance(){now.updateAndGet(t->t.plusSeconds(10));}

@@ -68,22 +68,48 @@ public class SimulationService {
             return s;
         });
     }
+    public RateQueryHistory.Summary rateSummary() { return store.history().summary(); }
+    public RateQueryHistory.Page rateQueries(Long before,int limit) { return store.history().page(before,limit); }
     private void poll(SharedState s) {
         Instant now = clock.instant();
         s.nextPollAt = now.toEpochMilli() + 10000;
+        // Reserve durably before any network call. Storage failure means no unaudited request.
+        long attempt = store.history().begin(now);
+        java.math.BigDecimal rate = null;
+        Integer httpStatus = null;
+        String errorCode = null;
+        boolean interrupted = false;
         try {
             var response = http.send(HttpRequest.newBuilder(market).timeout(Duration.ofSeconds(5))
                 .header("Accept","application/json").GET().build(),HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode()!=200) throw new IllegalArgumentException("Provider unavailable");
-            JsonNode data = json.readTree(response.body());
-            if (!"BTCUSDT".equals(data.path("symbol").asText()) || !data.path("price").isTextual()) throw new IllegalArgumentException("Invalid pair");
-            SimulationEngine.quote(s,Double.parseDouble(data.path("price").asText()),clock.instant());
-        } catch (InterruptedException interrupted) {
-            Thread.currentThread().interrupt(); s.error="Binance refresh interrupted. Last successful quote retained.";
-        } catch (Exception failure) {
-            s.error="Binance quote unavailable or invalid. Last successful quote retained; no simulated trade executed.";
+            httpStatus=response.statusCode();
+            if(httpStatus!=200) errorCode="HTTP_ERROR";
+            else {
+                JsonNode data=json.readTree(response.body());
+                if(data==null || !"BTCUSDT".equals(data.path("symbol").asText()) || !data.path("price").isTextual())
+                    throw new IllegalArgumentException("Invalid response");
+                String text=data.path("price").asText();
+                if(text.length()>128)throw new IllegalArgumentException("Invalid price");
+                rate=new java.math.BigDecimal(text);
+                if(rate.signum()<=0 || rate.compareTo(new java.math.BigDecimal("1000000000000"))>0 || rate.scale()>12)
+                    throw new IllegalArgumentException("Price outside database contract");
+            }
+        } catch (InterruptedException failure) {
+            interrupted=true;errorCode="INTERRUPTED";
+        } catch (java.net.http.HttpTimeoutException failure) {
+            errorCode="TRANSPORT_ERROR";
+        } catch (java.io.IOException failure) {
+            errorCode=httpStatus==null?"TRANSPORT_ERROR":"INVALID_RESPONSE";
+        } catch (RuntimeException failure) {
+            errorCode="INVALID_RESPONSE";
         }
-        s.revision++; s.updatedAt=clock.instant().toString();
+        Instant completed=clock.instant();
+        try {
+            store.history().complete(attempt,completed,errorCode==null?rate:null,httpStatus,errorCode);
+        } finally { if(interrupted)Thread.currentThread().interrupt(); }
+        if(errorCode==null) SimulationEngine.quote(s,rate.doubleValue(),completed);
+        else s.error="Binance quote unavailable or invalid ("+errorCode+"). Last successful quote retained; no simulated trade executed.";
+        s.revision++; s.updatedAt=completed.toString();
     }
     public SharedState command(JsonNode command) {
         if (command == null || !command.isObject()) throw new IllegalArgumentException("Invalid command.");

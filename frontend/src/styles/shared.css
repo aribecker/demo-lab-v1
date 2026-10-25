@@ -23,6 +23,7 @@
 :where(.panel) .button:disabled { opacity:.65; }
 
 .button[aria-pressed="true"],.button[aria-expanded="true"] { background:var(--color-surface-hover); border-color:var(--color-accent); color:var(--color-button-text); }
+.button.button--success,.button.button--success:hover:enabled { color:var(--color-positive); border-color:var(--color-positive); }
 .button:focus-visible,.field:focus-visible { outline:var(--focus-width) solid var(--color-focus); outline-offset:var(--focus-offset); }
 
 }

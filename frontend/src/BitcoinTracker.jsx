@@ -6,7 +6,7 @@ import { EMPTY_SIMULATION, simulationReducer, validLimits, validRun } from './si
 const money = value => `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 const time = value => new Date(value).toLocaleTimeString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' });
 
-export function BitcoinWidget({ tracker, minimum, maximum }) {
+export function BitcoinWidget({ tracker, minimum, maximum, rateHistory }) {
   const { samples, baseline, range, count, error, pending, running, visible, toggle, refresh } = tracker;
   const latest = samples.at(-1);
   const delta = latest ? latest.price - baseline : 0;
@@ -25,6 +25,7 @@ export function BitcoinWidget({ tracker, minimum, maximum }) {
       <div><dt>{tracker.shared ? 'Shared low' : 'Session low'}</dt><dd>{range ? money(range.min) : '—'}</dd></div>
       <div><dt>{tracker.shared ? 'Shared high' : 'Session high'}</dt><dd>{range ? money(range.max) : '—'}</dd></div>
       <div><dt>Successful readings</dt><dd>{count}</dd></div>
+      {rateHistory && <div className="bitcoin__history-stat"><dt>Provider attempts · lifetime</dt><dd>{rateHistory}</dd></div>}
       <div><dt>Last retrieved · Buenos Aires</dt><dd>{latest ? time(latest.retrievedAt) : '—'}</dd></div>
     </dl>
     <figure className="bitcoin__chart">
