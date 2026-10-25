@@ -55,3 +55,16 @@ A green expandable tag next to the successful-reading counter shows lifetime att
 Preserve every R44 table/migration. Add read-only GET /api/simulation/rate-periods with the same positive before cursor and limit1–100(default25), no-store, repeatable-read and10s query timeout. Return periods(id,from,to,readingCount),nextCursor,totalPeriods,successfulReadings. Group SUCCESS rows only, ordered by requested_at,id. A period continues iff the next successful reading is strictly less than60 seconds after the preceding successful reading; gap >=60 seconds starts another period. Compare full stored timestamp precision, not rounded display. Failed/incomplete attempts do not bridge gaps. A single reading has identical from/to. Groups may last longer than a minute through a chain of short gaps. Display latest period first, actual first/last recorded timestamps only; these are observed activity spans, not guaranteed uptime. Use server SQL window functions over the complete retained success history, never group only the browser's latest25 samples. New API does not write or request market data.
 
 Inline history has Latest25, View All and Resumido controls. Latest25 shows the first history page; View All automatically reads all older pages in bounded100-row requests, excludes later insertions through descending ID cursor, progressively shows loaded count, and can be canceled/collapsed. Never silently cap results or require repeated older clicks to fulfill View All. Read failures retain loaded rows and Retry resumes the failed cursor/action. Refresh repeats the selected view. Resumido shows From/To in Buenos Aires with tenths and successful-reading count per period, with Load older periods for all period pages; refresh recomputes the latest spans. Preserve all detailed attempt statuses/prices and existing controls. Views are per-browser, read-only, no simulation Reset. BEM/CSS design contract unchanged.
+
+## R47 — Durable application sessions
+`persistent-login.md` is authoritative for authentication persistence. New isolated schema `auth_private` contains:
+
+| Table / column | Type | Contract |
+|---|---|---|
+| application_sessions.token_hash | VARCHAR(43) | PK, length43, SHA-256 base64url of random token; no plaintext tokens |
+| profile | TEXT | NOT NULL, validated provider profile JSON including emailVerified |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, server creation time |
+| expires_at | TIMESTAMP WITH TIME ZONE | NOT NULL, exactly seven days after creation, greater than created_at |
+| revoked_at | TIMESTAMP WITH TIME ZONE | NULL until explicit logout |
+
+Index `application_sessions_expiry_idx(expires_at)`. Independent Flyway metadata `auth_private.session_schema_history`, migration directory `db/auth-migration`; V1 creates only the sessions table and index. No changes to existing tables, documents or migration history. Expired rows may be removed on session creation; live revocation survives restart. Authentication schema is excluded from all Database Explorer catalog and row queries. Runtime requires durable storage, with safe 503 on failure and no in-memory fallback.
