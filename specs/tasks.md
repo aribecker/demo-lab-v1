@@ -106,4 +106,4 @@
 - [x] Ground existing bearer, PKCE, session, JDBC and explorer boundaries.
 - [x] Implement durable hash-only sessions, browser persistence, revocation and cross-tab identity updates.
 - [x] Pass local frontend/style/build and Java tests; PostgreSQL tests run in Render's disposable build database.
-- [ ] Deploy API then frontend, verify migration/privacy and publish owner activation steps.
+- [x] Deploy API then frontend, verify migration/privacy and publish owner activation steps.

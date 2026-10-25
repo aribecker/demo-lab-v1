@@ -6,7 +6,7 @@ const TOKEN = "demo.auth.token",
 let boot;
 async function request(path, { token, body } = {}) {
   const controller = new AbortController(),
-    timer = setTimeout(() => controller.abort(), 45000);
+    timer = setTimeout(() => controller.abort(), 90000);
   try {
     const r = await fetch(`${API}/auth/${path}`, {
       method: body === undefined ? "GET" : "POST",
