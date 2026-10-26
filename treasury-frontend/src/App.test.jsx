@@ -1,6 +1,6 @@
 import React from 'react';
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
-import {render,screen,fireEvent,waitFor,cleanup,act} from '@testing-library/react';
+import {render,screen,fireEvent,waitFor,cleanup,act,within} from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import {MemoryRouter} from 'react-router';
 vi.mock('./api.js',()=>({restore:vi.fn(),request:vi.fn(),login:vi.fn(),logout:vi.fn(),root:id=>`/api/treasury/institutions/${id}`,download:vi.fn()}));
@@ -18,6 +18,17 @@ describe('Flujos de tesorería',()=>{
  it('Escape cierra el menú sándwich',()=>{mount('/');fireEvent.click(screen.getByRole('button',{name:'Abrir menú'}));expect(screen.getByRole('button',{name:'Cerrar menú principal'})).toHaveAttribute('aria-expanded','true');fireEvent.keyDown(window,{key:'Escape'});expect(screen.getByRole('button',{name:'Abrir menú'})).toHaveAttribute('aria-expanded','false');});
  it('seleccionar institución cambia su skin y habilita las vistas',async()=>{mount('/');await screen.findByRole('heading',{name:'Elegí una institución',level:1});fireEvent.click(await screen.findByRole('button',{name:'Seleccionar Mariners'}));expect(await screen.findByRole('heading',{name:'Mariners',level:1})).toBeInTheDocument();expect(document.querySelector('.app')).toHaveAttribute('data-theme','mariners');});
  it('solo habilita contabilizar cuando ARS y USD balancean',async()=>{localStorage.setItem('treasury.institution','m');mount('/entry');await screen.findByRole('heading',{name:'Nuevo asiento'});await waitFor(()=>expect(screen.getByLabelText('Cuenta línea 1').options).toHaveLength(3));const post=screen.getByRole('button',{name:'Contabilizar asiento'});expect(post).toBeDisabled();fireEvent.change(screen.getByLabelText('Cuenta línea 1'),{target:{value:'cash'}});fireEvent.change(screen.getByLabelText('Cuenta línea 2'),{target:{value:'income'}});fireEvent.change(screen.getByLabelText('Debe línea 1'),{target:{value:'123,45'}});fireEvent.change(screen.getByLabelText('Haber línea 2'),{target:{value:'123,45'}});expect(post).toBeEnabled();fireEvent.change(screen.getByLabelText('Moneda línea 2'),{target:{value:'USD'}});expect(post).toBeDisabled();});
+ it('muestra nombre antes de apellido y ordena miembros por ambos campos en español',async()=>{
+  const fallback=api.request.getMockImplementation();
+  const members=[{id:'1',first_name:'Zoe',last_name:'Abad',active:true},{id:'2',first_name:'Ana',last_name:'Zárate',active:true},{id:'3',first_name:'Álvaro',last_name:'Pérez',active:true},{id:'4',first_name:'ana',last_name:'Abad',active:true}];
+  api.request.mockImplementation((path,opts)=>path.endsWith('/members')?Promise.resolve(members):fallback(path,opts));localStorage.setItem('treasury.institution','m');
+  mount('/members');await screen.findByText('Zoe');
+  const rows=within(screen.getByRole('table')).getAllByRole('row');
+  expect(within(rows[0]).getAllByRole('columnheader').slice(0,2).map(c=>c.textContent)).toEqual(['Nombre','Apellido']);
+  expect(rows.slice(1).map(row=>within(row).getAllByRole('cell').slice(0,2).map(c=>c.textContent))).toEqual([['Álvaro','Pérez'],['ana','Abad'],['Ana','Zárate'],['Zoe','Abad']]);
+  fireEvent.change(screen.getByLabelText('Buscar miembros'),{target:{value:'ana'}});
+  expect(within(screen.getByRole('table')).getAllByRole('row').slice(1).map(row=>within(row).getAllByRole('cell')[1].textContent)).toEqual(['Abad','Zárate']);
+ });
  it('carga campos de miembro y envía la institución seleccionada',async()=>{localStorage.setItem('treasury.institution','m');mount('/members');await screen.findByRole('heading',{name:'Miembros'});fireEvent.click(screen.getByRole('button',{name:'Agregar miembro'}));fireEvent.change(screen.getByLabelText('Nombre *'),{target:{value:'Ariel'}});fireEvent.change(screen.getByLabelText('Apellido *'),{target:{value:'Becker'}});fireEvent.change(screen.getByLabelText('Residencia'),{target:{value:'CABA'}});fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));await waitFor(()=>expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions/m/members',{body:expect.objectContaining({first_name:'Ariel',last_name:'Becker',residence:'CABA'})}));});
  it('restaura la selección guardada sin mostrar el selector durante una carga lenta',async()=>{
   const fallback=api.request.getMockImplementation();let release;

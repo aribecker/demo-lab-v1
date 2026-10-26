@@ -28,3 +28,6 @@ The catalog formerly used the generic useLoad hook, which cleared data on refres
 
 ## Complete skin correction
 Live metadata confirms Eureka uses generic and Santos Patronos uses mariners. React already switches data-theme on the app root, and selection restoration tests cover that binding. CSS only varied --primary/--accent, while body canvas, white topbar, panels, inputs and table surfaces were hardcoded; both existing primary colors were similar navy blues. Expand centralized theme token sets and consume them throughout the BEM components. Use the existing persisted IDs and existing primary/accent colors, without a database migration or changing institution records. Validate live computed colors, fonts and radii after selecting each institution on the same page, including a reload, in addition to frontend regression tests.
+
+### Orden y presentación de miembros
+El CRUD mostraba Apellido antes de Nombre y conservaba el orden recibido del API. Se ordena una copia en la presentación con Intl.Collator español, por first_name y luego last_name; se aplica también al selector del asiento sin modificar datos almacenados.

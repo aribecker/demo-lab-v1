@@ -33,3 +33,6 @@ The selected institution's persisted theme_id controls a complete visual skin, n
 - Scottish: green/cream palette. Club: burgundy/rose palette. Unselected chooser uses the generic skin.
 - Apply a theme immediately when choosing another institution; preserve it on navigation, catalog refresh, reload and editing the active institution. The stored theme assignment must not be changed as part of this correction.
 Acceptance: switch Eureka (generic) -> Santos Patronos (mariners) on the same Members page. Verify different computed workspace/header colors, heading font and panel radius, then verify the theme survives reload. Confirm primary controls and header text remain readable in both skins.
+
+### Presentación de miembros
+La lista muestra Nombre antes de Apellido y se ordena ascendentemente por nombre, luego apellido, con comparación en español sin distinguir mayúsculas ni acentos. El selector de miembros del asiento usa el mismo orden y muestra «Nombre Apellido». El filtro conserva el orden y la institución activa.
