@@ -31,3 +31,6 @@ Live metadata confirms Eureka uses generic and Santos Patronos uses mariners. Re
 
 ### Orden y presentación de miembros
 El CRUD mostraba Apellido antes de Nombre y conservaba el orden recibido del API. Se ordena una copia en la presentación con Intl.Collator español, por first_name y luego last_name; se aplica también al selector del asiento sin modificar datos almacenados.
+
+### ID en la lista de miembros
+El API ya devuelve id en cada miembro. El CRUD genera las columnas y el filtro desde configs.members.columns: agregar id expone el identificador completo y permite buscarlo sin cambios de API, base de datos ni formulario. Mantener Nombre y Apellido como primeras columnas y el comparador existente.

@@ -36,3 +36,6 @@ Acceptance: switch Eureka (generic) -> Santos Patronos (mariners) on the same Me
 
 ### Presentación de miembros
 La lista muestra Nombre antes de Apellido y se ordena ascendentemente por nombre, luego apellido, con comparación en español sin distinguir mayúsculas ni acentos. El selector de miembros del asiento usa el mismo orden y muestra «Nombre Apellido». El filtro conserva el orden y la institución activa.
+
+### Identificador visible del miembro
+En la lista de miembros, mostrar el ID completo del registro en una columna «ID del miembro» después de Nombre y Apellido. Es de solo lectura, distinto del N.º de miembro. Conservar el orden por nombre y apellido; permitir buscar por ID con el filtro existente.

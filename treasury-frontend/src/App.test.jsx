@@ -25,6 +25,8 @@ describe('Flujos de tesorería',()=>{
   mount('/members');await screen.findByText('Zoe');
   const rows=within(screen.getByRole('table')).getAllByRole('row');
   expect(within(rows[0]).getAllByRole('columnheader').slice(0,2).map(c=>c.textContent)).toEqual(['Nombre','Apellido']);
+  expect(within(rows[0]).getAllByRole('columnheader')[2]).toHaveTextContent('ID del miembro');
+  expect(rows.slice(1).map(row=>within(row).getAllByRole('cell')[2].textContent)).toEqual(['3','4','2','1']);
   expect(rows.slice(1).map(row=>within(row).getAllByRole('cell').slice(0,2).map(c=>c.textContent))).toEqual([['Álvaro','Pérez'],['ana','Abad'],['Ana','Zárate'],['Zoe','Abad']]);
   fireEvent.change(screen.getByLabelText('Buscar miembros'),{target:{value:'ana'}});
   expect(within(screen.getByRole('table')).getAllByRole('row').slice(1).map(row=>within(row).getAllByRole('cell')[1].textContent)).toEqual(['Abad','Zárate']);
