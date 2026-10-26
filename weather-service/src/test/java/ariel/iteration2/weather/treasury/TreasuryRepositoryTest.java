@@ -21,6 +21,26 @@ class TreasuryRepositoryTest {
  Line line(String account,String currency,String debit,String credit){return new Line(account,member,"Cuota",currency,new BigDecimal(debit),new BigDecimal(credit));}
  Entry entry(List<Line> lines){return new Entry(date,"Cobro de cuotas","R-1",lines);}
  List<Line> balanced(){return List.of(line(cash,"ARS","123.45","0"),line(income,"ARS","0","123.45"),line(usd,"USD","100","0"),line(income,"USD","0","100"));}
+ @Test void memberAdmissionDateCanBeSetEditedAndCleared(){
+  assertThat(repo.members(inst).get(0)).containsEntry("admission_date",null);
+  repo.saveMember(inst,member,new Member("Ariel","Becker","CABA","1","","","",true,LocalDate.of(2020,1,2)));
+  assertThat(repo.members(inst).get(0)).containsEntry("admission_date","2020-01-02");
+  repo.saveMember(inst,member,new Member("Ariel","Becker","CABA","1","","","",true,LocalDate.of(2019,12,31)));
+  assertThat(repo.members(inst).get(0)).containsEntry("admission_date","2019-12-31");
+  repo.saveMember(inst,member,new Member("Ariel","Becker","CABA","1","","","",true,null));
+  assertThat(repo.members(inst).get(0)).containsEntry("admission_date",null);
+  String added=repo.saveMember(inst,null,new Member("Ana","Pérez","","","","","",true,LocalDate.of(2021,5,6)));
+  assertThat(repo.members(inst).stream().filter(m->added.equals(m.get("id"))).findFirst().orElseThrow()).containsEntry("admission_date","2021-05-06");
+ }
+ @Test void upgradingMembersPreservesUnknownAdmissionDates()throws Exception {
+  String url="jdbc:h2:mem:member-upgrade-"+UUID.randomUUID()+";MODE=PostgreSQL;DB_CLOSE_DELAY=-1";
+  org.flywaydb.core.Flyway.configure().dataSource(url,"","").schemas("TREASURY").defaultSchema("TREASURY").table("treasury_schema_history").locations("classpath:db/treasury-migration").target("1").load().migrate();
+  try(var c=DriverManager.getConnection(url);var st=c.createStatement()){
+   st.executeUpdate("INSERT INTO treasury.institutions(id,name,code,theme_id) VALUES('legacy-inst','Historical','HIST','generic')");
+   st.executeUpdate("INSERT INTO treasury.members(id,institution_id,first_name,last_name) VALUES('legacy','legacy-inst','Ana','Pérez')");
+  }
+  var upgraded=new TreasuryRepository(url);assertThat(upgraded.members("legacy-inst").get(0)).containsEntry("admission_date",null);
+ }
  @Test void balancesIndependentlyKeepsDraftsOutAndReversesWithoutChangingOriginal(){
   String e=repo.saveEntry(inst,null,entry(balanced()),"owner");assertThat((List<?>)repo.balance(inst,date).get("rows")).isEmpty();repo.post(inst,e);
   assertThat((List<?>)repo.balance(inst,date.minusDays(1)).get("rows")).isEmpty();assertThat((List<?>)repo.balance(inst,date).get("rows")).hasSize(4);
@@ -93,7 +113,7 @@ class TreasuryRepositoryTest {
   String name="treasury_test_"+UUID.randomUUID().toString().replace("-","");
   try(var c=DriverManager.getConnection(admin);var st=c.createStatement()){st.execute("CREATE DATABASE "+name);}
   String url=admin.replaceFirst("/[^/?]+(?=\\?|$)","/"+name);
-  try{setup(url);balancesIndependentlyKeepsDraftsOutAndReversesWithoutChangingOriginal();storesManyAttachmentsRejectsExecutableTypesAndLocksPostedReceipts();
+  try{setup(url);memberAdmissionDateCanBeSetEditedAndCleared();balancesIndependentlyKeepsDraftsOutAndReversesWithoutChangingOriginal();storesManyAttachmentsRejectsExecutableTypesAndLocksPostedReceipts();
    var explorer=new ariel.iteration2.weather.database.DatabaseExplorerRepository(url);
    assertThat(explorer.catalog().schemas()).noneMatch(s->s.name().equals("treasury"));
    assertThatThrownBy(()->explorer.rows("treasury","members",0,25)).isInstanceOf(ariel.iteration2.weather.database.DatabaseExplorerRepository.NotFound.class);

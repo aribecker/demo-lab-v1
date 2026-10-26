@@ -27,6 +27,19 @@ class TreasuryAccessTest {
   mvc.perform(get("/api/simulation")).andExpect(status().isUnauthorized());
   mvc.perform(get("/auth/me")).andExpect(status().isUnauthorized());
  }
+ @Test void memberAdmissionDateIsOptionalEditableAndValidated()throws Exception {
+  var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
+  var result=mvc.perform(post("/api/treasury/institutions").contentType("application/json").content("{\"name\":\"Ingreso\",\"code\":\"DATES\",\"theme_id\":\"generic\",\"active\":true}")).andExpect(status().isOk()).andReturn();
+  String inst=mapper.readTree(result.getResponse().getContentAsString()).get("id").asText(),path="/api/treasury/institutions/"+inst+"/members";
+  var created=mvc.perform(post(path).contentType("application/json").content("{\"first_name\":\"Ana\",\"last_name\":\"Pérez\",\"active\":true}")).andExpect(status().isOk()).andReturn();
+  String id=mapper.readTree(created.getResponse().getContentAsString()).get("id").asText();
+  mvc.perform(get(path)).andExpect(jsonPath("$[0].admission_date").isEmpty());
+  mvc.perform(post(path+"/"+id).contentType("application/json").content("{\"first_name\":\"Ana\",\"last_name\":\"Pérez\",\"active\":true,\"admission_date\":\"2020-01-02\"}")).andExpect(status().isOk());
+  mvc.perform(get(path)).andExpect(jsonPath("$[0].admission_date").value("2020-01-02"));
+  mvc.perform(post(path+"/"+id).contentType("application/json").content("{\"first_name\":\"Ana\",\"last_name\":\"Pérez\",\"active\":true,\"admission_date\":\"invalid\"}")).andExpect(status().isBadRequest());
+  mvc.perform(post(path+"/"+id).contentType("application/json").content("{\"first_name\":\"Ana\",\"last_name\":\"Pérez\",\"active\":true,\"admission_date\":null}")).andExpect(status().isOk());
+  mvc.perform(get(path)).andExpect(jsonPath("$[0].admission_date").isEmpty());
+ }
  @Test void allowsOnlyConfiguredTreasuryOriginAndCallback()throws Exception {
   mvc.perform(options("/api/treasury/institutions").header("Origin","https://ariel-treasury.onrender.com").header("Access-Control-Request-Method","POST").header("Access-Control-Request-Headers","authorization,content-type"))
    .andExpect(status().isOk()).andExpect(header().string("Access-Control-Allow-Origin","https://ariel-treasury.onrender.com"));

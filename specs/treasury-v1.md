@@ -37,5 +37,6 @@ Acceptance: switch Eureka (generic) -> Santos Patronos (mariners) on the same Me
 ### Presentación de miembros
 La lista muestra Nombre antes de Apellido y se ordena ascendentemente por nombre, luego apellido, con comparación en español sin distinguir mayúsculas ni acentos. El selector de miembros del asiento usa el mismo orden y muestra «Nombre Apellido». El filtro conserva el orden y la institución activa.
 
-### Identificador visible del miembro
-En la lista de miembros, mostrar el ID completo del registro en una columna «ID del miembro» después de Nombre y Apellido. Es de solo lectura, distinto del N.º de miembro. Conservar el orden por nombre y apellido; permitir buscar por ID con el filtro existente.
+### Fecha de ingreso y desempate de miembros
+Reemplazar la columna ID interno por Fecha de ingreso. Es un campo de negocio opcional DATE (admission_date), editable manualmente al crear o editar un miembro, independiente de cualquier timestamp de creación del registro. Vacío significa «Sin identificar». No inferir ni completar automáticamente la fecha en registros nuevos o existentes. Permitir borrar una fecha ya cargada.
+Mostrar Nombre, Apellido, Fecha de ingreso (dd/mm/aaaa), y el resto de columnas. Ordenar por nombre y apellido en español, luego por fecha de ingreso ascendente; cuando coinciden ambos nombres, los que no tienen fecha quedan al final. Desempatar igualdad completa por ID interno sin mostrarlo. Aplicar el mismo orden al selector de miembros del asiento. Mantener institución, tema, filtros y edición. Las fechas son días de calendario sin conversiones de zona horaria. Migración incremental nullable; no modificar V1 ni datos existentes. API acepta fecha ISO yyyy-mm-dd o null y conserva compatibilidad con solicitudes sin este campo.

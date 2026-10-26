@@ -34,3 +34,6 @@ El CRUD mostraba Apellido antes de Nombre y conservaba el orden recibido del API
 
 ### ID en la lista de miembros
 El API ya devuelve id en cada miembro. El CRUD genera las columnas y el filtro desde configs.members.columns: agregar id expone el identificador completo y permite buscarlo sin cambios de API, base de datos ni formulario. Mantener Nombre y Apellido como primeras columnas y el comparador existente.
+
+### Fecha de ingreso de miembros
+La migración V1 no guarda fecha de ingreso en members. Se agrega V2__member_admission_date.sql con admission_date DATE nullable sin default. TreasuryModels.Member incorpora LocalDate opcional; saveMember lo persiste al crear y editar. members ya selecciona todas las columnas y query serializa java.sql.Date en ISO, sin cambios de lectura. El frontend incorpora un input date opcional y convierte vacío a null al guardar. Sustituye la columna id por admission_date, formatea dd/mm/aaaa sin zona horaria, y extiende sortedMembers con desempate por fecha y luego ID. Validar creación/edición/borrado de fecha, homónimos y ausencia de fecha, y migración V1 con miembros existentes. La idea inicial de timestamp de creación queda descartada por la aclaración del usuario; no se despliega.

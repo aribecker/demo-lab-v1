@@ -25,11 +25,28 @@ describe('Flujos de tesorería',()=>{
   mount('/members');await screen.findByText('Zoe');
   const rows=within(screen.getByRole('table')).getAllByRole('row');
   expect(within(rows[0]).getAllByRole('columnheader').slice(0,2).map(c=>c.textContent)).toEqual(['Nombre','Apellido']);
-  expect(within(rows[0]).getAllByRole('columnheader')[2]).toHaveTextContent('ID del miembro');
-  expect(rows.slice(1).map(row=>within(row).getAllByRole('cell')[2].textContent)).toEqual(['3','4','2','1']);
+  expect(within(rows[0]).getAllByRole('columnheader')[2]).toHaveTextContent('Fecha de ingreso');
+  expect(rows.slice(1).map(row=>within(row).getAllByRole('cell')[2].textContent)).toEqual(['Sin identificar','Sin identificar','Sin identificar','Sin identificar']);
   expect(rows.slice(1).map(row=>within(row).getAllByRole('cell').slice(0,2).map(c=>c.textContent))).toEqual([['Álvaro','Pérez'],['ana','Abad'],['Ana','Zárate'],['Zoe','Abad']]);
   fireEvent.change(screen.getByLabelText('Buscar miembros'),{target:{value:'ana'}});
   expect(within(screen.getByRole('table')).getAllByRole('row').slice(1).map(row=>within(row).getAllByRole('cell')[1].textContent)).toEqual(['Abad','Zárate']);
+ });
+ it('desempata homónimos por fecha de ingreso, con fechas vacías al final, y permite editar o borrar la fecha',async()=>{
+  const fallback=api.request.getMockImplementation();
+  let members=[{id:'newest',first_name:'Ana',last_name:'Pérez',residence:'Nueva',admission_date:'2026-10-25',active:true},{id:'legacy',first_name:'Ana',last_name:'Pérez',residence:'Histórica',admission_date:null,active:true},{id:'oldest',first_name:'Ana',last_name:'Pérez',residence:'Antigua',admission_date:'2020-01-02',active:true}];
+  api.request.mockImplementation(async(path,opts)=>{if(path.endsWith('/members/oldest')){members=members.map(m=>m.id==='oldest'?{...m,...opts.body}:m);return {id:'oldest'};}return path.endsWith('/members')?members:fallback(path,opts);});localStorage.setItem('treasury.institution','m');mount('/members');await screen.findByText('Nueva');
+  const rows=within(screen.getByRole('table')).getAllByRole('row').slice(1);
+  expect(rows.map(row=>within(row).getAllByRole('cell')[3].textContent)).toEqual(['Antigua','Nueva','Histórica']);
+  expect(within(rows[0]).getAllByRole('cell')[2]).toHaveTextContent('02/01/2020');
+  expect(within(rows[1]).getAllByRole('cell')[2]).toHaveTextContent('25/10/2026');
+  expect(within(rows[2]).getAllByRole('cell')[2]).toHaveTextContent('Sin identificar');
+  expect(screen.queryByRole('columnheader',{name:'ID del miembro'})).not.toBeInTheDocument();
+  fireEvent.click(within(rows[0]).getByRole('button',{name:'Editar',exact:true}));
+  expect(screen.getByLabelText('Fecha de ingreso')).toHaveValue('2020-01-02');
+  fireEvent.change(screen.getByLabelText('Fecha de ingreso'),{target:{value:'2019-12-31'}});fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));
+  await screen.findByText('31/12/2019');
+  fireEvent.click(within(screen.getByText('Antigua').closest('tr')).getByRole('button',{name:'Editar',exact:true}));fireEvent.change(screen.getByLabelText('Fecha de ingreso'),{target:{value:''}});fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));
+  await waitFor(()=>expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions/m/members/oldest',{body:expect.objectContaining({admission_date:null})}));
  });
  it('carga campos de miembro y envía la institución seleccionada',async()=>{localStorage.setItem('treasury.institution','m');mount('/members');await screen.findByRole('heading',{name:'Miembros'});fireEvent.click(screen.getByRole('button',{name:'Agregar miembro'}));fireEvent.change(screen.getByLabelText('Nombre *'),{target:{value:'Ariel'}});fireEvent.change(screen.getByLabelText('Apellido *'),{target:{value:'Becker'}});fireEvent.change(screen.getByLabelText('Residencia'),{target:{value:'CABA'}});fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));await waitFor(()=>expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions/m/members',{body:expect.objectContaining({first_name:'Ariel',last_name:'Becker',residence:'CABA'})}));});
  it('restaura la selección guardada sin mostrar el selector durante una carga lenta',async()=>{
