@@ -23,6 +23,18 @@ class TreasuryBackupTest {
   assertEquals("aribecker2@gmail.com",p.get("recipient"));assertEquals(false,p.get("configured"));assertEquals(2,((List<?>)p.get("files")).size());
   assertThrows(TreasuryModels.Problem.class,()->service.send((String)p.get("confirmation")));assertThrows(TreasuryModels.Problem.class,()->service.send("forged"));verifyNoInteractions(repo);
  }
+ @Test void downloadsSurviveMissingOrFailingMailAndAreIdempotent()throws Exception{
+  for(String key:List.of("","configured")){
+   var repo=mock(TreasuryRepository.class);int[] generations={0};
+   var service=new TreasuryBackupService(repo,"",key,"sender@example.com",new ObjectMapper()){
+    @Override void generate(Confirmation p){generations[0]++;p.zip=new byte[]{1,2};p.xlsx=new byte[]{3,4};}
+    @Override String deliver(Confirmation p){throw new TreasuryModels.Problem(502,"mail failed");}
+   };
+   String token=(String)service.preview().get("confirmation");var result=service.prepare(token);
+   assertEquals(false,result.get("mail_accepted"));assertEquals(result,service.prepare(token));assertEquals(1,generations[0]);
+   assertArrayEquals(new byte[]{1,2},service.download(token,"zip").bytes());assertArrayEquals(new byte[]{3,4},service.download(token,"xlsx").bytes());assertThrows(TreasuryModels.Problem.class,()->service.download("forged","zip"));
+  }
+ }
  @Test void workbookContainsEmptyTablesExactDecimalsAndLiteralFormulaAndBinaryChunks()throws Exception{
   try(var c=DriverManager.getConnection("jdbc:h2:mem:backup-xlsx;MODE=PostgreSQL;DB_CLOSE_DELAY=-1")){
    c.createStatement().execute("CREATE SCHEMA treasury");c.createStatement().execute("CREATE TABLE treasury.full_table(id VARCHAR, amount NUMERIC(18,2), text_value VARCHAR, optional VARCHAR, receipt BYTEA)");c.createStatement().execute("CREATE TABLE treasury.empty_table(id VARCHAR)");
