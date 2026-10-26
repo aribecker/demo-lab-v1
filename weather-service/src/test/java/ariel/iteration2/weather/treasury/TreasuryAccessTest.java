@@ -13,6 +13,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class TreasuryAccessTest {
  @Autowired MockMvc mvc;
+ @Test void backupPreviewNeedsNoInstitutionAndSendRequiresConfirmation()throws Exception {
+  mvc.perform(get("/api/treasury/backup/preview")).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.recipient").value("aribecker2@gmail.com")).andExpect(jsonPath("$.configured").value(false)).andExpect(jsonPath("$.files.length()").value(2));
+  mvc.perform(post("/api/treasury/backup/send").contentType("application/json").content("{\"confirmation\":\"forged\"}")).andExpect(status().isConflict());
+ }
  @Test void allowsTreasuryWithoutLoginButKeepsOtherFeaturesProtected()throws Exception {
   mvc.perform(get("/api/treasury/institutions")).andExpect(status().isOk()).andExpect(header().string("Cache-Control","no-store"));
   var created=mvc.perform(post("/api/treasury/institutions").contentType("application/json").content("{\"name\":\"Acceso directo\",\"code\":\"DIRECT\",\"theme_id\":\"generic\",\"active\":true}"))
@@ -50,3 +54,4 @@ class TreasuryAccessTest {
   mvc.perform(get("/login/oauth2/code/google").session(session).param("code","forged").param("state","wrong")).andExpect(redirectedUrl("https://ariel-treasury.onrender.com/login#auth_error=failed"));
  }
 }
+
