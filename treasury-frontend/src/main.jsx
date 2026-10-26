@@ -4,6 +4,7 @@ import {BrowserRouter,Routes,Route,NavLink,useLocation,useNavigate,Link} from 'r
 import * as api from './api.js';
 import {amount,decimal,totals,balanceHtml,journalHtml} from './reports.js';
 import './styles.css';
+import {Backup} from './Backup.jsx';
 
 const Context=createContext(null),useApp=()=>useContext(Context);
 const today=()=>{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Buenos_Aires',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());return ['year','month','day'].map(k=>parts.find(p=>p.type===k).value).join('-');};
@@ -37,7 +38,7 @@ export function App(){
  const changeInstitution=()=>{select('');navigate('/');};
  const refresh=()=>{setVersion(v=>v+1);return loadInstitutions();};
  const catalogLoading=catalog===null&&catalogBusy;
- const links=[['/institutions','Instituciones','building'],['/members','Miembros','members'],['/accounts','Plan de cuentas','accounts'],['/entries','Libro de asientos','ledger'],['/balance','Balance','chart'],['/journal','Libro diario','ledger']];
+ const links=[['/institutions','Instituciones','building'],['/members','Miembros','members'],['/accounts','Plan de cuentas','accounts'],['/entries','Libro de asientos','ledger'],['/balance','Balance','chart'],['/journal','Libro diario','ledger'],['/backup','Respaldo de seguridad','download']];
  return <Context.Provider value={{institution,institutions:catalog||[],themes:themes.data||[],select,changeInstitution,refresh,version,catalogLoading,catalogError}}><div className="app" data-theme={institution?.theme_id||'generic'}>
  <aside id="treasury-menu" aria-label="Menú principal" aria-hidden={!menu} inert={!menu} className={`sidebar ${menu?'sidebar--open':''}`}><Link to="/" className="brand" onClick={()=>setMenu(false)}><span className="brand__mark"><Icon size={26}/></span><span>Tesorería<small>GESTIÓN INSTITUCIONAL</small></span></Link><button className="sidebar__close" onClick={()=>setMenu(false)} aria-label="Cerrar menú">×</button>
  <div className="sidebar__label">ESPACIO DE TRABAJO</div><nav>{links.map(([to,label,icon])=><NavLink className={({isActive})=>`sidebar__link ${isActive?'sidebar__link--active':''}`} to={to} key={to} onClick={()=>setMenu(false)}><Icon name={icon}/>{label}</NavLink>)}</nav>
@@ -45,7 +46,7 @@ export function App(){
  {menu&&<button className="scrim" aria-label="Cerrar menú" onClick={()=>setMenu(false)}/>}
  <div className="workspace"><header className="topbar"><button className="icon-button" aria-label={menu?"Cerrar menú principal":"Abrir menú"} aria-controls="treasury-menu" aria-expanded={menu} onClick={()=>setMenu(!menu)}><Icon name="menu"/></button><div className="topbar__selector"><span>INSTITUCIÓN ACTIVA</span><select aria-label="Institución activa" value={institution?.id||''} onChange={e=>select(e.target.value)}><option value="" disabled>Elegir institución</option>{(catalog||[]).map(i=><option key={i.id} value={i.id}>{i.name}{i.active?'':' · Inactiva'}</option>)}</select></div><div className="topbar__access">{institution?<button className="button button--text" onClick={changeInstitution}>Cambiar institución</button>:<><span className="status-dot"/>Elegí una institución</>}</div></header>
  <main className="main"><ErrorBox>{catalogError||themes.error}</ErrorBox>{selectionNotice&&<div className="notice" role="status">{selectionNotice}</div>}{institution&&!institution.active&&<div className="notice">Institución inactiva: podés consultar su historial. Reactivala en Instituciones para registrar cambios.</div>}
- <Routes><Route path="/" element={<Scoped><Overview/></Scoped>}/><Route path="/login" element={<Scoped><Overview/></Scoped>}/><Route path="/institutions" element={<Crud kind="institutions" key="institutions"/>}/><Route path="/members" element={<Scoped><Crud kind="members" key={'members'+selected}/></Scoped>}/><Route path="/accounts" element={<Scoped><Crud kind="accounts" key={'accounts'+selected}/></Scoped>}/><Route path="/entries" element={<Scoped><Entries key={selected}/></Scoped>}/><Route path="/entry" element={<Scoped><EditorRoute/></Scoped>}/><Route path="/balance" element={<Scoped><Report kind="balance" key={'balance'+selected}/></Scoped>}/><Route path="/journal" element={<Scoped><Report kind="journal" key={'journal'+selected}/></Scoped>}/><Route path="*" element={<Scoped><Overview/></Scoped>}/></Routes>
+ <Routes><Route path="/" element={<Scoped><Overview/></Scoped>}/><Route path="/login" element={<Scoped><Overview/></Scoped>}/><Route path="/institutions" element={<Crud kind="institutions" key="institutions"/>}/><Route path="/members" element={<Scoped><Crud kind="members" key={'members'+selected}/></Scoped>}/><Route path="/accounts" element={<Scoped><Crud kind="accounts" key={'accounts'+selected}/></Scoped>}/><Route path="/entries" element={<Scoped><Entries key={selected}/></Scoped>}/><Route path="/entry" element={<Scoped><EditorRoute/></Scoped>}/><Route path="/balance" element={<Scoped><Report kind="balance" key={'balance'+selected}/></Scoped>}/><Route path="/journal" element={<Scoped><Report kind="journal" key={'journal'+selected}/></Scoped>}/><Route path="/backup" element={<Backup/>}/><Route path="*" element={<Scoped><Overview/></Scoped>}/></Routes>
  </main><footer className="workspace__footer">Una institución. Sus cuentas. Todo en orden.<span>Contabilidad bimonetaria</span></footer></div></div></Context.Provider>;
 }
 function Scoped({children}){
@@ -130,3 +131,4 @@ function Report({kind}){const {institution}=useApp(),[from,setFrom]=useState(tod
 }
 const mount=document.getElementById('root');
 if(mount)createRoot(mount).render(<BrowserRouter><App/></BrowserRouter>);
+

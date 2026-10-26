@@ -33,3 +33,9 @@
 .app button:focus-visible,.app a:focus-visible,.app input:focus-visible,.app select:focus-visible,.app textarea:focus-visible{outline-color:var(--primary)}
 .app .topbar :focus-visible{outline-color:var(--header-text)}
 .app .sidebar :focus-visible{outline-color:var(--accent)}
+
+
+.backup{padding:24px;max-width:850px;line-height:1.6;overflow-wrap:anywhere}
+.backup li{margin-block:10px}
+.backup__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.backup__cancel--disabled{opacity:.55;cursor:wait}

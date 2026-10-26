@@ -60,6 +60,7 @@ public class TreasuryRepository {
   var row=one("SELECT * FROM treasury.institutions WHERE id=?"+(writable?" FOR UPDATE":""),inst);
   if(writable&&!Boolean.TRUE.equals(row.get("active")))throw new Problem(409,"La institución está inactiva.");return row;
  }
+ void ensureBackupReady(){initialize();}
  public List<Map<String,Object>> themes(){return read(()->query("SELECT * FROM treasury.themes ORDER BY id"));}
  public List<Map<String,Object>> institutions(){return read(()->query("SELECT i.*,t.primary_color,t.accent_color FROM treasury.institutions i JOIN treasury.themes t ON t.id=i.theme_id ORDER BY i.name"));}
  public String saveInstitution(String key,Institution form){final String institutionKey=key;return tx(()->{
@@ -200,3 +201,4 @@ public class TreasuryRepository {
   return Map.of("institution",institution,"from",from.toString(),"to",to.toString(),"entries",result);
  });}
 }
+
