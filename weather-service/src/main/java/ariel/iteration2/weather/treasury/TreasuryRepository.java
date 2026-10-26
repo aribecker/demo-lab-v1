@@ -78,9 +78,9 @@ public class TreasuryRepository {
  public List<Map<String,Object>> members(String inst){return read(()->{institution(inst,false);return query("SELECT * FROM treasury.members WHERE institution_id=? ORDER BY last_name,first_name",inst);});}
  public String saveMember(String inst,String key,Member f){final String memberKey=key;return tx(()->{
   institution(inst,true);String target=memberKey==null?id():memberKey;
-  Object[] fields={text(f.first_name(),120,true),text(f.last_name(),120,true),text(f.residence(),240,false),text(f.membership_number(),50,false),text(f.email(),200,false),text(f.phone(),80,false),text(f.notes(),2000,false),f.active(),inst,target};
-  if(memberKey==null)db.update("INSERT INTO treasury.members(first_name,last_name,residence,membership_number,email,phone,notes,active,institution_id,id) VALUES(?,?,?,?,?,?,?,?,?,?)",fields);
-  else {one("SELECT id FROM treasury.members WHERE institution_id=? AND id=?",inst,target);db.update("UPDATE treasury.members SET first_name=?,last_name=?,residence=?,membership_number=?,email=?,phone=?,notes=?,active=? WHERE institution_id=? AND id=?",fields);}return target;
+  Object[] fields={text(f.first_name(),120,true),text(f.last_name(),120,true),text(f.residence(),240,false),text(f.membership_number(),50,false),text(f.email(),200,false),text(f.phone(),80,false),text(f.notes(),2000,false),f.active(),f.admission_date(),inst,target};
+  if(memberKey==null)db.update("INSERT INTO treasury.members(first_name,last_name,residence,membership_number,email,phone,notes,active,admission_date,institution_id,id) VALUES(?,?,?,?,?,?,?,?,?,?,?)",fields);
+  else {one("SELECT id FROM treasury.members WHERE institution_id=? AND id=?",inst,target);db.update("UPDATE treasury.members SET first_name=?,last_name=?,residence=?,membership_number=?,email=?,phone=?,notes=?,active=?,admission_date=? WHERE institution_id=? AND id=?",fields);}return target;
  });}
  public void deleteMember(String inst,String key){tx(()->{
   institution(inst,true);one("SELECT id FROM treasury.members WHERE institution_id=? AND id=?",inst,key);

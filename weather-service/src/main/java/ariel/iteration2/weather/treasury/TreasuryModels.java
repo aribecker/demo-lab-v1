@@ -7,7 +7,9 @@ import java.util.List;
 public final class TreasuryModels {
  private TreasuryModels() {}
  public record Institution(String name,String code,String theme_id,boolean active) {}
- public record Member(String first_name,String last_name,String residence,String membership_number,String email,String phone,String notes,boolean active) {}
+ public record Member(String first_name,String last_name,String residence,String membership_number,String email,String phone,String notes,boolean active,LocalDate admission_date) {
+  public Member(String first_name,String last_name,String residence,String membership_number,String email,String phone,String notes,boolean active){this(first_name,last_name,residence,membership_number,email,phone,notes,active,null);}
+ }
  public record Account(String code,String name,String type,String parent_id,String currency_policy,boolean allows_posting,boolean active) {}
  public record Line(String account_id,String member_id,String description,String currency,BigDecimal debit,BigDecimal credit) {}
  public record Entry(LocalDate entry_date,String description,String reference,List<Line> lines) {}
