@@ -1,0 +1,101 @@
+
+:root{--ms-green:#a8d85f;--ms-ink:#111111;--ms-sub:#2f3a2a;--ms-background:#f8fbf1;--ms-orange:#f39a2d;--ms-line:#d6e6bf;--ms-white:white;--ms-gold:#f39a2d;--ms-sage:#eef7df;--ms-deep:#92c94e}
+
+*{box-sizing:border-box}
+
+body{margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ms-ink);background:var(--ms-background);line-height:1.5}
+header{background:linear-gradient(135deg,var(--ms-green),var(--ms-deep));color:var(--ms-ink)}
+.ms-container{max-width:1180px;margin:auto;padding:0 46px}
+.ms-header__row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 0}
+.ms-brand{font-size:20px;font-weight:800;letter-spacing:.2px}
+.ms-brand small{display:block;font-size:11px;letter-spacing:2px;color:#21301a;font-weight:700}
+.ms-navigation{display:flex;gap:8px;flex-wrap:wrap}
+button,.ms-button{font:inherit;cursor:pointer}
+button.ms-navigation__button{background:rgba(255,255,255,.28);color:var(--ms-ink);border:2px solid #000;border-radius:9px;padding:9px 13px}
+button.ms-navigation__button.ms-navigation__button--active{background:white;color:#275c38}
+.ms-hero{padding:67px 0 76px;display:grid;grid-template-columns:1.35fr .7fr;gap:50px;align-items:center}
+.ms-eyebrow{color:#3c5c1a;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:clamp(34px,4.5vw,55px);line-height:1.1;letter-spacing:-1.5px;margin:13px 0 19px}
+h2{font-size:30px;letter-spacing:-.8px;margin:0 0 11px}
+h3{margin:0 0 10px}
+p{color:var(--ms-sub)}
+.ms-hero p{font-size:18px;color:#1f2a18;max-width:640px}
+.ms-button{display:inline-block;border-radius:10px;border:0;padding:13px 21px;background:var(--ms-orange);color:var(--ms-ink);font-weight:750}
+.ms-button:hover{filter:brightness(.94)}
+.ms-button.ms-button--secondary{background:rgba(255,255,255,.35);border:2px solid #000;color:var(--ms-ink)}
+.ms-hero__actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}
+.ms-hero__aside{border:2px solid #000;background:rgba(255,255,255,.45);backdrop-filter:blur(2px);padding:26px;border-radius:18px}
+.ms-hero__aside strong{color:#e66b00;font-size:36px;display:block;font-weight:900}
+.ms-hero__aside p{color:#22301b}
+.ms-hero__aside .ms-text--tiny{font-size:12px}
+.ms-section{padding:64px 0}
+.ms-section__heading{margin-bottom:25px}
+.ms-section__heading p{margin:0;max-width:630px}
+.ms-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:19px}
+.ms-card,.ms-panel{background:white;border:2px solid #000;border-radius:17px;padding:26px;box-shadow:0 8px 30px #132b3b09}
+.ms-card .ms-card__number{width:44px;height:44px;background:var(--ms-sage);color:var(--ms-orange);display:grid;place-items:center;border-radius:12px;font-size:23px;margin-bottom:20px}
+.ms-card p{margin-bottom:0}
+.ms-section--pricing{background:#f4f8ef}
+.ms-price-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ms-price{background:white;border:2px solid #000;padding:30px;border-radius:17px}
+.ms-price.ms-price--featured{border:3px solid #000}
+.ms-price .ms-price__amount{font-size:38px;letter-spacing:-1.5px;color:#e66b00;font-weight:900}
+.ms-price .ms-price__period{font-size:14px;color:var(--ms-sub)}
+.ms-price ul{padding-left:20px;color:var(--ms-sub)}
+.ms-pill{display:inline-block;border-radius:100px;padding:5px 10px;color:#111;background:#e6f2df;border:2px solid #000;font-size:12px;font-weight:800}
+.ms-form-layout{display:grid;grid-template-columns:1.5fr .8fr;gap:22px;align-items:start}
+.ms-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ms-field{margin-bottom:15px}
+.ms-field label{display:block;font-weight:700;font-size:13px;margin-bottom:7px}
+input,select,textarea{font:inherit;width:100%;border:2px solid #000;border-radius:9px;padding:12px 13px;background:white;color:var(--ms-ink)}
+textarea{min-height:145px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:3px solid #111111;outline-offset:3px}
+.ms-text--fine{font-size:13px}
+.ms-consent{display:flex;gap:10px;align-items:start;margin:7px 0 20px}
+.ms-consent input{width:auto;margin-top:5px}
+.ms-notice{padding:14px 16px;background:#edf8e8;border:1px solid #b8d6aa;color:#275b46;border-radius:10px;margin-top:18px}
+.ms-notice.ms-notice--error{background:#fff0ec;border-color:#facabe;color:#8c3828}
+.ms-hidden{display:none!important}
+.ms-faq{padding:20px 0}
+.ms-faq details{border-bottom:2px solid #000;padding:16px 0}
+.ms-faq summary{cursor:pointer;font-weight:700}
+.ms-admin-list{display:grid;gap:14px}
+.ms-case{border:2px solid #000;padding:19px;border-radius:12px}
+.ms-case__heading{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.ms-case small{color:var(--ms-sub)}
+.ms-case p{white-space:pre-wrap;overflow-wrap:anywhere}
+.ms-case select{max-width:210px}
+.ms-case textarea{min-height:80px}
+.ms-text--muted{color:var(--ms-sub)}
+.ms-toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:20px}
+footer{padding:30px 0;color:#111111;background:linear-gradient(135deg,var(--ms-green),var(--ms-deep));font-size:13px}
+.ms-footer__row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media(max-width:800px){.ms-container{padding-left:30px;padding-right:30px}
+.ms-hero,.ms-form-layout{grid-template-columns:1fr}
+.ms-hero{gap:20px;padding:45px 0}
+.ms-card-grid{grid-template-columns:1fr}
+.ms-price-grid{grid-template-columns:1fr}
+.ms-form-grid{grid-template-columns:1fr}
+.ms-header__row{align-items:flex-start;flex-direction:column}
+.ms-section{padding:45px 0}
+}
+@media print{header,.ms-navigation,.ms-button,footer{display:none!important}
+.ms-view{display:block!important}
+}
+
+
+.ms-hero-band{background:linear-gradient(135deg,var(--ms-green),var(--ms-deep))}
+.ms-heading--ms-ink{color:var(--ms-ink)}
+.ms-divider{border:0;border-top:2px solid #000}
+.ms-price__heading{margin-top:15px}
+.ms-price__amount--quote{font-size:28px}
+.ms-honeypot{display:none}
+/* Accessibility and small-screen behavior shared across this brand. */
+[hidden]{display:none!important}
+button,input,select,.ms-button{min-height:44px}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--ms-ink);outline-offset:3px}
+.ms-form-grid>*,.ms-form-layout>*,.ms-hero>*{min-width:0}
+.ms-container{overflow-wrap:anywhere}
+.ms-consent input{min-height:initial;flex-shrink:0}
+.ms-button{text-decoration:none}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
