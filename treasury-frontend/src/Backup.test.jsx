@@ -4,24 +4,22 @@ import {render,screen,fireEvent,cleanup,waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import {Backup} from './Backup.jsx';
 import * as api from './api.js';
-vi.mock('./api.js',()=>({request:vi.fn()}));
-const preview={confirmation:'server-token',recipient:'aribecker2@gmail.com',date:'20261026',files:['Treasury Database-20261026.zip','Treasury Database-20261026.xlsx'],configured:true};
-beforeEach(()=>{api.request.mockReset();});afterEach(cleanup);
-describe('Confirmación de respaldo',()=>{
- it('muestra destinatario y ambos archivos sin generar ni enviar hasta confirmar; evita doble clic',async()=>{
-  let done;api.request.mockImplementation(path=>path.endsWith('preview')?Promise.resolve(preview):new Promise(r=>{done=r;}));render(<Backup/>);
-  await screen.findByText('Por favor, confirmá');expect(screen.getByText(preview.recipient)).toBeInTheDocument();preview.files.forEach(f=>expect(screen.getByText(f)).toBeInTheDocument());
-  expect(api.request).toHaveBeenCalledTimes(1);expect(screen.getByRole('link',{name:'Cancelar'})).toHaveAttribute('href','/');
-  fireEvent.click(screen.getByRole('button',{name:'Confirmar y enviar'}));fireEvent.click(screen.getByRole('button',{name:'Generando y enviando…'}));expect(api.request).toHaveBeenCalledTimes(2);
-  expect(api.request).toHaveBeenLastCalledWith('/api/treasury/backup/send',{body:{confirmation:'server-token'}});
-  done({...preview,message_id:'provider-id'});await screen.findByText('Correo aceptado para envío');
+vi.mock('./api.js',()=>({request:vi.fn(),download:vi.fn(),API:'https://api.example'}));
+const preview={confirmation:'server-token',recipient:'aribecker2@gmail.com',date:'20261026',files:['Treasury Database-20261026.zip','Treasury Database-20261026.xlsx'],configured:false};
+const prepared={...preview,mail_accepted:false,downloads:['/files/zip','/files/xlsx']};
+beforeEach(()=>{api.request.mockReset();api.download.mockReset();});afterEach(cleanup);
+describe('Descargas independientes del correo',()=>{
+ it('confirma antes de generar y descarga ambos archivos aunque el correo no esté configurado',async()=>{
+  api.request.mockImplementation(path=>Promise.resolve(path.endsWith('preview')?preview:path.endsWith('prepare')?prepared:new Blob(['backup'])));
+  render(<Backup/>);const button=await screen.findByRole('button',{name:'Confirmar y descargar'});expect(button).toBeEnabled();expect(api.download).not.toHaveBeenCalled();fireEvent.click(button);
+  await waitFor(()=>expect(api.download).toHaveBeenCalledTimes(2));expect(screen.getByRole('status')).toHaveTextContent('No se pudo asegurar el envío del correo');expect(api.download.mock.calls.map(c=>c[1])).toEqual(preview.files);expect(screen.getByRole('link',{name:preview.files[0]})).toHaveAttribute('href','https://api.example/files/zip');
  });
- it('bloquea el envío cuando falta configuración de servidor',async()=>{
-  api.request.mockResolvedValue({...preview,configured:false});render(<Backup/>);await screen.findByText('Por favor, confirmá');expect(screen.getByRole('button',{name:'Confirmar y enviar'})).toBeDisabled();expect(screen.getByRole('alert')).toHaveTextContent('pendiente de configuración');expect(api.request).toHaveBeenCalledTimes(1);
+ it('no inicia descargas parciales si falla obtener un archivo y permite reintentar',async()=>{
+  api.request.mockImplementation(path=>path.endsWith('preview')?Promise.resolve(preview):path.endsWith('prepare')?Promise.resolve(prepared):Promise.reject(new Error('Falló descarga')));
+  render(<Backup/>);fireEvent.click(await screen.findByRole('button',{name:'Confirmar y descargar'}));await screen.findByText('Falló descarga');expect(api.download).not.toHaveBeenCalled();expect(screen.queryByText('Respaldo listo')).not.toBeInTheDocument();expect(screen.getByRole('button',{name:'Confirmar y descargar'})).toBeEnabled();
  });
- it('muestra fallo real sin éxito y reintenta con el mismo token de confirmación',async()=>{
-  api.request.mockResolvedValueOnce(preview).mockRejectedValueOnce(new Error('No se aceptó el correo')).mockResolvedValueOnce({...preview,message_id:'retry-id'});
-  render(<Backup/>);fireEvent.click(await screen.findByRole('button',{name:'Confirmar y enviar'}));expect(await screen.findByRole('alert')).toHaveTextContent('No se aceptó el correo');expect(screen.queryByText('Correo aceptado para envío')).not.toBeInTheDocument();
-  await waitFor(()=>expect(screen.getByRole('button',{name:'Confirmar y enviar'})).toBeEnabled());fireEvent.click(screen.getByRole('button',{name:'Confirmar y enviar'}));await screen.findByText('Correo aceptado para envío');expect(api.request.mock.calls[1][1]).toEqual(api.request.mock.calls[2][1]);
+ it('descarga también cuando el proveedor acepta el correo y evita doble clic',async()=>{
+  let finish;api.request.mockImplementation(path=>path.endsWith('preview')?Promise.resolve({...preview,configured:true}):path.endsWith('prepare')?new Promise(r=>{finish=r;}):Promise.resolve(new Blob(['backup'])));
+  render(<Backup/>);fireEvent.click(await screen.findByRole('button',{name:'Confirmar y descargar'}));fireEvent.click(screen.getByRole('button',{name:'Generando respaldo…'}));expect(api.request).toHaveBeenCalledTimes(2);finish({...prepared,mail_accepted:true});await waitFor(()=>expect(api.download).toHaveBeenCalledTimes(2));expect(screen.getByRole('status')).toHaveTextContent('aceptó el respaldo');
  });
 });

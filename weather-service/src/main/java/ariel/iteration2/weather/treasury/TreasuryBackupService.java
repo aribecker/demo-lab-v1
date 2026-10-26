@@ -43,26 +43,40 @@ public class TreasuryBackupService {
  }
  private Map<String,Object> previewOf(Confirmation p){return Map.of("confirmation",p.id,"recipient",RECIPIENT,"files",p.files(),"date",p.date,"configured",configured());}
  private void cleanup(){confirmations.values().removeIf(c->c.expires.isBefore(Instant.now()));}
- public Map<String,Object> send(String token){
+ public Map<String,Object> send(String token){return prepare(token,false);}
+ public Map<String,Object> prepare(String token){return prepare(token,true);}
+ private Map<String,Object> prepare(String token,boolean downloads){
   Confirmation p;
   synchronized(this){
    cleanup();p=confirmations.get(token);if(p==null)throw new Problem(409,"La confirmación venció. Recargá la pantalla para preparar un nuevo respaldo.");
    if(p.result!=null)return p.result;
-   if(!configured())throw new Problem(503,"Falta configurar el remitente y la clave del servicio de correo en el servidor.");
+   if(!downloads&&!configured())throw new Problem(503,"Falta configurar el remitente y la clave del servicio de correo en el servidor.");
    if(running)throw new Problem(409,"Ya hay un respaldo en curso. Esperá antes de reintentar.");
    if(lastStarted.plusSeconds(60).isAfter(Instant.now()))throw new Problem(429,"Esperá un minuto entre intentos de respaldo.");
    running=true;lastStarted=Instant.now();
   }
   try{
    if(p.zip==null){repository.ensureBackupReady();generate(p);}
-   String id=deliver(p);
-   synchronized(this){p.result=Map.of("recipient",RECIPIENT,"files",p.files(),"message_id",id);p.zip=null;p.xlsx=null;return p.result;}
+   String id="";boolean accepted=false;
+   if(configured())try{id=deliver(p);accepted=true;}catch(Exception mailFailure){if(!downloads)throw mailFailure;}
+   synchronized(this){
+    // Keep at most two downloadable snapshots in this single-instance application.
+    var retained=confirmations.values().stream().filter(c->c!=p&&c.zip!=null).toList();
+    for(int i=0;i<retained.size()-1;i++){retained.get(i).zip=null;retained.get(i).xlsx=null;}
+    p.result=Map.of("recipient",RECIPIENT,"files",p.files(),"message_id",id,"mail_accepted",accepted,"downloads",List.of("/api/treasury/backup/files/"+p.id+"/zip","/api/treasury/backup/files/"+p.id+"/xlsx"));return p.result;
+   }
   }catch(Problem e){throw e;}
   catch(InterruptedException e){Thread.currentThread().interrupt();throw new Problem(503,"Se interrumpió el respaldo. Reintentá con esta misma confirmación.");}
   catch(Exception e){throw new Problem(503,"No se pudo generar o enviar el respaldo. Reintentá con esta misma confirmación; no se informó un envío exitoso.");}
   finally{synchronized(this){running=false;}}
  }
- private void generate(Confirmation p)throws Exception{
+ public record Download(String name,String type,byte[] bytes){}
+ public synchronized Download download(String token,String format){
+  cleanup();var p=confirmations.get(token);
+  if(p==null||p.result==null||p.zip==null)throw new Problem(410,"Los archivos ya no están disponibles. Generá un nuevo respaldo.");
+  return switch(format){case "zip"->new Download(p.files().get(0),"application/zip",p.zip);case "xlsx"->new Download(p.files().get(1),"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",p.xlsx);default->throw new Problem(404,"Archivo no encontrado.");};
+ }
+ void generate(Confirmation p)throws Exception{
   Path dir=Files.createTempDirectory("treasury-backup-");
   try{
    Path sql=dir.resolve("treasury.sql"),xlsx=dir.resolve("treasury.xlsx"),archive=dir.resolve("treasury.zip");
