@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 27/10/2026 — Pantalla en blanco al alternar Users y Groups
+
+- Cada ruta administrativa monta su propio estado de formulario, listado y membresías.
+- Evita interpretar usuarios como grupos durante la navegación y descarta respuestas tardías de la pantalla anterior.
+- Regresión reproducida antes de corregir y cubierta en ambas direcciones.
+
 ## 27/10/2026 — Everyone en la administración para revisión
 
 - Asignación solicitada de Everyone a Users administration y Groups administration mediante V2 optativa de una sola ejecución.

@@ -84,8 +84,8 @@ function AppContent({ loader, authApi, simulationApi, marketApi, accessApi }) {
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/hello-world" element={<HelloWorld />} />
         <Route path="/bitcoin" element={<MarketTracker api={marketApi} />} />
-        <Route path="/users" element={<SimulatorGate permission="canManageUsers" title="Users"><AccessManagement kind="users" api={accessApi}/></SimulatorGate>} />
-        <Route path="/groups" element={<SimulatorGate permission="canManageGroups" title="Groups"><AccessManagement kind="groups" api={accessApi}/></SimulatorGate>} />
+        <Route path="/users" element={<SimulatorGate permission="canManageUsers" title="Users"><AccessManagement key="users" kind="users" api={accessApi}/></SimulatorGate>} />
+        <Route path="/groups" element={<SimulatorGate permission="canManageGroups" title="Groups"><AccessManagement key="groups" kind="groups" api={accessApi}/></SimulatorGate>} />
         <Route path="/trading-simulator" element={<SimulatorGate><TradingSimulator api={simulationApi}/></SimulatorGate>} />
         <Route path="*" element={<section className="page-intro">
           <p className="text__eyebrow">404</p>

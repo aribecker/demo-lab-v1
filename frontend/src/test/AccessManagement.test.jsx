@@ -48,3 +48,44 @@ it('an expired identity can fall back to an explicitly public Everyone permissio
  const api=auth(null,caps());api.initialize.mockRejectedValue(Object.assign(new Error('Expired'),{status:401}));
  const simulation=open('/trading-simulator',api);expect(await screen.findByTestId('usdt-balance')).toBeInTheDocument();expect(simulation.command).not.toHaveBeenCalled();
 });
+
+it('isolates users and groups forms and membership state during repeated menu navigation',async()=>{
+ const users=[{id:1,firstName:'Ariel',lastName:'Becker',email:'aribecker2@gmail.com',principalKind:'USER',systemKey:'owner'}];
+ const groups=[{id:4,name:'Review groups',permissions:['GROUPS']}];
+ const api={listRecords:vi.fn(async kind=>kind==='users'?users:groups),readMembers:vi.fn(async()=>({users,memberIds:[1]}))};
+ open('/users',auth(null,caps(true,true,true)),api);
+ await screen.findByText('Ariel Becker');
+ fireEvent.click(screen.getByRole('button',{name:'Edit Ariel'}));
+ fireEvent.change(screen.getByLabelText('First name'),{target:{value:'Unsaved user'}});
+ const navigate=label=>{fireEvent.click(screen.getByRole('button',{name:'Menu',exact:true}));fireEvent.click(screen.getByRole('link',{name:label,exact:true}));};
+ navigate('Groups');
+ await screen.findByRole('button',{name:'Members of Review groups'});
+ expect(screen.getByLabelText('Group name')).toHaveValue('');
+ expect(screen.getByRole('checkbox',{name:'Groups administration'})).not.toBeChecked();
+ expect(screen.queryByText('Ariel Becker')).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole('button',{name:'Edit Review groups'}));
+ fireEvent.change(screen.getByLabelText('Group name'),{target:{value:'Unsaved group'}});
+ fireEvent.click(screen.getByRole('button',{name:'Members of Review groups'}));
+ await screen.findByRole('region',{name:'Group membership'});
+ navigate('Users');
+ await screen.findByText('Ariel Becker');
+ expect(screen.getByLabelText('First name')).toHaveValue('');
+ expect(screen.queryByRole('region',{name:'Group membership'})).not.toBeInTheDocument();
+ expect(screen.queryByLabelText('Group name')).not.toBeInTheDocument();
+ navigate('Groups');
+ await screen.findByRole('button',{name:'Members of Review groups'});
+ expect(screen.getByLabelText('Group name')).toHaveValue('');
+ expect(screen.queryByRole('region',{name:'Group membership'})).not.toBeInTheDocument();
+});
+it('ignores an old users response after navigating to groups while loading',async()=>{
+ let finishUsers;let usersSignal;
+ const api={listRecords:vi.fn((kind,signal)=>kind==='users'?(usersSignal=signal,new Promise(resolve=>{finishUsers=resolve;})):Promise.resolve([{id:5,name:'Destination group',permissions:['USERS']}]))};
+ open('/users',auth(null,caps(true,true,true)),api);
+ await screen.findByText('Loading users…');
+ fireEvent.click(screen.getByRole('button',{name:'Menu',exact:true}));fireEvent.click(screen.getByRole('link',{name:'Groups',exact:true}));
+ await screen.findByRole('button',{name:'Edit Destination group'});
+ expect(usersSignal.aborted).toBe(true);
+ await act(async()=>finishUsers([{id:1,firstName:'Stale',lastName:'Person',email:'stale@example.test',principalKind:'USER'}]));
+ expect(screen.getByRole('button',{name:'Edit Destination group'})).toBeInTheDocument();
+ expect(screen.queryByText('Stale Person')).not.toBeInTheDocument();
+});
