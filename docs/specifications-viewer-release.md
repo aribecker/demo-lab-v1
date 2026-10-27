@@ -1,0 +1,5 @@
+# Specifications viewer — v2.12.0
+
+R42 follows separate master-specification and grounding commits. Specifications is available from Home/menu and /specifications. The build automatically discovers all eight current specs/**/*.md files and creates lazy static chunks. Complete original text is displayed through safe React spans with line numbers, filename filter, query selection/history, bounded font sizes, copy and original-source download. The module uses the existing central CSS/BEM tokens and has no backend/repository runtime dependency.
+
+Validation:116 frontend tests pass, including six new catalog/viewer tests. The style contract and production build pass; the direct specifications/index.html entry is generated. Catalog tests compare every bundled document with its original source, and interaction tests cover routing, filtering, unknown selection, history, stale/read failures, safe markup and source actions. Desktop live UI verification is performed after deployment; mobile breakpoints are source-reviewed, with no mobile emulation claim. No production records or simulation commands are issued.

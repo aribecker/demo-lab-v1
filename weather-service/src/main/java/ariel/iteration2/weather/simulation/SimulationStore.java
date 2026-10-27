@@ -1,0 +1,80 @@
+package ariel.iteration2.weather.simulation;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ariel.iteration2.weather.database.DatabaseConnections;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
+import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SimulationStore {
+    private static final Logger LOG = LoggerFactory.getLogger(SimulationStore.class);
+    private final DatabaseConnections connections;
+    private final ObjectMapper json;
+    private volatile boolean ready;
+    private final RateQueryHistory history;
+    public SimulationStore(String connection, ObjectMapper json) {
+        this.json = json;
+        this.connections = new DatabaseConnections(connection);
+        this.history = new RateQueryHistory(connections);
+    }
+    public RateQueryHistory history() { return history; }
+    public boolean configured() { return connections.configured(); }
+    public synchronized void initialize() {
+        if (ready) return;
+        if (!configured()) throw new StorageUnavailable();
+        try (Connection c = connect(); var statement = c.createStatement()) {
+            String schema;
+            try (var input = getClass().getResourceAsStream("/db/shared-simulation.sql")) { schema = new String(input.readAllBytes(),StandardCharsets.UTF_8); }
+            for (String sql : schema.split(";")) if (!sql.isBlank()) statement.execute(sql);
+            try (var insert = c.prepareStatement("INSERT INTO bitcoin_shared.simulation_state(state_id,document) SELECT 1,? WHERE NOT EXISTS (SELECT 1 FROM bitcoin_shared.simulation_state WHERE state_id=1)")) {
+                insert.setString(1,json.writeValueAsString(new SharedState()));
+                try { insert.executeUpdate(); } catch (SQLException race) { if (!"23505".equals(race.getSQLState())) throw race; }
+            }
+            history.initialize();
+            ready = true;
+        } catch (Exception failure) {
+            LOG.warn("Simulation storage initialization failed (SQL state: {}).", failure instanceof SQLException sql ? sql.getSQLState() : "unavailable");
+            throw new StorageUnavailable();
+        }
+    }
+    private Connection connect() throws SQLException { return connections.open(); }
+    public SharedState read() {
+        if (!ready) throw new StorageUnavailable();
+        try (Connection c = connect(); var statement = c.createStatement(); var rows = statement.executeQuery("SELECT document FROM bitcoin_shared.simulation_state WHERE state_id=1")) {
+            if (!rows.next()) throw new StorageUnavailable();
+            return json.readValue(rows.getString(1),SharedState.class);
+        } catch (Exception failure) { throw new StorageUnavailable(); }
+    }
+    public <T> T locked(Function<SharedState,T> action) {
+        if (!ready) throw new StorageUnavailable();
+        try (Connection c = connect()) {
+            c.setAutoCommit(false);
+            try {
+                if (c.getMetaData().getDatabaseProductName().equals("PostgreSQL")) {
+                    try (var timeout = c.createStatement()) { timeout.execute("SET LOCAL lock_timeout = '8s'"); }
+                }
+                SharedState state;
+                try (var statement = c.createStatement(); var rows = statement.executeQuery("SELECT document FROM bitcoin_shared.simulation_state WHERE state_id=1 FOR UPDATE")) {
+                    if (!rows.next()) throw new StorageUnavailable();
+                    state = json.readValue(rows.getString(1),SharedState.class);
+                }
+                T result = action.apply(state);
+                try (var save = c.prepareStatement("UPDATE bitcoin_shared.simulation_state SET document=? WHERE state_id=1")) {
+                    save.setString(1,json.writeValueAsString(state)); save.executeUpdate();
+                }
+                c.commit(); return result;
+            } catch (Exception failure) {
+                c.rollback();
+                if (failure instanceof IllegalArgumentException bad) throw bad;
+                if (failure instanceof SimulationService.Conflict conflict) throw conflict;
+                throw new StorageUnavailable();
+            }
+        } catch (SQLException failure) { throw new StorageUnavailable(); }
+    }
+    public static class StorageUnavailable extends RuntimeException {
+        public StorageUnavailable() { super("Shared simulation storage is unavailable. No local simulation was created."); }
+    }
+}
+

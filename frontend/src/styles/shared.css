@@ -1,0 +1,29 @@
+@layer base {
+/* Shared BEM blocks composed by every feature. */
+.panel { border:var(--border-width) solid var(--color-panel-border); border-radius:var(--radius-16px); background:linear-gradient(135deg,var(--color-surface),var(--color-surface-end)); color:var(--color-text); }
+.button { min-height:var(--control-height); padding:var(--space-12) var(--space-16); border:var(--border-width) solid var(--color-button-border); border-radius:var(--radius-7px); background:var(--color-button); color:var(--color-button-text); font:inherit; font-size:var(--text-12px); font-weight:var(--weight-medium); cursor:pointer; }
+.button:hover:enabled { background:var(--color-surface-hover); border-color:var(--color-accent); }
+.button--primary { background:var(--color-accent); color:var(--color-on-accent); font-weight:var(--weight-strong); }
+.button--primary:hover:enabled { background:var(--color-focus); }
+.button:disabled { opacity:.65; cursor:default; }
+.field { min-height:var(--control-height); background:var(--color-surface-inset); color:var(--color-text); border:var(--border-width) solid var(--color-button-border); border-radius:var(--radius-8px); padding:var(--space-12); font:inherit; }
+.field--checkbox { min-height:auto; padding:0; accent-color:var(--color-accent); }
+.notice { border:var(--border-width) solid var(--color-border); border-left:3px solid var(--color-accent); padding:14px var(--space-16); color:var(--color-text-secondary); font-size:var(--text-12px); line-height:1.65; border-radius:var(--radius-6px); margin-bottom:var(--space-16); }
+.notice--warning,.notice--error { border-color:var(--color-warning-border); color:var(--color-warning); background:var(--color-warning-surface); }
+.text--positive { color:var(--color-positive); }
+.text--negative { color:var(--color-negative); }
+:where(.panel) :focus-visible { outline:var(--focus-width) solid var(--color-focus); outline-offset:var(--focus-offset); }
+
+}
+@layer shared {
+:where(.panel) .button { border-color:var(--color-button-border); background:var(--color-button); color:var(--color-button-text); }
+:where(.panel) .button--primary { background:var(--color-accent); color:var(--color-on-accent); }
+:where(.panel) .button:hover:enabled { background:var(--color-surface-hover); border-color:var(--color-accent); }
+:where(.panel) .button--primary:hover:enabled { background:var(--color-focus); }
+:where(.panel) .button:disabled { opacity:.65; }
+
+.button[aria-pressed="true"],.button[aria-expanded="true"] { background:var(--color-surface-hover); border-color:var(--color-accent); color:var(--color-button-text); }
+.button.button--success,.button.button--success:hover:enabled { color:var(--color-positive); border-color:var(--color-positive); }
+.button:focus-visible,.field:focus-visible { outline:var(--focus-width) solid var(--color-focus); outline-offset:var(--focus-offset); }
+
+}

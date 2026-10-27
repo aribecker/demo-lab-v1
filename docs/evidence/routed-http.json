@@ -1,0 +1,40 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "url": "https://ariel-weather-iteration-2.onrender.com/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "appShell": true,
+      "scripts": [
+        "/assets/index-CyAX6Tf1.js"
+      ]
+    },
+    {
+      "path": "/weather",
+      "url": "https://ariel-weather-iteration-2.onrender.com/weather",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "appShell": true,
+      "scripts": [
+        "/assets/index-CyAX6Tf1.js"
+      ]
+    },
+    {
+      "path": "/components",
+      "url": "https://ariel-weather-iteration-2.onrender.com/components",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "appShell": true,
+      "scripts": [
+        "/assets/index-CyAX6Tf1.js"
+      ]
+    }
+  ],
+  "bundle": {
+    "url": "https://ariel-weather-iteration-2.onrender.com/assets/index-CyAX6Tf1.js",
+    "status": 200,
+    "bytes": 276893,
+    "configuredApiPresent": true
+  }
+}
