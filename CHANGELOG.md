@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 27/10/2026 — Recuperación de conexión del Bitcoin Tracker
+
+- Espera de lectura pública ampliada de 12 a 90 segundos para el arranque del backend.
+- Mensajes de conexión claros en lugar de errores técnicos de aborto del navegador.
+- Cancelación al salir y reintento automático conservados; no modifica el simulador.
+
 ## 27/10/2026 — Conexión directa de Demo Lab a PostgreSQL
 
 - Credencial configurada únicamente en Render, fuera del repositorio.

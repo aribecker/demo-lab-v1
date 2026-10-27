@@ -14,6 +14,6 @@ export default function MarketTracker({api=publicApi}) {
     {error&&<p className="notice notice--error" role="alert">{error}</p>}
     {data?<BitcoinWidget readOnly tracker={{...data,shared:true,visible:true,pending:false}}
       rateHistory={<RateQueryHistory summary={data.rateQueries} loader={api.history} periodLoader={api.historyPeriods}/>}/>
-      :<p role="status">Loading market readings…</p>}
+      :<p role="status">Connecting to saved market readings… The backend may take a minute or more to wake up. Retrying automatically.</p>}
   </>;
 }
