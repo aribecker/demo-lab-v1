@@ -1,3 +1,9 @@
+# Nota de vigencia — 26/10/2026
+
+Este archivo conserva evidencia histórica de v1. El nuevo comportamiento de
+acceso está documentado en treasury-operations-grounding.md y sustituye las
+referencias siguientes a acceso anónimo. Los cambios nuevos no están desplegados.
+
 # Treasury v1 — implementation and deployment
 
 ## Existing resources retained
@@ -50,3 +56,4 @@ Pruebas: frontend confirma solo tras acción explícita, no duplica clics, reint
 
 ## Descarga independiente del correo
 Al confirmar, generar ZIP y Excel aunque no haya configuración de correo. Intentar enviar si hay configuración; ante fallo indicar «No se pudo asegurar el envío del correo, pero se procederá con la descarga de los archivos igualmente». Descargar ambos archivos también cuando el correo es aceptado. Mantener enlaces de descarga individual para navegadores que bloquean descargas múltiples, con expiración de 15 minutos o al desplazar respaldos anteriores (máximo dos capturas retenidas). No mostrar éxito de generación si falla crear u obtener los archivos. Endpoint POST /backup/prepare y GET /backup/files/{confirmation}/{zip|xlsx}; destinatario fijo y alcance treasury.
+
