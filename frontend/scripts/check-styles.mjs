@@ -38,9 +38,11 @@ for (const file of files) {
   assert(!/#[a-z][\w-]*\s*[>{,:.\[]/i.test(text), `${file}: ID styling is forbidden`);
 }
 const colors = Object.fromEntries([...tokens.matchAll(/--color-([\w-]+):\s*(#[\da-f]{6});/g)].map(m => [m[1], m[2]]));
+const specification = await readFile(path.join(root, '../specs/design-system.md'), 'utf8');
+for (const [, value] of tokens.matchAll(/--color-[\w-]+:\s*([^;]+);/g)) assert(specification.includes(value.trim()), `Palette value absent from specification: ${value}`);
 const luminance = hex => hex.slice(1).match(/../g).map(x => parseInt(x, 16) / 255).map(x => x <= .04045 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4).reduce((sum, x, i) => sum + x * [.2126,.7152,.0722][i], 0);
-for (const [fg, bg, minimum] of [['text','surface',4.5],['text-secondary','surface-raised',4.5],['button-text','button',4.5],['button-text','surface-hover',4.5],['on-accent','accent',4.5],['button-border','surface',3],['focus','surface',3]]) {
+for (const [fg, bg, minimum] of [['text','surface',4.5],['text-secondary','surface-raised',4.5],['button-text','button',4.5],['button-text','surface-hover',4.5],['on-accent','accent',4.5],['button-border','surface',3],['focus','surface',3],['accent','surface',3],['accent','surface-hover',3]]) {
   const levels = [luminance(colors[fg]), luminance(colors[bg])].sort((a,b) => a-b);
   assert((levels[1]+.05)/(levels[0]+.05) >= minimum, `Insufficient contrast: ${fg}/${bg}`);
 }
-console.log(`Style contract passed: ${files.length} central CSS modules, BEM, import boundary, token resolution and 7 contrast pairs.`);
+console.log(`Style contract passed: ${files.length} central CSS modules, BEM, import boundary, token resolution and 9 contrast pairs.`);

@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useNavigate } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from '../App.jsx';
+import designSpecification from '../../../specs/design-system.md?raw';
 import { sample } from './fixture.js';
 import { sharedSnapshot } from './sharedFixture.js';
 import * as peopleClient from '../peopleClient.js';
@@ -53,6 +54,19 @@ describe('routed demo application', () => {
     expect(loader).not.toHaveBeenCalled();
     expect(screen.queryByRole('region', { name: 'Buenos Aires weather' })).not.toBeInTheDocument();
     expect(menuLink('Home')).toHaveAttribute('aria-current', 'page');
+    // Every documented destination keeps its text name and decorative icon.
+    const documented = [...designSpecification.matchAll(/\| ([^|]+?) \| `([^`]+)` \| `([^`]+)` \|/g)];
+    expect(documented).toHaveLength(13);
+    for (const [, label, route, icon] of documented) {
+      const link = screen.getByRole('link', {name: label, exact: true});
+      expect(link).toHaveAttribute('href', route);
+      const svg = link.querySelector('svg');
+      expect(svg).toHaveAttribute('data-icon', icon);
+      expect(svg).toHaveAttribute('aria-hidden', 'true');
+      expect(svg).toHaveAttribute('focusable', 'false');
+      expect(svg.children.length).toBeGreaterThan(0);
+    }
+
     expect(screen.getByRole('link', { name: 'Weather demo', exact: true })).not.toHaveAttribute('aria-current');
   });
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
 import packageInfo from '../package.json';
+import MenuIcon from './MenuIcon.jsx';
 import Home from './Home.jsx';
 import Login from './Login.jsx';
 import HelloWorld from './HelloWorld.jsx';
@@ -17,19 +18,19 @@ import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
 
 const destinations = [
-  { to: '/', label: 'Home' },
-  { to: '/weather', label: 'Weather demo' },
-  { to: '/components', label: 'Component gallery' },
-  { to: '/login', label: 'Login' },
-  { to: '/people', label: 'People' },
-  { to: '/database', label: 'Database' },
-  { to: '/specifications', label: 'Specifications' },
-  { to: '/chatbot', label: 'Chatbot' },
-  { to: '/hello-world', label: 'Hello World' },
-  { to: '/bitcoin', label: 'Bitcoin Tracker' },
-  { to: '/trading-simulator', label: 'Trading Simulator' },
-  { to: '/users', label: 'Users' },
-  { to: '/groups', label: 'Groups' },
+  { to: '/', label: 'Home', icon: 'house' },
+  { to: '/weather', label: 'Weather demo', icon: 'cloud-sun' },
+  { to: '/components', label: 'Component gallery', icon: 'layout-grid' },
+  { to: '/login', label: 'Login', icon: 'log-in' },
+  { to: '/people', label: 'People', icon: 'contact-card' },
+  { to: '/database', label: 'Database', icon: 'database' },
+  { to: '/specifications', label: 'Specifications', icon: 'book-open' },
+  { to: '/chatbot', label: 'Chatbot', icon: 'message-circle' },
+  { to: '/hello-world', label: 'Hello World', icon: 'hand' },
+  { to: '/bitcoin', label: 'Bitcoin Tracker', icon: 'bitcoin' },
+  { to: '/trading-simulator', label: 'Trading Simulator', icon: 'chart-candlestick' },
+  { to: '/users', label: 'Users', icon: 'user-settings' },
+  { to: '/groups', label: 'Groups', icon: 'users-group' },
 ];
 
 export default function App(props) {
@@ -62,8 +63,8 @@ function AppContent({ loader, authApi, simulationApi, marketApi, accessApi }) {
             <span className="app-shell__hamburger" aria-hidden="true"><span /><span /><span /></span>
           </button>
           <nav className="app-shell__menu" id="main-navigation" aria-label="Main navigation" hidden={!menuOpen}>
-            {destinations.map(({ to, label }) => <NavLink className={({ isActive }) => `app-shell__menu-link${isActive ? ' app-shell__menu-link--active' : ''}`} key={to} to={to} end
-              onClick={() => setMenuOpen(false)}>{label}</NavLink>)}
+            {destinations.map(({ to, label, icon }) => <NavLink className={({ isActive }) => `app-shell__menu-link${isActive ? ' app-shell__menu-link--active' : ''}`} key={to} to={to} end
+              onClick={() => setMenuOpen(false)}><MenuIcon name={icon}/><span>{label}</span></NavLink>)}
           </nav>
         </div>
         <Link to="/" className="app-shell__brand" aria-label="Demo application home"><span className="app-shell__brand-icon">◒</span> DEMO LAB</Link>

@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 27/10/2026 — Turquesa e íconos de navegación
+
+- R49 actualiza la especificación visual y sus tokens a una paleta verde azulada más alegre.
+- Las 13 opciones del menú tienen íconos SVG locales definidos en la especificación, con etiquetas y accesibilidad conservadas.
+- Menú desplazable en pantallas pequeñas, opción activa destacada y contraste verificado.
+
 ## 27/10/2026 — Acceso configurable de Demo Lab por grupos
 
 - Especificación R48 y migración aditiva en el nuevo esquema demo_lab de la base compartida; Treasury conserva su esquema separado.
