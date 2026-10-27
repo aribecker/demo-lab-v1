@@ -21,3 +21,7 @@ No schema/migration or data changes. Preserve all existing tables, snapshots, ba
 
 ## Acceptance
 Test anonymous/forged/expired/revoked sessions, another verified email, unverified owner email, another provider, verified owner, exact email normalization, protected GET/POST/history and database-row bypass. Check that denial has no simulation effect, public projection omits protected fields, history stays public/read-only and owner commands still work. Test menu visibility, direct URL states, greeting, login/logout, expiry, permission failure/retry, separate panels and preserved state on navigation. Run full frontend and Java regressions, style contract, production builds and disposable PostgreSQL checks; verify live public GETs and denied private requests without resetting state.
+
+## Public tracker connection recovery — 2026-10-27
+
+A sleeping Free backend can take longer than 12 seconds to answer. The public market read must allow up to 90 seconds for each attempt, remain GET-only, cancel immediately on navigation and preserve existing snapshots during reconnection. Timeout and temporary network failures must show an actionable connection message, never raw browser abort text. Existing polling retries after a failed attempt without overlapping requests. Initial loading must explain the possible backend startup delay. Regression coverage includes a response later than 12 seconds, the 90-second timeout, caller cancellation, and automatic recovery without commands.
