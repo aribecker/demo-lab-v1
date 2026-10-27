@@ -22,3 +22,6 @@ Corrección de prueba PostgreSQL del respaldo: elimina el supuesto de ocho tabla
 y verifica hojas contra el catálogo real, más restauración de proveedores y
 permisos incorporados en V3. La prueba había frenado correctamente el primer
 build del backend; no se publicó una versión con pruebas fallidas.
+
+El build Docker garantiza detener PostgreSQL desechable al salir, incluso ante
+fallos de tests, y separa su log del stream de build para no retener la compilación.
