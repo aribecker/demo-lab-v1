@@ -11,7 +11,7 @@ import Chatbot from './Chatbot.jsx';
 import TradingSimulator from './SharedBitcoinTracker.jsx';
 import MarketTracker from './MarketTracker.jsx';
 import SimulatorGate from './SimulatorGate.jsx';
-import { AuthProvider, AuthRouteCheck, useAuth } from './AuthContext.jsx';
+import { AuthProvider, AuthRouteCheck } from './AuthContext.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
 
@@ -26,14 +26,13 @@ const destinations = [
   { to: '/chatbot', label: 'Chatbot' },
   { to: '/hello-world', label: 'Hello World' },
   { to: '/bitcoin', label: 'Bitcoin Tracker' },
-  { to: '/trading-simulator', label: 'Trading Simulator', restricted: true },
+  { to: '/trading-simulator', label: 'Trading Simulator' },
 ];
 
 export default function App(props) {
   return <AuthProvider api={props.authApi}><AuthRouteCheck/><AppContent {...props}/></AuthProvider>;
 }
 function AppContent({ loader, authApi, simulationApi, marketApi }) {
-  const {canUseSimulator}=useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef(null);
   const content = useRef(null);
@@ -60,7 +59,7 @@ function AppContent({ loader, authApi, simulationApi, marketApi }) {
             <span className="app-shell__hamburger" aria-hidden="true"><span /><span /><span /></span>
           </button>
           <nav className="app-shell__menu" id="main-navigation" aria-label="Main navigation" hidden={!menuOpen}>
-            {destinations.filter(item=>!item.restricted||canUseSimulator).map(({ to, label }) => <NavLink className={({ isActive }) => `app-shell__menu-link${isActive ? ' app-shell__menu-link--active' : ''}`} key={to} to={to} end
+            {destinations.map(({ to, label }) => <NavLink className={({ isActive }) => `app-shell__menu-link${isActive ? ' app-shell__menu-link--active' : ''}`} key={to} to={to} end
               onClick={() => setMenuOpen(false)}>{label}</NavLink>)}
           </nav>
         </div>
@@ -71,7 +70,7 @@ function AppContent({ loader, authApi, simulationApi, marketApi }) {
 
     <div ref={content} className="app-shell__content">
       <Routes>
-        <Route path="/" element={<Home canUseSimulator={canUseSimulator} />} />
+        <Route path="/" element={<Home />} />
         <Route path="/weather" element={<WeatherDemo loader={loader} />} />
         <Route path="/components" element={<ComponentGallery />} />
         <Route path="/login" element={<Login api={authApi} />} />

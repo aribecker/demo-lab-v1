@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-export default function Home({canUseSimulator=false}) {
+export default function Home() {
   return <>
     <section className="page-intro page-intro--home" aria-labelledby="page-heading">
       <p className="text__eyebrow">ONE APP · A FEW SMALL EXPERIMENTS</p>
@@ -33,7 +33,7 @@ export default function Home({canUseSimulator=false}) {
         <p>Add sample names and browse the persistent people list in the same application as Login and the trading simulator.</p>
         <span className="home__action">Open People →</span>
       </Link>
-      {canUseSimulator&&<Link className="home__card" to="/trading-simulator"><span className="home__number">OWNER ACCESS · VIRTUAL FUNDS</span><h2>Trading Simulator ↗</h2><p>Manage the saved simulation, strategy, balances and tracking decisions.</p><span className="home__action">Open Trading Simulator →</span></Link>}
+      <Link className="home__card" to="/trading-simulator"><span className="home__number">OWNER ACCESS · VIRTUAL FUNDS</span><h2>Trading Simulator ↗</h2><p>Manage the saved simulation, strategy, balances and tracking decisions.</p><span className="home__action">Open Trading Simulator →</span></Link>
       <Link className="home__card" to="/bitcoin">
         <span className="home__number" aria-hidden="true">04 / MARKET WATCH</span>
         <h2>Bitcoin tracker <span aria-hidden="true">↗</span></h2>

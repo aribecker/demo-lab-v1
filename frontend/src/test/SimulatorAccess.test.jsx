@@ -19,31 +19,31 @@ afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();sessionStorage.clear();}
 it('anonymous direct entry shows login icon and never mounts or reads simulator',async()=>{
  const b=open(null);expect(await screen.findByText('Please sign in to use this feature.')).toBeInTheDocument();
  expect(screen.getByRole('img',{name:'Login'})).toBeInTheDocument();expect(screen.getByRole('link',{name:'Login',exact:true})).toHaveAttribute('href','/login');
- menu();expect(screen.getByRole('link',{name:'Bitcoin Tracker',exact:true})).toBeInTheDocument();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();
+ menu();expect(screen.getByRole('link',{name:'Bitcoin Tracker',exact:true})).toBeInTheDocument();expect(screen.getByRole('link',{name:'Trading Simulator',exact:true})).toBeInTheDocument();
  expect(b.simulationApi.read).not.toHaveBeenCalled();expect(b.simulationApi.command).not.toHaveBeenCalled();
 });
-it('another signed-in user is greeted, denied and has no simulator menu',async()=>{
+it('another signed-in user is greeted and denied while simulator navigation stays visible',async()=>{
  const b=open({...owner,profile:{name:'Jane Example',email:'jane@example.test'},canUseSimulator:false});
- expect(await screen.findByRole('heading',{name:'Hello, Jane Example.'})).toBeInTheDocument();expect(screen.getByText('You are not authorized to use this feature.')).toBeInTheDocument();
- menu();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();expect(b.simulationApi.read).not.toHaveBeenCalled();
+ expect(await screen.findByRole('heading',{name:'Hello, Jane Example.'})).toBeInTheDocument();expect(screen.getByText('Lamentamos, usted no tiene acceso a esta sección.')).toBeInTheDocument();
+ menu();expect(screen.getByRole('link',{name:'Trading Simulator',exact:true})).toBeInTheDocument();expect(b.simulationApi.read).not.toHaveBeenCalled();
 });
 it('owner can open separate simulator and tracker routes without commands or duplicate panels',async()=>{
- const b=open(owner);expect(await screen.findByTestId('usdt-balance')).toBeInTheDocument();expect(screen.queryByRole('region',{name:'Bitcoin price tracker'})).not.toBeInTheDocument();
+ const b=open(owner);expect(await screen.findByTestId('usdt-balance')).toBeInTheDocument();expect(screen.getByText('Hello, Ariel Becker.')).toBeInTheDocument();expect(screen.queryByRole('region',{name:'Bitcoin price tracker'})).not.toBeInTheDocument();
  menu();expect(screen.getByRole('link',{name:'Trading Simulator',exact:true})).toHaveAttribute('aria-current','page');fireEvent.click(screen.getByRole('link',{name:'Bitcoin Tracker',exact:true}));
  expect(await screen.findByRole('region',{name:'Bitcoin price tracker'})).toBeInTheDocument();expect(screen.queryByTestId('usdt-balance')).not.toBeInTheDocument();
  expect(screen.queryByRole('button',{name:'Pause tracking'})).not.toBeInTheDocument();expect(screen.queryByRole('button',{name:'Start simulation'})).not.toBeInTheDocument();expect(b.simulationApi.command).not.toHaveBeenCalled();expect(b.marketApi.command).not.toHaveBeenCalled();
 });
-it('logging out removes owner navigation and direct access immediately',async()=>{
+it('logging out keeps simulator navigation and removes direct access immediately',async()=>{
  const b=open(owner,'/login');await screen.findByText('aribecker2@gmail.com');menu();expect(screen.getByRole('link',{name:'Trading Simulator',exact:true})).toBeInTheDocument();menu();
  fireEvent.click(screen.getByRole('button',{name:'Sign out of demo'}));await waitFor(()=>expect(screen.queryByText('aribecker2@gmail.com')).not.toBeInTheDocument());
  // Subsequent revalidation must also return the revoked session as absent.
- b.authApi.profile.mockResolvedValue(null);menu();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();expect(b.simulationApi.command).not.toHaveBeenCalled();
+ b.authApi.profile.mockResolvedValue(null);menu();expect(screen.getByRole('link',{name:'Trading Simulator',exact:true})).toBeInTheDocument();expect(b.simulationApi.command).not.toHaveBeenCalled();
 });
-it('expiry removes mounted private data and menu',async()=>{
+it('expiry removes mounted private data while retaining navigation',async()=>{
  vi.useFakeTimers();localStorage.setItem('demo.auth.token','expiring-token');open({...owner,expiresAt:new Date(Date.now()+1000).toISOString()});
  await act(async()=>{await Promise.resolve();});expect(screen.getByTestId('usdt-balance')).toBeInTheDocument();
  await act(()=>vi.advanceTimersByTimeAsync(1001));expect(screen.queryByTestId('usdt-balance')).not.toBeInTheDocument();expect(screen.getByText(/session expired/)).toBeInTheDocument();
- expect(localStorage.getItem('demo.auth.token')).toBeNull();menu();expect(screen.queryByRole('link',{name:'Trading Simulator',exact:true})).not.toBeInTheDocument();
+ expect(localStorage.getItem('demo.auth.token')).toBeNull();menu();expect(screen.getByRole('link',{name:'Trading Simulator',exact:true})).toBeInTheDocument();
 });
 it('failed verification stays closed and allows retry',async()=>{
  const api=client(null);api.initialize.mockRejectedValue(new Error('Cannot verify session'));
@@ -64,4 +64,12 @@ it('cross-tab logout removes private content without resetting the simulator',as
  const b=open(owner);await screen.findByTestId('usdt-balance');b.authApi.profile.mockResolvedValue(null);
  act(()=>window.dispatchEvent(new StorageEvent('storage',{key:'demo.auth.token',newValue:null})));
  expect(await screen.findByText('Please sign in to use this feature.')).toBeInTheDocument();expect(screen.queryByTestId('usdt-balance')).not.toBeInTheDocument();expect(b.simulationApi.command).not.toHaveBeenCalled();
+});
+
+it('anonymous Home exposes a simulator card that leads to the login gate',async()=>{
+ const b=open(null,'/');
+ fireEvent.click(screen.getByRole('link',{name:/OWNER ACCESS.*Trading Simulator/}));
+ expect(await screen.findByText('Please sign in to use this feature.')).toBeInTheDocument();
+ expect(screen.getByRole('link',{name:'Login',exact:true})).toHaveAttribute('href','/login');
+ expect(b.simulationApi.read).not.toHaveBeenCalled();expect(b.simulationApi.command).not.toHaveBeenCalled();
 });

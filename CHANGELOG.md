@@ -1,5 +1,12 @@
 # Historial de cambios
 
+## 27/10/2026 — Trading Simulator siempre visible
+
+- Menú y tarjeta de Home visibles para todas las sesiones.
+- Login requerido al entrar sin sesión; saludo y denegación en castellano para usuarios no autorizados.
+- Cuenta Google propietaria verificada conserva acceso al simulador completo.
+- Logout y expiración quitan los datos privados, pero conservan la navegación.
+
 ## 27/10/2026 — Recuperación de conexión del Bitcoin Tracker
 
 - Espera de lectura pública ampliada de 12 a 90 segundos para el arranque del backend.
