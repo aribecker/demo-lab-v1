@@ -10,8 +10,13 @@ public final class TreasuryModels {
  public record Member(String first_name,String last_name,String residence,String membership_number,String email,String phone,String notes,boolean active,LocalDate admission_date) {
   public Member(String first_name,String last_name,String residence,String membership_number,String email,String phone,String notes,boolean active){this(first_name,last_name,residence,membership_number,email,phone,notes,active,null);}
  }
- public record Account(String code,String name,String type,String parent_id,String currency_policy,boolean allows_posting,boolean active) {}
- public record Line(String account_id,String member_id,String description,String currency,BigDecimal debit,BigDecimal credit) {}
+ public record Account(String code,String name,String type,String parent_id,String currency_policy,boolean allows_posting,boolean active,boolean requires_member,boolean requires_supplier,String auxiliary_type) {
+  public Account(String code,String name,String type,String parent_id,String currency_policy,boolean allows_posting,boolean active){this(code,name,type,parent_id,currency_policy,allows_posting,active,false,false,null);}
+ }
+ public record SupplierForm(String name,String external_reference,String email,String notes,boolean active) {}
+ public record Line(String account_id,String member_id,String description,String currency,BigDecimal debit,BigDecimal credit,String supplier_id) {
+  public Line(String account_id,String member_id,String description,String currency,BigDecimal debit,BigDecimal credit){this(account_id,member_id,description,currency,debit,credit,null);}
+ }
  public record Entry(LocalDate entry_date,String description,String reference,List<Line> lines) {}
  public record Reversal(LocalDate entry_date,String description) {}
  public static class Problem extends RuntimeException {
@@ -25,3 +30,4 @@ public final class TreasuryModels {
  }
  public static String nullable(String value){return value==null||value.isBlank()?null:value;}
 }
+

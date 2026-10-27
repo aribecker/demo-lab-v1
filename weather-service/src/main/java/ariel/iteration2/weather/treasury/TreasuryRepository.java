@@ -55,6 +55,27 @@ public class TreasuryRepository {
   return db.query(sql,(r,n)->{var row=new LinkedHashMap<String,Object>();var meta=r.getMetaData();
    for(int i=1;i<=meta.getColumnCount();i++){Object value=r.getObject(i);if(value instanceof BigDecimal amount)value=amount.toPlainString();if(value instanceof java.sql.Date date)value=date.toLocalDate().toString();if(value instanceof Timestamp time)value=time.toInstant().toString();row.put(meta.getColumnLabel(i).toLowerCase(Locale.ROOT),value);}return row;},args);
  }
+ public void provisionOwnerPermissions(String provider,String account){tx(()->{
+  for(var i:query("SELECT id FROM treasury.institutions ORDER BY id FOR UPDATE")){
+   String inst=(String)i.get("id");
+   if(db.queryForObject("SELECT COUNT(*) FROM treasury.treasury_permissions WHERE institution_id=? AND provider=? AND account_id=?",Long.class,inst,provider,account)==0)
+    db.update("INSERT INTO treasury.treasury_permissions(institution_id,provider,account_id,can_read,can_write,can_confirm,granted_by) VALUES(?,?,?,TRUE,TRUE,TRUE,?)",inst,provider,account,"bootstrap:"+provider+":"+account);
+   else db.update("UPDATE treasury.treasury_permissions SET can_read=TRUE,can_write=TRUE,can_confirm=TRUE,granted_by=?,granted_at=CURRENT_TIMESTAMP WHERE institution_id=? AND provider=? AND account_id=? AND (can_read=FALSE OR can_write=FALSE OR can_confirm=FALSE)","bootstrap:"+provider+":"+account,inst,provider,account);
+  }
+  return null;
+ });}
+ public boolean permitted(String inst,String provider,String account,String permission){
+  if(!Set.of("can_read","can_write","can_confirm").contains(permission))throw new IllegalArgumentException("Invalid permission");
+  return read(()->db.queryForObject("SELECT COUNT(*) FROM treasury.treasury_permissions WHERE institution_id=? AND provider=? AND account_id=? AND "+permission+"=TRUE",Long.class,inst,provider,account)>0);
+ }
+ public List<Map<String,Object>> suppliers(String inst){return read(()->{institution(inst,false);return query("SELECT * FROM treasury.suppliers WHERE institution_id=? ORDER BY name,id",inst);});}
+ public String saveSupplier(String inst,String key,SupplierForm f){return tx(()->{
+  institution(inst,true);String target=key==null?id():key;
+  if(key!=null)one("SELECT id FROM treasury.suppliers WHERE institution_id=? AND id=?",inst,key);
+  Object[] fields={text(f.name(),200,true),text(f.external_reference(),100,false),text(f.email(),200,false),text(f.notes(),2000,false),f.active(),inst,target};
+  db.update(key==null?"INSERT INTO treasury.suppliers(name,external_reference,email,notes,active,institution_id,id) VALUES(?,?,?,?,?,?,?)":"UPDATE treasury.suppliers SET name=?,external_reference=?,email=?,notes=?,active=? WHERE institution_id=? AND id=?",fields);return target;
+ });}
+ public void deactivateSupplier(String inst,String key){tx(()->{institution(inst,true);one("SELECT id FROM treasury.suppliers WHERE institution_id=? AND id=?",inst,key);db.update("UPDATE treasury.suppliers SET active=FALSE WHERE institution_id=? AND id=?",inst,key);return null;});}
  private String id(){return UUID.randomUUID().toString();}
  private Map<String,Object> institution(String inst,boolean writable) {
   var row=one("SELECT * FROM treasury.institutions WHERE id=?"+(writable?" FOR UPDATE":""),inst);
@@ -93,6 +114,14 @@ public class TreasuryRepository {
   institution(inst,true);String target=accountKey==null?id():accountKey,parent=nullable(f.parent_id());
   String code=text(f.code(),30,true),name=text(f.name(),160,true);
   if(!Set.of("ASSET","LIABILITY","EQUITY","INCOME","EXPENSE").contains(Objects.toString(f.type(),""))||!Set.of("ARS","USD","BOTH").contains(Objects.toString(f.currency_policy(),"")))throw new Problem(400,"Tipo de cuenta o moneda inválidos.");
+  String auxiliary=nullable(f.auxiliary_type());
+  if(auxiliary!=null){
+   if(!Set.of("MEMBER_DEBT","MEMBER_ADVANCE","SUPPLIER_DEBT","SUPPLIER_ADVANCE").contains(auxiliary))throw new Problem(400,"Auxiliar inválido.");
+   boolean memberAux=auxiliary.startsWith("MEMBER_");
+   if(!f.allows_posting() || (memberAux?(!f.requires_member()||f.requires_supplier()):(!f.requires_supplier()||f.requires_member())))throw new Problem(400,"La cuenta auxiliar requiere su tercero y debe ser imputable.");
+   String expected=switch(auxiliary){case "MEMBER_DEBT","SUPPLIER_ADVANCE"->"ASSET";default->"LIABILITY";};
+   if(!expected.equals(f.type()))throw new Problem(400,"El tipo de cuenta no corresponde al auxiliar.");
+  }
   if(parent!=null){var seen=new HashSet<String>();seen.add(target);String walk=parent;
    while(walk!=null){if(!seen.add(walk))throw new Problem(400,"La jerarquía de cuentas no puede contener ciclos.");var p=one("SELECT * FROM treasury.accounts WHERE institution_id=? AND id=?",inst,walk);
     if(!Boolean.TRUE.equals(p.get("active"))||Boolean.TRUE.equals(p.get("allows_posting")))throw new Problem(400,"La cuenta superior debe estar activa y ser agrupadora.");walk=(String)p.get("parent_id");}
@@ -100,10 +129,11 @@ public class TreasuryRepository {
   if(accountKey!=null){var old=one("SELECT * FROM treasury.accounts WHERE institution_id=? AND id=?",inst,target);
    long used=db.queryForObject("SELECT COUNT(*) FROM treasury.journal_lines WHERE institution_id=? AND account_id=?",Long.class,inst,target);
    if(used>0&&(!f.type().equals(old.get("type"))||!f.currency_policy().equals(old.get("currency_policy"))||f.allows_posting()!=Boolean.TRUE.equals(old.get("allows_posting"))))throw new Problem(409,"Una cuenta con movimientos conserva su tipo, moneda y condición de imputación.");
+   if(used>0&&!Objects.equals(auxiliary,old.get("auxiliary_type")))throw new Problem(409,"Una cuenta con movimientos conserva su auxiliar; creá una cuenta nueva y conciliá la transición.");
    if(f.allows_posting()&&db.queryForObject("SELECT COUNT(*) FROM treasury.accounts WHERE institution_id=? AND parent_id=?",Long.class,inst,target)>0)throw new Problem(409,"Una cuenta con subcuentas debe ser agrupadora.");
   }
-  Object[] fields={code,name,f.type(),parent,f.currency_policy(),f.allows_posting(),f.active(),inst,target};
-  db.update(accountKey==null?"INSERT INTO treasury.accounts(code,name,type,parent_id,currency_policy,allows_posting,active,institution_id,id) VALUES(?,?,?,?,?,?,?,?,?)":"UPDATE treasury.accounts SET code=?,name=?,type=?,parent_id=?,currency_policy=?,allows_posting=?,active=? WHERE institution_id=? AND id=?",fields);return target;
+  Object[] fields={code,name,f.type(),parent,f.currency_policy(),f.allows_posting(),f.active(),f.requires_member(),f.requires_supplier(),auxiliary,inst,target};
+  db.update(accountKey==null?"INSERT INTO treasury.accounts(code,name,type,parent_id,currency_policy,allows_posting,active,requires_member,requires_supplier,auxiliary_type,institution_id,id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)":"UPDATE treasury.accounts SET code=?,name=?,type=?,parent_id=?,currency_policy=?,allows_posting=?,active=?,requires_member=?,requires_supplier=?,auxiliary_type=? WHERE institution_id=? AND id=?",fields);return target;
  });}
  public void deleteAccount(String inst,String key){tx(()->{
   institution(inst,true);one("SELECT id FROM treasury.accounts WHERE institution_id=? AND id=?",inst,key);
@@ -135,9 +165,14 @@ public class TreasuryRepository {
    if(!Boolean.TRUE.equals(a.get("allows_posting"))||!Boolean.TRUE.equals(a.get("active")))throw new Problem(400,"La cuenta debe estar activa y admitir imputaciones.");
    if(!"BOTH".equals(a.get("currency_policy"))&&!line.currency().equals(a.get("currency_policy")))throw new Problem(400,"La moneda no está habilitada para esta cuenta.");
    String member=nullable(line.member_id());if(member!=null){var m=one("SELECT active FROM treasury.members WHERE institution_id=? AND id=?",inst,member);if(!Boolean.TRUE.equals(m.get("active")))throw new Problem(400,"El miembro está inactivo.");}
+   if(Boolean.TRUE.equals(a.get("requires_member"))&&member==null)throw new Problem(400,"La cuenta requiere un miembro de la institución en Debe y Haber.");
+   String supplier=nullable(line.supplier_id());
+   if(supplier!=null){var p=one("SELECT active FROM treasury.suppliers WHERE institution_id=? AND id=?",inst,supplier);if(!Boolean.TRUE.equals(p.get("active")))throw new Problem(400,"El proveedor está inactivo.");}
+   if(Boolean.TRUE.equals(a.get("requires_supplier"))&&supplier==null)throw new Problem(400,"La cuenta requiere un proveedor de la institución en Debe y Haber.");
+   if(a.get("auxiliary_type")!=null)throw new Problem(409,"La cuenta auxiliar requiere un documento operativo vinculado; no admite asientos manuales.");
    BigDecimal debit=money(line.debit()),credit=money(line.credit());
    if((debit.signum()>0)==(credit.signum()>0))throw new Problem(400,"Cada línea debe tener un importe solamente en debe o en haber.");
-   clean.add(new Line(line.account_id(),member,text(line.description(),500,false),line.currency(),debit,credit));
+   clean.add(new Line(line.account_id(),member,text(line.description(),500,false),line.currency(),debit,credit,supplier));
    balance.merge(line.currency(),debit.subtract(credit),BigDecimal::add);
   }
   if(posting&&balance.values().stream().anyMatch(v->v.signum()!=0))throw new Problem(400,"El debe y el haber deben coincidir por separado en ARS y USD.");
@@ -153,8 +188,8 @@ public class TreasuryRepository {
   }else{entry(inst,target,true);db.update("UPDATE treasury.journal_entries SET entry_date=?,description=?,reference=? WHERE institution_id=? AND id=?",form.entry_date(),concept,reference,inst,target);db.update("DELETE FROM treasury.journal_lines WHERE institution_id=? AND journal_entry_id=?",inst,target);}
   insertLines(inst,target,lines);return target;
  });}
- private void insertLines(String inst,String key,List<Line> lines){int position=0;for(var l:lines)db.update("INSERT INTO treasury.journal_lines(id,institution_id,journal_entry_id,position,account_id,member_id,description,currency,debit,credit) VALUES(?,?,?,?,?,?,?,?,?,?)",id(),inst,key,++position,l.account_id(),l.member_id(),l.description(),l.currency(),l.debit(),l.credit());}
- private List<Line> lines(String inst,String key){return query("SELECT * FROM treasury.journal_lines WHERE institution_id=? AND journal_entry_id=? ORDER BY position",inst,key).stream().map(l->new Line((String)l.get("account_id"),(String)l.get("member_id"),(String)l.get("description"),(String)l.get("currency"),new BigDecimal((String)l.get("debit")),new BigDecimal((String)l.get("credit")))).toList();}
+ private void insertLines(String inst,String key,List<Line> lines){int position=0;for(var l:lines)db.update("INSERT INTO treasury.journal_lines(id,institution_id,journal_entry_id,position,account_id,member_id,description,currency,debit,credit,supplier_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)",id(),inst,key,++position,l.account_id(),l.member_id(),l.description(),l.currency(),l.debit(),l.credit(),l.supplier_id());}
+ private List<Line> lines(String inst,String key){return query("SELECT * FROM treasury.journal_lines WHERE institution_id=? AND journal_entry_id=? ORDER BY position",inst,key).stream().map(l->new Line((String)l.get("account_id"),(String)l.get("member_id"),(String)l.get("description"),(String)l.get("currency"),new BigDecimal((String)l.get("debit")),new BigDecimal((String)l.get("credit")),(String)l.get("supplier_id"))).toList();}
  public void post(String inst,String key){tx(()->{
   institution(inst,true);entry(inst,key,true);validate(inst,lines(inst,key),true);
   db.update("UPDATE treasury.journal_entries SET status='POSTED',posted_at=CURRENT_TIMESTAMP WHERE institution_id=? AND id=?",inst,key);return null;
@@ -166,7 +201,7 @@ public class TreasuryRepository {
   if(form.entry_date()==null||form.entry_date().isBefore(LocalDate.parse((String)old.get("entry_date"))))throw new Problem(400,"La fecha de reversión debe ser igual o posterior al asiento original.");
   String target=id();long number=((Number)institution.get("next_entry")).longValue();
   db.update("INSERT INTO treasury.journal_entries(id,institution_id,entry_number,entry_date,description,reference,status,reversal_of_id,created_by,posted_at) VALUES(?,?,?,?,?,?,'POSTED',?,?,CURRENT_TIMESTAMP)",target,inst,number,form.entry_date(),text(form.description(),1000,true),"Reversión #"+old.get("entry_number"),key,actor);
-  var opposite=lines(inst,key).stream().map(l->new Line(l.account_id(),l.member_id(),l.description(),l.currency(),l.credit(),l.debit())).toList();
+  var opposite=lines(inst,key).stream().map(l->new Line(l.account_id(),l.member_id(),l.description(),l.currency(),l.credit(),l.debit(),l.supplier_id())).toList();
   insertLines(inst,target,opposite);db.update("UPDATE treasury.institutions SET next_entry=next_entry+1 WHERE id=?",inst);return target;
  });}
  public static String fileType(byte[] bytes){
@@ -201,4 +236,5 @@ public class TreasuryRepository {
   return Map.of("institution",institution,"from",from.toString(),"to",to.toString(),"entries",result);
  });}
 }
+
 

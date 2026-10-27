@@ -10,10 +10,10 @@ const inst={id:'m',name:'Mariners',code:'MAR',theme_id:'mariners',active:true};
 const accounts=[{id:'cash',code:'1',name:'Caja pesos',active:true,allows_posting:true,type:'ASSET',currency_policy:'ARS'},{id:'income',code:'4',name:'Cuotas',active:true,allows_posting:true,type:'INCOME',currency_policy:'BOTH'}];
 const owner={canUseSimulator:true,profile:{name:'Ariel Becker'}};
 function mount(route){return render(<MemoryRouter initialEntries={[route]}><App/></MemoryRouter>);}
-beforeEach(()=>{vi.stubEnv("VITE_TREASURY_PENDING","false");vi.clearAllMocks();localStorage.clear();api.restore.mockResolvedValue(owner);api.request.mockImplementation(async path=>{if(path.endsWith('/institutions'))return [inst];if(path.endsWith('/themes'))return [{id:'mariners',name:'Mariners'},{id:'scottish',name:'Verde escocés'},{id:'generic',name:'Clásico'}];if(path.endsWith('/accounts'))return accounts;if(path.endsWith('/members'))return [];if(path.endsWith('/entries'))return [];throw new Error('Unexpected '+path);});});
+beforeEach(()=>{vi.stubEnv("VITE_TREASURY_PENDING","false");vi.clearAllMocks();localStorage.clear();api.restore.mockResolvedValue(owner);api.request.mockImplementation(async path=>{if(path.endsWith('/institutions'))return [inst];if(path.endsWith('/themes'))return [{id:'mariners',name:'Mariners'},{id:'scottish',name:'Verde escocés'},{id:'generic',name:'Clásico'}];if(path.endsWith('/accounts'))return accounts;if(path.endsWith('/members')||path.endsWith('/suppliers'))return [];if(path.endsWith('/entries'))return [];throw new Error('Unexpected '+path);});});
 afterEach(cleanup);
 describe('Flujos de tesorería',()=>{
- it('abre la tesorería sin iniciar ni restaurar una sesión',async()=>{api.restore.mockResolvedValue(null);mount('/');await screen.findByRole('heading',{name:'Elegí una institución',level:1});expect(api.restore).not.toHaveBeenCalled();expect(api.login).not.toHaveBeenCalled();expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions');expect(screen.queryByRole('button',{name:/Continuar con Google/})).not.toBeInTheDocument();});
+ it('el shell interno no duplica la autenticación gestionada por AccessGate',async()=>{api.restore.mockResolvedValue(null);mount('/');await screen.findByRole('heading',{name:'Elegí una institución',level:1});expect(api.restore).not.toHaveBeenCalled();expect(api.login).not.toHaveBeenCalled();expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions');expect(screen.queryByRole('button',{name:/Continuar con Google/})).not.toBeInTheDocument();});
  it('el menú sándwich abre las seis opciones y se cierra al navegar',async()=>{mount('/');const toggle=screen.getByRole('button',{name:'Abrir menú'});expect(toggle).toHaveAttribute('aria-expanded','false');fireEvent.click(toggle);for(const name of ['Instituciones','Miembros','Plan de cuentas','Libro de asientos','Balance','Libro diario'])expect(screen.getByRole('link',{name})).toBeInTheDocument();fireEvent.click(screen.getByRole('link',{name:'Instituciones'}));expect(await screen.findByRole('heading',{level:1,name:'Instituciones'})).toBeInTheDocument();expect(screen.getByRole('button',{name:'Abrir menú'})).toHaveAttribute('aria-expanded','false');});
  it('Escape cierra el menú sándwich',()=>{mount('/');fireEvent.click(screen.getByRole('button',{name:'Abrir menú'}));expect(screen.getByRole('button',{name:'Cerrar menú principal'})).toHaveAttribute('aria-expanded','true');fireEvent.keyDown(window,{key:'Escape'});expect(screen.getByRole('button',{name:'Abrir menú'})).toHaveAttribute('aria-expanded','false');});
  it('seleccionar institución cambia su skin y habilita las vistas',async()=>{mount('/');await screen.findByRole('heading',{name:'Elegí una institución',level:1});fireEvent.click(await screen.findByRole('button',{name:'Seleccionar Mariners'}));expect(await screen.findByRole('heading',{name:'Mariners',level:1})).toBeInTheDocument();expect(document.querySelector('.app')).toHaveAttribute('data-theme','mariners');});
@@ -94,4 +94,23 @@ describe('Flujos de tesorería',()=>{
   fireEvent.click(screen.getByRole('button',{name:'Abrir menú'}));fireEvent.click(screen.getByRole('link',{name:'Miembros'}));await screen.findByRole('heading',{name:'Miembros',level:1});expect(document.querySelector('.app')).toHaveAttribute('data-theme','scottish');
  });
 
+});
+
+it('registra un proveedor solamente en la institución activa',async()=>{
+ localStorage.setItem('treasury.institution','m');
+ const fallback=api.request.getMockImplementation();
+ api.request.mockImplementation(async(path,options)=>path.endsWith('/suppliers')&&options?.body?{id:'supplier'}:fallback(path,options));
+ mount('/suppliers');await screen.findByRole('heading',{name:'Proveedores',level:1});
+ fireEvent.click(screen.getByRole('button',{name:'Agregar proveedor'}));
+ fireEvent.change(screen.getByLabelText('Nombre *'),{target:{value:'Proveedor real'}});
+ fireEvent.change(screen.getByLabelText('Referencia externa'),{target:{value:'REF-01'}});
+ fireEvent.click(screen.getByRole('button',{name:'Guardar cambios'}));
+ await waitFor(()=>expect(api.request).toHaveBeenCalledWith('/api/treasury/institutions/m/suppliers',{body:expect.objectContaining({name:'Proveedor real',external_reference:'REF-01'})}));
+});
+it('expone controles de tercero en la cuenta sin asignarlos automáticamente',async()=>{
+ localStorage.setItem('treasury.institution','m');mount('/accounts');await screen.findByRole('heading',{name:'Plan de cuentas',level:1});
+ fireEvent.click(screen.getByRole('button',{name:'Agregar cuenta'}));
+ expect(screen.getByLabelText('Exige miembro en Debe y Haber')).not.toBeChecked();
+ expect(screen.getByLabelText('Exige proveedor en Debe y Haber')).not.toBeChecked();
+ expect(screen.getByLabelText('Auxiliar (bloquea asientos manuales)')).toHaveValue('');
 });

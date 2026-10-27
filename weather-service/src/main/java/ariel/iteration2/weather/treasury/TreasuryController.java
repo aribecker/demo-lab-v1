@@ -18,7 +18,19 @@ public class TreasuryController {
  private Map<String,String> saved(String id){return Map.of("id",id);}
  private String actor(HttpServletRequest request){return (String)request.getAttribute("treasury.actor");}
  @GetMapping("/themes") public Object themes(){return repo.themes();}
- @GetMapping("/institutions") public Object institutions(){return repo.institutions();}
+ @GetMapping("/institutions") public Object institutions(HttpServletRequest request){
+  var p=(ariel.iteration2.weather.auth.DemoSessions.Profile)request.getAttribute("treasury.profile");
+  return repo.institutions().stream().filter(i->repo.permitted((String)i.get("id"),p.provider(),p.accountId(),"can_read")).toList();
+ }
+ @GetMapping("/access") public Object access(HttpServletRequest request){return Map.of("catalog_editor",Boolean.TRUE.equals(request.getAttribute("treasury.catalog-editor")));}
+ @GetMapping("/institutions/{inst}/access") public Object access(@PathVariable String inst,HttpServletRequest request){
+  var p=(ariel.iteration2.weather.auth.DemoSessions.Profile)request.getAttribute("treasury.profile");
+  return Map.of("can_write",repo.permitted(inst,p.provider(),p.accountId(),"can_write"),"can_confirm",repo.permitted(inst,p.provider(),p.accountId(),"can_confirm"));
+ }
+ @GetMapping("/institutions/{inst}/suppliers") public Object suppliers(@PathVariable String inst){return repo.suppliers(inst);}
+ @PostMapping("/institutions/{inst}/suppliers") public Object createSupplier(@PathVariable String inst,@RequestBody SupplierForm form){return saved(repo.saveSupplier(inst,null,form));}
+ @PostMapping("/institutions/{inst}/suppliers/{id}") public Object editSupplier(@PathVariable String inst,@PathVariable String id,@RequestBody SupplierForm form){return saved(repo.saveSupplier(inst,id,form));}
+ @PostMapping("/institutions/{inst}/suppliers/{id}/delete") public void deleteSupplier(@PathVariable String inst,@PathVariable String id){repo.deactivateSupplier(inst,id);}
  @PostMapping("/institutions") public Object createInstitution(@RequestBody Institution form){return saved(repo.saveInstitution(null,form));}
  @PostMapping("/institutions/{id}") public Object editInstitution(@PathVariable String id,@RequestBody Institution form){return saved(repo.saveInstitution(id,form));}
  @PostMapping("/institutions/{id}/delete") public void deleteInstitution(@PathVariable String id){repo.deleteInstitution(id);}
@@ -53,3 +65,4 @@ public class TreasuryController {
  @ExceptionHandler(org.springframework.dao.DataAccessException.class) public ResponseEntity<?> database(){return ResponseEntity.status(503).body(Map.of("message","No se pudo completar la operación en PostgreSQL. Reintentá."));}
  @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class) public ResponseEntity<?> large(){return ResponseEntity.status(413).body(Map.of("message","El comprobante supera 5 MB."));}
 }
+
