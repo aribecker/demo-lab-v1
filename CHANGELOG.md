@@ -17,3 +17,8 @@ Detalle: docs/treasury-operations-validation.md.
 El usuario autorizó publicar sobre ramas/servicios actuales. Se incorpora
 bootstrap de permisos para la cuenta Google propietaria verificada mediante
 configuración explícita, vacía por defecto, para evitar bloquear el acceso.
+
+Corrección de prueba PostgreSQL del respaldo: elimina el supuesto de ocho tablas
+y verifica hojas contra el catálogo real, más restauración de proveedores y
+permisos incorporados en V3. La prueba había frenado correctamente el primer
+build del backend; no se publicó una versión con pruebas fallidas.
