@@ -2,10 +2,10 @@
   "configurationVersion": 1,
   "backend": {
     "workspaceId": "tea-db1drlhsrm7s73b7qmhg",
-    "repo": "https://github.com/aribecker/0080-prueba-SDD-full-stack",
-    "branch": "proximo-desarrollo-hello-world",
+    "repo": "https://github.com/aribecker/demo-lab",
+    "branch": "main",
     "autoDeploy": "yes",
-    "name": "ariel-demo-integrated-api",
+    "name": "demo-lab-api",
     "runtime": "docker",
     "dockerfilePath": "./Weather-Dockerfile",
     "dockerContext": ".",
@@ -18,28 +18,30 @@
       },
       {
         "key": "ALLOWED_ORIGINS",
-        "value": "https://ariel-demo-integrated.onrender.com,http://localhost:5173"
+        "value": "https://demo-lab-jeov.onrender.com,http://localhost:5173"
       },
       {
         "key": "AUTH_FRONTEND_URL",
-        "value": "https://ariel-demo-integrated.onrender.com"
+        "value": "https://demo-lab-jeov.onrender.com"
       },
       {
         "key": "AUTH_BACKEND_URL",
-        "value": "https://ariel-demo-integrated-api.onrender.com"
+        "value": "https://demo-lab-api.onrender.com"
       },
       {
         "key": "SIMULATION_HOSTING_MODE",
         "value": "free"
       }
-    ]
+    ],
+    "serviceId": "srv-dbge9g0u01pc73fl3f7g",
+    "url": "https://demo-lab-api.onrender.com"
   },
   "frontend": {
     "workspaceId": "tea-db1drlhsrm7s73b7qmhg",
-    "repo": "https://github.com/aribecker/0080-prueba-SDD-full-stack",
-    "branch": "proximo-desarrollo-hello-world",
+    "repo": "https://github.com/aribecker/demo-lab",
+    "branch": "main",
     "autoDeploy": "yes",
-    "name": "ariel-demo-integrated",
+    "name": "demo-lab",
     "buildCommand": "cd frontend && npm ci && npm test && npm run build",
     "publishPath": "frontend/dist",
     "envVars": [
@@ -57,13 +59,15 @@
       },
       {
         "key": "VITE_AUTH_API_URL",
-        "value": "https://ariel-demo-integrated-api.onrender.com"
+        "value": "https://demo-lab-api.onrender.com"
       },
       {
         "key": "VITE_BACKEND_API_URL",
-        "value": "https://ariel-demo-integrated-api.onrender.com"
+        "value": "https://demo-lab-api.onrender.com"
       }
-    ]
+    ],
+    "serviceId": "srv-dbge9jt9el5s738tcjr0",
+    "url": "https://demo-lab-jeov.onrender.com"
   },
   "requiredSecrets": {
     "backend": [
@@ -76,9 +80,10 @@
     "region": "oregon"
   },
   "notes": [
-    "Render connector creation manifest; not Blueprint syntax.",
-    "Secrets are deliberately omitted; never configure database URLs in VITE variables.",
-    "No change to application logic or existing services."
+    "Direct MCP deployment configuration; not Blueprint syntax.",
+    "Secret values must be configured in Render Environment, never in this file.",
+    "Original integrated services are retained; their clients and secrets have not been changed.",
+    "SIMULATION_DATABASE_URL and OAuth/provider credentials remain pending manual transfer."
   ],
   "retainedWeather": {
     "serviceId": "srv-db2rlbnlk1mc738gjtfg",

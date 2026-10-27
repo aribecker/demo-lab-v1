@@ -1,5 +1,12 @@
 # Historial de cambios
 
+## 27/10/2026 — Demo Lab en repositorio propio
+
+- Servicios demo-lab y demo-lab-api creados desde aribecker/demo-lab, rama main.
+- URL real del frontend incorporada a CORS y redirección del backend.
+- Configuración de despliegue, especificación y pasos de activación de secretos documentados.
+- Servicios anteriores y datos conservados. Credenciales pendientes de transferencia dentro de Render.
+
 ## Sin publicar — 26/10/2026
 
 - Primera parte del requerimiento de operaciones y contabilidad: controles de

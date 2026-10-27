@@ -1,7 +1,7 @@
 # Integrated Demo Lab v2.10.0
 
-Current frontend: https://ariel-demo-integrated.onrender.com
-Application backend: https://ariel-demo-integrated-api.onrender.com
+Current frontend: https://demo-lab-jeov.onrender.com
+Application backend: https://demo-lab-api.onrender.com
 Independent Weather: https://ariel-sdd-weather-microservice.onrender.com
 
 People, the shared trading simulator, login and chatbot use the application backend. Only live weather uses the independent weather service. PostgreSQL remains the same existing database; never reset it during deployment.
@@ -23,3 +23,7 @@ SDD order is specification commit, grounding commit, generated implementation/te
 
 ## Database explorer
 /database groups SELECT-accessible PostgreSQL base tables by their actual schema names. Expand a table to load25 rows, then expand a row to inspect every column and its PostgreSQL text/null value. Primary keys/ID sort ascending; tables without a key explicitly use non-guaranteed database default order. Load more and refresh are read-only. Long individual values show a65,536-character truncation marker. The integrated backend reads the existing SIMULATION_DATABASE_URL with no new schema, database, migration or environment value. Deployment details and verification: docs/database-explorer-release.md.
+
+## Dedicated repository deployment
+
+Source: https://github.com/aribecker/demo-lab, default branch `main`. Render services `demo-lab` (static frontend) and `demo-lab-api` (Java/Docker backend) follow this branch automatically. See specs/demo-lab-deployment.md and docs/demo-lab-deployment-release.md for credential activation and verification status.
