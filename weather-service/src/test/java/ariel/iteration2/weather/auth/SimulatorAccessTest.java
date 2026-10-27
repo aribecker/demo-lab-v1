@@ -12,7 +12,7 @@ import ariel.iteration2.weather.simulation.SimulationStore;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
- "simulation.database-url=jdbc:h2:mem:owner-access;MODE=PostgreSQL;DB_CLOSE_DELAY=-1","simulation.scheduling-enabled=false"})
+ "simulation.database-url=jdbc:h2:mem:owner-access;MODE=PostgreSQL;DB_CLOSE_DELAY=-1","simulation.scheduling-enabled=false","access.seed-everyone-simulator=false"})
 class SimulatorAccessTest {
  @Autowired TestRestTemplate http;
  @Autowired DemoSessions sessions;
@@ -59,9 +59,10 @@ class SimulatorAccessTest {
   var clock=new Moving();var store=SessionFixtures.sessions(clock);String v="a".repeat(43);
   var result=store.exchange(store.issue(profile("google","aribecker2@gmail.com",true),DemoSessions.digest(v)),v);
   assertThat(result.canUseSimulator()).isTrue();clock.now=clock.now.plusSeconds(DemoSessions.LIFETIME_SECONDS+1);assertThat(store.find(result.token())).isNull();
-  assertThat(SimulatorAccess.allowed(Profiles.from("google",Map.of("email","aribecker2@gmail.com","email_verified",true)))).isTrue();
-  assertThat(SimulatorAccess.allowed(Profiles.from("google",Map.of("email","aribecker2@gmail.com","email_verified","true")))).isFalse();
-  assertThat(SimulatorAccess.allowed(Profiles.from("google",Map.of("email","aribecker2@gmail.com")))).isFalse();
+  var directory=new ariel.iteration2.weather.access.AccessDirectory("jdbc:h2:mem:identity-claims;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",false);
+  assertThat(directory.capabilities(Profiles.from("google",Map.of("email","aribecker2@gmail.com","email_verified",true))).canUseSimulator()).isTrue();
+  assertThat(directory.capabilities(Profiles.from("google",Map.of("email","aribecker2@gmail.com","email_verified","true"))).canUseSimulator()).isFalse();
+  assertThat(directory.capabilities(Profiles.from("google",Map.of("email","aribecker2@gmail.com"))).canUseSimulator()).isFalse();
  }
  @Test void publicMarketIsReadOnlyAndNeverLeaksSimulation() {
   long revision=store.read().controlRevision,count=store.history().summary().total();

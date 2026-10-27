@@ -9,9 +9,9 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthApiTest {
  @Autowired TestRestTemplate http;
- @Test void publicMarketDoesNotInitializeSimulationAndPrivateStateRequiresLogin(){
+ @Test void missingAuthorizationStorageFailsClosedWithoutInitializingSimulation(){
   assertThat(http.getForEntity("/auth/providers",String.class).getStatusCode().value()).isEqualTo(200);
-  assertThat(http.getForEntity("/api/simulation",String.class).getStatusCode().value()).isEqualTo(401);
+  assertThat(http.getForEntity("/api/simulation",String.class).getStatusCode().value()).isEqualTo(503);
   var state=http.getForEntity("/api/bitcoin",String.class);
   assertThat(state.getStatusCode().value()).isEqualTo(503);
   assertThat(state.getBody()).contains("SIMULATION_STORAGE_UNAVAILABLE");

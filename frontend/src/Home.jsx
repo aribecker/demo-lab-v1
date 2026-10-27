@@ -33,7 +33,7 @@ export default function Home() {
         <p>Add sample names and browse the persistent people list in the same application as Login and the trading simulator.</p>
         <span className="home__action">Open People →</span>
       </Link>
-      <Link className="home__card" to="/trading-simulator"><span className="home__number">OWNER ACCESS · VIRTUAL FUNDS</span><h2>Trading Simulator ↗</h2><p>Manage the saved simulation, strategy, balances and tracking decisions.</p><span className="home__action">Open Trading Simulator →</span></Link>
+      <Link className="home__card" to="/trading-simulator"><span className="home__number">GROUP ACCESS · VIRTUAL FUNDS</span><h2>Trading Simulator ↗</h2><p>Manage the saved simulation, strategy, balances and tracking decisions.</p><span className="home__action">Open Trading Simulator →</span></Link>
       <Link className="home__card" to="/bitcoin">
         <span className="home__number" aria-hidden="true">04 / MARKET WATCH</span>
         <h2>Bitcoin tracker <span aria-hidden="true">↗</span></h2>
@@ -55,7 +55,7 @@ export default function Home() {
       <Link className="home__card" to="/login">
         <span className="home__number" aria-hidden="true">03 / IDENTITY</span>
         <h2>Login <span aria-hidden="true">↗</span></h2>
-        <p>Sign in to see your profile. Trading Simulator access is reserved for the authorized Google account.</p>
+        <p>Sign in to see your profile. Trading Simulator access follows the configured user groups.</p>
         <span className="home__action">Open Login →</span>
       </Link>
     </section>

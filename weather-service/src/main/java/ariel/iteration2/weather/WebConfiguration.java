@@ -38,7 +38,7 @@ class WebConfiguration implements WebMvcConfigurer {
         for(String path : new String[]{"/api/treasury/**", "/auth/**"})
             registry.addMapping(path).allowedOrigins(treasuryOrigins()).allowedMethods("GET","POST","OPTIONS")
                 .allowedHeaders("Accept","Content-Type","Authorization").allowCredentials(false).maxAge(600);
-        registry.addMapping("/**").allowedOrigins(origins).allowedMethods("GET", "POST", "OPTIONS")
+        registry.addMapping("/**").allowedOrigins(origins).allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Accept", "Content-Type", "X-Request-Id", "Authorization")
                 .exposedHeaders("X-Request-Id").allowCredentials(false).maxAge(600);
     }

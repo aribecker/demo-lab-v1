@@ -11,6 +11,7 @@ import Chatbot from './Chatbot.jsx';
 import TradingSimulator from './SharedBitcoinTracker.jsx';
 import MarketTracker from './MarketTracker.jsx';
 import SimulatorGate from './SimulatorGate.jsx';
+import AccessManagement from './AccessManagement.jsx';
 import { AuthProvider, AuthRouteCheck } from './AuthContext.jsx';
 import WeatherDemo from './WeatherDemo.jsx';
 import ComponentGallery from './ComponentGallery.jsx';
@@ -27,12 +28,14 @@ const destinations = [
   { to: '/hello-world', label: 'Hello World' },
   { to: '/bitcoin', label: 'Bitcoin Tracker' },
   { to: '/trading-simulator', label: 'Trading Simulator' },
+  { to: '/users', label: 'Users' },
+  { to: '/groups', label: 'Groups' },
 ];
 
 export default function App(props) {
   return <AuthProvider api={props.authApi}><AuthRouteCheck/><AppContent {...props}/></AuthProvider>;
 }
-function AppContent({ loader, authApi, simulationApi, marketApi }) {
+function AppContent({ loader, authApi, simulationApi, marketApi, accessApi }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef(null);
   const content = useRef(null);
@@ -80,6 +83,8 @@ function AppContent({ loader, authApi, simulationApi, marketApi }) {
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/hello-world" element={<HelloWorld />} />
         <Route path="/bitcoin" element={<MarketTracker api={marketApi} />} />
+        <Route path="/users" element={<SimulatorGate permission="canManageUsers" title="Users"><AccessManagement kind="users" api={accessApi}/></SimulatorGate>} />
+        <Route path="/groups" element={<SimulatorGate permission="canManageGroups" title="Groups"><AccessManagement kind="groups" api={accessApi}/></SimulatorGate>} />
         <Route path="/trading-simulator" element={<SimulatorGate><TradingSimulator api={simulationApi}/></SimulatorGate>} />
         <Route path="*" element={<section className="page-intro">
           <p className="text__eyebrow">404</p>

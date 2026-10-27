@@ -106,7 +106,7 @@ describe('Bitcoin tracking lifecycle', () => {
     vi.useFakeTimers();
     const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => sharedSnapshot() });
     vi.stubGlobal('fetch', fetcher);
-    render(<MemoryRouter><App /></MemoryRouter>);
+    render(<MemoryRouter><App authApi={{initialize:async()=>null,profile:async()=>null}} /></MemoryRouter>);
     expect(fetcher).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
     fireEvent.click(screen.getByRole('link', { name: 'Bitcoin Tracker', exact: true }));

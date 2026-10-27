@@ -92,7 +92,7 @@ function LoginContent() {
         </p>
       </section>
       <aside className="notice">
-        <strong>Account access.</strong> Bitcoin Tracker is public. Trading Simulator is reserved for the authorized Google account.
+        <strong>Account access.</strong> Bitcoin Tracker is public. Trading Simulator, Users and Groups access follows the configured group memberships.
         Signing in or out preserves the saved simulation.
         {auth.canUseSimulator&&<p><a className="text__link" href="/trading-simulator">Open Trading Simulator →</a></p>}
         <p>

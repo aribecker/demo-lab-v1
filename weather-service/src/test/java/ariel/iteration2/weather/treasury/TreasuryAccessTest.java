@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties={"simulation.database-url=jdbc:h2:mem:treasury-api;MODE=PostgreSQL;DB_CLOSE_DELAY=-1","simulation.scheduling-enabled=false","auth.google.client-id=test-client","auth.google.client-secret=test-secret","treasury.catalog-editors=owner@example.invalid"})
+@SpringBootTest(properties={"simulation.database-url=jdbc:h2:mem:treasury-api;MODE=PostgreSQL;DB_CLOSE_DELAY=-1","simulation.scheduling-enabled=false","access.seed-everyone-simulator=false","auth.google.client-id=test-client","auth.google.client-secret=test-secret","treasury.catalog-editors=owner@example.invalid"})
 @AutoConfigureMockMvc
 class TreasuryAccessTest {
  @Autowired MockMvc mvc;

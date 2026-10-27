@@ -68,7 +68,7 @@ it('cross-tab logout removes private content without resetting the simulator',as
 
 it('anonymous Home exposes a simulator card that leads to the login gate',async()=>{
  const b=open(null,'/');
- fireEvent.click(screen.getByRole('link',{name:/OWNER ACCESS.*Trading Simulator/}));
+ fireEvent.click(screen.getByRole('link',{name:/GROUP ACCESS.*Trading Simulator/}));
  expect(await screen.findByText('Please sign in to use this feature.')).toBeInTheDocument();
  expect(screen.getByRole('link',{name:'Login',exact:true})).toHaveAttribute('href','/login');
  expect(b.simulationApi.read).not.toHaveBeenCalled();expect(b.simulationApi.command).not.toHaveBeenCalled();

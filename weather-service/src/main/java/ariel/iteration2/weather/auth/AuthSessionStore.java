@@ -12,10 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthSessionStore {
     private final DatabaseConnections connections;
+    private final String databaseUrl;
+    String databaseUrl(){return databaseUrl;}
     private final ObjectMapper json;
     private volatile boolean ready;
     public AuthSessionStore(@Value("${auth.database-url:}") String connection,ObjectMapper json) {
-        this.connections=new DatabaseConnections(connection);this.json=json;
+        this.databaseUrl=connection;this.connections=new DatabaseConnections(connection);this.json=json;
     }
     private synchronized void initialize() {
         if(ready)return;

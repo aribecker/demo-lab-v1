@@ -9,6 +9,8 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
+import ariel.iteration2.weather.access.AccessDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 public class DemoSessions {
@@ -19,10 +21,10 @@ public class DemoSessions {
         }
     }
     public record Session(Profile profile, Instant expiresAt, boolean canUseSimulator) {
-        public Session(Profile profile,Instant expiresAt) { this(profile,expiresAt,SimulatorAccess.allowed(profile)); }
+        public Session(Profile profile,Instant expiresAt) { this(profile,expiresAt,false); }
     }
     public record Exchange(String token, Profile profile, Instant expiresAt, boolean canUseSimulator) {
-        public Exchange(String token,Profile profile,Instant expiresAt) { this(token,profile,expiresAt,SimulatorAccess.allowed(profile)); }
+        public Exchange(String token,Profile profile,Instant expiresAt) { this(token,profile,expiresAt,false); }
     }
     private record Ticket(Profile profile, String challenge, Instant expiresAt) {}
     private final Map<String, Ticket> tickets = new ConcurrentHashMap<>();
@@ -30,7 +32,9 @@ public class DemoSessions {
     public static final long LIFETIME_SECONDS=7*24*60*60;
     private final SecureRandom random = new SecureRandom();
     private final Clock clock;
-    public DemoSessions(Clock clock,AuthSessionStore sessions) { this.clock = clock;this.sessions=sessions; }
+    private final AccessDirectory access;
+    @Autowired public DemoSessions(Clock clock,AuthSessionStore sessions,AccessDirectory access) { this.clock=clock;this.sessions=sessions;this.access=access; }
+    public DemoSessions(Clock clock,AuthSessionStore sessions) { this(clock,sessions,new AccessDirectory(sessions.databaseUrl(),false)); }
     public static String digest(String value) {
         try {
             return Base64.getUrlEncoder().withoutPadding().encodeToString(
@@ -63,11 +67,13 @@ public class DemoSessions {
         String token = randomToken(); Instant createdAt=clock.instant(),expiry = createdAt.plusSeconds(LIFETIME_SECONDS);
         sessions.save(digest(token),found.profile(),createdAt,expiry);
         tickets.remove(digest(ticket));
-        return new Exchange(token, found.profile(), expiry);
+        return new Exchange(token, found.profile(), expiry,access.capabilities(found.profile()).canUseSimulator());
     }
     public Session find(String token) {
         prune();
-        return token == null || !token.matches("[A-Za-z0-9_-]{43}") ? null : sessions.find(digest(token),clock.instant());
+        if(token==null || !token.matches("[A-Za-z0-9_-]{43}"))return null;
+        var session=sessions.find(digest(token),clock.instant());
+        return session==null?null:new Session(session.profile(),session.expiresAt(),access.capabilities(session.profile()).canUseSimulator());
     }
     public void revoke(String token) { if (token != null && token.matches("[A-Za-z0-9_-]{43}")) sessions.revoke(digest(token),clock.instant()); }
 }

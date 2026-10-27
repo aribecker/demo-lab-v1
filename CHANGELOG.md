@@ -1,5 +1,14 @@
 # Historial de cambios
 
+## 27/10/2026 — Acceso configurable de Demo Lab por grupos
+
+- Especificación R48 y migración aditiva en el nuevo esquema demo_lab de la base compartida; Treasury conserva su esquema separado.
+- CRUD de usuarios, grupos y membresías con tres permisos independientes, comprobados en interfaz y API.
+- Ariel Becker inicialmente en los tres grupos; Everyone inicialmente en Trading Simulator para permitir acceso público.
+- Los cambios persisten entre despliegues; protección del último administrador y exclusión del esquema del explorador público.
+- Google OAuth continúa siendo requisito para identificar administradores; sus credenciales se configuran fuera del código.
+
+
 ## 27/10/2026 — Trading Simulator siempre visible
 
 - Menú y tarjeta de Home visibles para todas las sesiones.

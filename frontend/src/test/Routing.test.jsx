@@ -16,7 +16,7 @@ function HistoryControls() {
 }
 
 function open(path = '/', loader = vi.fn().mockResolvedValue(sample), history = false) {
-  const view = render(<MemoryRouter initialEntries={[path]}><App loader={loader} />{history && <HistoryControls />}</MemoryRouter>);
+  const view = render(<MemoryRouter initialEntries={[path]}><App loader={loader} authApi={{initialize:async()=>null,profile:async()=>null}} />{history && <HistoryControls />}</MemoryRouter>);
   return { ...view, loader };
 }
 
