@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 27/10/2026 — Conexión directa de Demo Lab a PostgreSQL
+
+- Credencial configurada únicamente en Render, fuera del repositorio.
+- Mapeo explícito de simulation.database-url mediante SPRING_APPLICATION_JSON.
+- Despliegue activo y conexión PostgreSQL confirmada en registros de ejecución.
+
 ## 27/10/2026 — Demo Lab en repositorio propio
 
 - Servicios demo-lab y demo-lab-api creados desde aribecker/demo-lab, rama main.

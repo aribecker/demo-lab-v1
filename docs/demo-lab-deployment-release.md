@@ -27,3 +27,11 @@ The original services, existing database, balances, control state and simulated 
 - The independent existing weather service did not respond within the initial verification timeout; weather availability and its CORS permission for the new frontend remain unverified.
 - No deployed database was accessed by build tests; Docker provisions a disposable PostgreSQL cluster.
 
+
+## PostgreSQL activation — 2026-10-27
+
+Owner supplied the existing internal connection through the conversation. Its value was saved only to the Render backend environment; it is omitted from this repository.
+
+Deploy dep-dbgei1ss728c738unhb0 reached live but /api/people/health still returned 503. Owner confirmed the environment entry existed. An explicit Spring property mapping via SPRING_APPLICATION_JSON was then applied without repeating the credential. Deploy dep-dbgena3l550s738rflf0 reached live. Runtime Flyway logs confirmed a connection to the existing PostgreSQL 17.11 database. This activation supersedes the earlier database-pending statements; OAuth and optional chatbot provider configuration remain separate pending work.
+
+Verification after activation: /health returned 200/UP; /api/people/health returned 200 with PostgreSQL UP; /api/database returned 200 and the existing bitcoin_shared and public schemas. No reset or simulated trade command was sent.

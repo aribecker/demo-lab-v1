@@ -15,3 +15,7 @@ Date: 2026-10-27. User authorized deployment in Ariel's workspace.
 - Successful builds and health checks do not imply login, database or chatbot activation. Verify these independently after secrets are supplied.
 
 Grounding: frontend/src/backendConfig.js, frontend/src/authClient.js, weather-service/src/main/resources/application.properties, weather-service/src/main/java/ariel/iteration2/weather/auth/AuthConfiguration.java and SimulationService.java. Source imported unchanged from db22fbccfc95ebb6020341ea10f860dc943e3bfb into eb0cc74780de39618236851e830077d06e3b605b.
+
+## Explicit Spring database mapping
+
+After SIMULATION_DATABASE_URL was saved, the first deployment still reported unavailable storage. Setting SPRING_APPLICATION_JSON to {"simulation":{"database-url":"${SIMULATION_DATABASE_URL}"}} explicitly maps the environment secret to the property consumed by repositories, without duplicating credentials. Both variables must remain configured in Render. No secret value belongs in source or this specification. This is a verified deployment workaround; the exact reason the original mapping did not take effect was not established.
