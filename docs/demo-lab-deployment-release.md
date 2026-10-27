@@ -22,6 +22,8 @@ The original services, existing database, balances, control state and simulated 
 - Initial frontend deploy live; HTTP 200 for /, /trading-simulator/ and /login/.
 - Frontend generated JavaScript contains the new backend origin and excludes the previous integrated API origin.
 - Initial backend deploy dep-dbge9gou01pc73fl3ftg reached live. Docker build ran 103 tests with zero failures, errors or skips.
-- Backend deploy dep-dbge9p636a0s73bnpur0 applies the assigned frontend origin; final runtime verification follows.
+- Backend deploy dep-dbge9p636a0s73bnpur0 reached live. /health returned HTTP 200 with status UP and Access-Control-Allow-Origin matching https://demo-lab-jeov.onrender.com.
+- /auth/providers returned HTTP 200 with all providers disabled, as expected without credentials. /api/people/health returned HTTP 503 confirming pending PostgreSQL configuration.
+- The independent existing weather service did not respond within the initial verification timeout; weather availability and its CORS permission for the new frontend remain unverified.
 - No deployed database was accessed by build tests; Docker provisions a disposable PostgreSQL cluster.
 
