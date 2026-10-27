@@ -1,5 +1,10 @@
 # Historial de cambios
 
+## 27/10/2026 — Everyone en la administración para revisión
+
+- Asignación solicitada de Everyone a Users administration y Groups administration mediante V2 optativa de una sola ejecución.
+- Conserva los permisos del propietario y el CRUD como autoridad; quitar Everyone no se revierte en reinicios.
+
 ## 27/10/2026 — Turquesa e íconos de navegación
 
 - R49 actualiza la especificación visual y sus tokens a una paleta verde azulada más alegre.

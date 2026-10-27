@@ -24,3 +24,10 @@ This specification supersedes the fixed owner-only authorization in R46 for Demo
 
 ## Validation and rollout
 Test anonymous Everyone access, verified owner and other identities, three independent permissions, CRUD validation and duplicates, membership changes on an existing token, initial seed persistence across restart, last-admin protection, authorization storage outage and private-schema exclusion. Test frontend anonymous/denied/authorized gates and CRUD flows. Apply additive Flyway migration via normal startup, deploy backend before frontend, verify public reads and anonymous administration denial without changing existing simulation state. OAuth remains separately configured.
+
+## Temporary administration review — 2026-10-27
+The owner explicitly requests Everyone membership in the Users administration and Groups administration groups as well, to examine the application without waiting for Google OAuth. This intentionally permits anonymous administration reads and writes through the same group checks. Keep the named owner in every group.
+
+Apply an opt-in, transactionally recorded V2 data migration in the existing demo_lab access history. ACCESS_REVIEW_EVERYONE_ADMINISTRATION=true on demo-lab-api enables the assignment on first application of V2; default false elsewhere. Do not use a per-request authorization bypass or a recurring environment override. V2 must not restore memberships after an administrator removes Everyone, even when the opt-in remains set at restart. The setting does not revoke grants when turned off; membership CRUD remains the authority. Existing fresh-install defaults outside this explicitly enabled deployment remain simulator-only. No Treasury, simulator-state or identity records change.
+
+Verify the one-time grant and removal persistence with isolated storage; in production confirm all three anonymous capabilities and the owner/Everyone memberships by read-only API calls.

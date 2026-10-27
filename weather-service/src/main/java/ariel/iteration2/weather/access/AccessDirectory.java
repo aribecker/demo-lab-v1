@@ -33,9 +33,12 @@ public class AccessDirectory {
  private final org.springframework.jdbc.datasource.AbstractDataSource source;
  private final TransactionTemplate transactions;
  private final boolean seedEveryone;
+ private final boolean reviewEveryoneAdministration;
  private volatile boolean ready;
- public AccessDirectory(@Value("${simulation.database-url:}")String url,@Value("${access.seed-everyone-simulator:true}")boolean seedEveryone){
-  connections=new DatabaseConnections(url);this.seedEveryone=seedEveryone;
+ public AccessDirectory(String url,boolean seedEveryone){this(url,seedEveryone,false);}
+ @org.springframework.beans.factory.annotation.Autowired
+ public AccessDirectory(@Value("${simulation.database-url:}")String url,@Value("${access.seed-everyone-simulator:true}")boolean seedEveryone,@Value("${access.review-everyone-administration:false}")boolean reviewEveryoneAdministration){
+  connections=new DatabaseConnections(url);this.seedEveryone=seedEveryone;this.reviewEveryoneAdministration=reviewEveryoneAdministration;
   source=new AbstractDataSource(){public Connection getConnection()throws SQLException{return connections.open();}public Connection getConnection(String u,String p)throws SQLException{return getConnection();}};
   db=new JdbcTemplate(source);db.setQueryTimeout(15);transactions=new TransactionTemplate(new DataSourceTransactionManager(source));
  }
@@ -49,7 +52,7 @@ public class AccessDirectory {
   if(ready)return;
   try{
    String schema;try(var c=source.getConnection()){schema=c.getMetaData().getDatabaseProductName().equals("H2")?"DEMO_LAB":"demo_lab";}
-   Flyway.configure().dataSource(source).schemas(schema).defaultSchema(schema).table("access_schema_history").locations("classpath:db/access-migration").load().migrate();
+   Flyway.configure().dataSource(source).schemas(schema).defaultSchema(schema).table("access_schema_history").locations("classpath:db/access-migration").javaMigrations(new V2__Review_everyone_administration(reviewEveryoneAdministration)).load().migrate();
    transactions.execute(status->{
     boolean done=db.queryForObject("SELECT initialized FROM demo_lab.bootstrap_state WHERE id=1 FOR UPDATE",Boolean.class);
     if(!done){

@@ -35,6 +35,10 @@
       {
         "key": "SPRING_APPLICATION_JSON",
         "value": "{\"simulation\":{\"database-url\":\"${SIMULATION_DATABASE_URL}\"}}"
+      },
+      {
+        "key": "ACCESS_REVIEW_EVERYONE_ADMINISTRATION",
+        "value": "true"
       }
     ],
     "serviceId": "srv-dbge9g0u01pc73fl3f7g",
@@ -87,7 +91,8 @@
     "Direct MCP deployment configuration; not Blueprint syntax.",
     "Secret values must be configured in Render Environment, never in this file.",
     "Original integrated services are retained; their clients and secrets have not been changed.",
-    "SIMULATION_DATABASE_URL configured in Render; explicit Spring JSON mapping is required on this deployment. OAuth/provider credentials remain pending transfer."
+    "SIMULATION_DATABASE_URL configured in Render; explicit Spring JSON mapping is required on this deployment. OAuth/provider credentials remain pending transfer.",
+    "Owner-authorized review: V2 grants Everyone Users/Groups once; subsequent membership edits persist even with the opt-in set."
   ],
   "retainedWeather": {
     "serviceId": "srv-db2rlbnlk1mc738gjtfg",

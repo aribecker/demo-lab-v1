@@ -54,6 +54,21 @@ class AccessDirectoryTest {
   db.replaceMembers(group.id(),new AccessDirectory.MemberInput(List.of(everyone)));
   assertThat(db.capabilities(null).canManageUsers()).isTrue();
  }
+ @Test void optInReviewGrantsAdministrationOnceAndNeverRegrantsAfterRemoval(){
+  String url=url();
+  // Simulate upgrading the existing V1 deployment rather than only a new install.
+  var source=new org.springframework.jdbc.datasource.DriverManagerDataSource(url);
+  org.flywaydb.core.Flyway.configure().dataSource(source).schemas("DEMO_LAB").defaultSchema("DEMO_LAB").table("access_schema_history").locations("classpath:db/access-migration").target("1").load().migrate();
+  var db=new AccessDirectory(url,true,true);
+  assertThat(db.capabilities(null)).isEqualTo(new AccessDirectory.Capabilities(true,true,true));
+  var owner=db.users().stream().filter(u->"owner".equals(u.systemKey())).findFirst().get();
+  for(var group:db.groups()) {
+   assertThat(db.members(group.id()).memberIds()).contains(owner.id());
+   if(group.permissions().contains("USERS")||group.permissions().contains("GROUPS"))db.replaceMembers(group.id(),new AccessDirectory.MemberInput(List.of(owner.id())));
+  }
+  assertThat(new AccessDirectory(url,true,true).capabilities(null)).isEqualTo(new AccessDirectory.Capabilities(true,false,false));
+  assertThat(new AccessDirectory(url,true,false).capabilities(null)).isEqualTo(new AccessDirectory.Capabilities(true,false,false));
+ }
  @Test void missingStorageNeverAllowsEveryone(){assertThatThrownBy(()->new AccessDirectory("",true).capabilities(null)).isInstanceOf(AccessDirectory.Problem.class);}
 
  @Test @org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named="SIMULATION_TEST_DATABASE_URL",matches=".+")
@@ -64,7 +79,7 @@ class AccessDirectoryTest {
   try(var c=java.sql.DriverManager.getConnection(admin);var st=c.createStatement()){st.execute("CREATE DATABASE "+name);}
   String url=admin.replaceFirst("/[^/?]+(?=\\?|$)","/"+name);
   try {
-   var db=new AccessDirectory(url,true);assertThat(db.capabilities(null).canUseSimulator()).isTrue();
+   var db=new AccessDirectory(url,true,true);assertThat(db.capabilities(null)).isEqualTo(new AccessDirectory.Capabilities(true,true,true));
    assertThat(db.capabilities(profile("aribecker2@gmail.com",true)).canManageGroups()).isTrue();
    assertThat(new ariel.iteration2.weather.database.DatabaseExplorerRepository(url).catalog().schemas()).noneMatch(schema->schema.name().equals("demo_lab"));
    var group=db.groups().stream().filter(g->g.permissions().contains("SIMULATOR")).findFirst().get();
