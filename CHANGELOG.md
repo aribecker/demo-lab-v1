@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 27/10/2026 — Filas administrativas legibles en celular
+
+- R50 especifica datos y acciones en regiones separadas, con datos arriba en pantallas de hasta 820px.
+- Users y Groups usan el bloque compartido record-list; botones cortos y nombres accesibles con contexto.
+- El contrato CSS impide volver a comprimir los nombres entre botones y cubre el ajuste de filas.
+
 ## 27/10/2026 — Pantalla en blanco al alternar Users y Groups
 
 - Cada ruta administrativa monta su propio estado de formulario, listado y membresías.

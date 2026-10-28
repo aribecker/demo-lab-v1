@@ -37,6 +37,16 @@ for (const file of files) {
   for (const match of text.matchAll(/\.([a-z][\w-]*)/g)) assert(bem.test(match[1]), `${file}: invalid selector ${match[1]}`);
   assert(!/#[a-z][\w-]*\s*[>{,:.\[]/i.test(text), `${file}: ID styling is forbidden`);
 }
+// R50 guards the responsive shared CRUD contract against the squeezed-title regression.
+const records = await readFile(path.join(styles, 'records.css'), 'utf8');
+const rule = selector => records.match(new RegExp(selector.replaceAll('.', '\\.') + '\\s*\\{([^}]+)\\}'))?.[1] ?? '';
+assert(/flex-wrap\s*:\s*wrap/.test(rule('.record-list__item')), 'Record rows must wrap rather than squeeze names');
+assert(/flex-wrap\s*:\s*wrap/.test(rule('.record-list__actions')), 'Record actions must wrap within their region');
+for (const selector of ['.record-list__details', '.record-list__actions']) {
+  assert(/min-width\s*:\s*0/.test(rule(selector)) && /max-width\s*:\s*100%/.test(rule(selector)), `${selector}: children must stay within the panel`);
+}
+assert(/flex\s*:\s*1\s+1\s+16rem/.test(rule('.record-list__details')), 'Record details must have space to grow');
+assert(/@media\s*\(max-width\s*:\s*820px\)\s*\{\s*\.record-list__details\s*\{\s*flex-basis\s*:\s*100%;?\s*\}\s*\.record-list__actions\s*\{\s*width\s*:\s*100%;?\s*\}/.test(records), 'Small-screen record details and actions must each occupy a full row');
 const colors = Object.fromEntries([...tokens.matchAll(/--color-([\w-]+):\s*(#[\da-f]{6});/g)].map(m => [m[1], m[2]]));
 const specification = await readFile(path.join(root, '../specs/design-system.md'), 'utf8');
 for (const [, value] of tokens.matchAll(/--color-[\w-]+:\s*([^;]+);/g)) assert(specification.includes(value.trim()), `Palette value absent from specification: ${value}`);

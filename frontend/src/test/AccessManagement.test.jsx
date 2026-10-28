@@ -1,5 +1,5 @@
 import React from 'react';
-import {act,fireEvent,render,screen,waitFor} from '@testing-library/react';
+import {act,fireEvent,render,screen,waitFor,within} from '@testing-library/react';
 import {MemoryRouter} from 'react-router';
 import {expect,it,vi} from 'vitest';
 import App from '../App.jsx';
@@ -28,8 +28,8 @@ it('a named user administrator can create edit and delete a user',async()=>{
  await screen.findByText('Ariel Becker');
  fireEvent.change(screen.getByLabelText('First name'),{target:{value:'Jane'}});fireEvent.change(screen.getByLabelText('Last name'),{target:{value:'Doe'}});fireEvent.change(screen.getByLabelText('Email'),{target:{value:'jane@example.test'}});fireEvent.click(screen.getByRole('button',{name:'Save user'}));
  await screen.findByText('Jane Doe');expect(api.saveRecord).toHaveBeenCalledWith('users',null,{firstName:'Jane',lastName:'Doe',email:'jane@example.test'},expect.any(AbortSignal));
- fireEvent.click(screen.getByRole('button',{name:'Edit Jane'}));fireEvent.change(screen.getByLabelText('First name'),{target:{value:'Janet'}});fireEvent.click(screen.getByRole('button',{name:'Save user'}));await screen.findByText('Janet Doe');
- fireEvent.click(screen.getByRole('button',{name:'Delete Janet'}));await waitFor(()=>expect(screen.queryByText('Janet Doe')).not.toBeInTheDocument());
+ fireEvent.click(screen.getByRole('button',{name:'Edit Jane Doe'}));fireEvent.change(screen.getByLabelText('First name'),{target:{value:'Janet'}});fireEvent.click(screen.getByRole('button',{name:'Save user'}));await screen.findByText('Janet Doe');
+ fireEvent.click(screen.getByRole('button',{name:'Delete Janet Doe'}));await waitFor(()=>expect(screen.queryByText('Janet Doe')).not.toBeInTheDocument());
  expect(api.deleteRecord).toHaveBeenCalledWith('users',3,expect.any(AbortSignal));
 });
 it('group administrators can explicitly assign Everyone to a permission group',async()=>{
@@ -55,7 +55,7 @@ it('isolates users and groups forms and membership state during repeated menu na
  const api={listRecords:vi.fn(async kind=>kind==='users'?users:groups),readMembers:vi.fn(async()=>({users,memberIds:[1]}))};
  open('/users',auth(null,caps(true,true,true)),api);
  await screen.findByText('Ariel Becker');
- fireEvent.click(screen.getByRole('button',{name:'Edit Ariel'}));
+ fireEvent.click(screen.getByRole('button',{name:'Edit Ariel Becker'}));
  fireEvent.change(screen.getByLabelText('First name'),{target:{value:'Unsaved user'}});
  const navigate=label=>{fireEvent.click(screen.getByRole('button',{name:'Menu',exact:true}));fireEvent.click(screen.getByRole('link',{name:label,exact:true}));};
  navigate('Groups');
@@ -88,4 +88,14 @@ it('ignores an old users response after navigating to groups while loading',asyn
  await act(async()=>finishUsers([{id:1,firstName:'Stale',lastName:'Person',email:'stale@example.test',principalKind:'USER'}]));
  expect(screen.getByRole('button',{name:'Edit Destination group'})).toBeInTheDocument();
  expect(screen.queryByText('Stale Person')).not.toBeInTheDocument();
+});
+
+it('keeps long group names in the record and gives short actions their full accessible context',async()=>{
+ const name='Administración de usuarios y grupos con un nombre largo para revisión móvil';
+ const api={listRecords:vi.fn(async()=>[{id:7,name,permissions:['USERS','GROUPS']}])};
+ open('/groups',auth(null,caps(true,true,true)),api);
+ await screen.findByText(name,{exact:true});
+ const actions=screen.getByRole('group',{name:`Actions for ${name}`});
+ for(const [label,visible] of [[`Edit ${name}`,'Edit'],[`Delete ${name}`,'Delete'],[`Members of ${name}`,'Members']])expect(within(actions).getByRole('button',{name:label,exact:true})).toHaveTextContent(new RegExp(`^${visible}$`));
+ expect(api.listRecords).toHaveBeenCalledWith('groups',expect.any(AbortSignal));
 });

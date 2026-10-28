@@ -31,12 +31,18 @@ export default function AccessManagement({kind,api=defaultApi}) {
    <p className="people__note">Everyone represents all visitors, including people without login. Assigning Everyone to a group makes its section permissions public.</p>
    {loading&&<p role="status">Loading {kind}…</p>}{error&&<p role="alert" className="notice notice--error">{error}</p>}{notice&&<p role="status">{notice}</p>}
    <button className="button" disabled={saving||loading} onClick={()=>run(signal=>load(signal),'List refreshed.')}>Refresh list</button>
-   <ul className="people__list" aria-label={`Saved ${kind}`}>
-    {rows.map(row=><li key={row.id}><span><strong>{groupMode?row.name:`${row.firstName} ${row.lastName}`}</strong><small>#{row.id} · {groupMode?row.permissions.map(p=>sections[p]).join(', '):row.email||'Special principal'}</small></span>
-     {(groupMode||row.principalKind!=='EVERYONE')&&<button className="button" disabled={saving} onClick={()=>edit(row)}>Edit {groupMode?row.name:row.firstName}</button>}
-     {(groupMode||!row.systemKey)&&<button className="button" disabled={saving} onClick={()=>remove(row)}>Delete {groupMode?row.name:row.firstName}</button>}
-     {groupMode&&<button className="button" disabled={saving} onClick={()=>openMembers(row)}>Members of {row.name}</button>}
-    </li>)}
+   <ul className="record-list" aria-label={`Saved ${kind}`}>
+    {rows.map(row=>{
+     const name=groupMode?row.name:`${row.firstName} ${row.lastName}`;
+     return <li className="record-list__item" key={row.id}>
+      <div className="record-list__details"><strong className="record-list__title">{name}</strong><small className="record-list__meta">#{row.id} · {groupMode?row.permissions.map(p=>sections[p]).join(', '):row.email||'Special principal'}</small></div>
+      <div className="record-list__actions" role="group" aria-label={`Actions for ${name}`}>
+       {(groupMode||row.principalKind!=='EVERYONE')&&<button className="button" aria-label={`Edit ${name}`} disabled={saving} onClick={()=>edit(row)}>Edit</button>}
+       {(groupMode||!row.systemKey)&&<button className="button" aria-label={`Delete ${name}`} disabled={saving} onClick={()=>remove(row)}>Delete</button>}
+       {groupMode&&<button className="button" aria-label={`Members of ${row.name}`} disabled={saving} onClick={()=>openMembers(row)}>Members</button>}
+      </div>
+     </li>;
+    })}
    </ul>
    <h2>{id?'Edit':'Create'} {groupMode?'group':'user'}</h2>
    <form onSubmit={submit}>
