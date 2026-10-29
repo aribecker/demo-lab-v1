@@ -1,8 +1,12 @@
+import ConsultationWizard from './ConsultationWizard';
+import AdminPanel from './AdminPanel';
 import { useEffect, useRef, useState } from 'react';
 import './styles.css';
 
 export default function App() {
-  const [view, setView] = useState('home');
+  const [view, setView] = useState(window.location.hash === '#administracion' ? 'admin' : 'home');
+  const apiBase = import.meta.env.VITE_API_URL || '';
+  const integrated = import.meta.env.VITE_CONSULTATIONS_API === 'true';
   const [service, setService] = useState('');
   const formHeading = useRef(null);
   useEffect(() => {
@@ -27,6 +31,7 @@ export default function App() {
 </div>
 </header>
 <main>
+{view === "admin" && <AdminPanel apiBase={apiBase}/> }
 <div id="home" className="ms-view" hidden={view !== "home"}>
 <section className="ms-hero-band">
 <div className="ms-container ms-hero">
@@ -144,7 +149,7 @@ export default function App() {
 <h2 ref={formHeading} tabIndex={-1}>Dejá tu consulta</h2>
 <p>Describí tu situación con claridad. No incluyas contraseñas, datos bancarios ni información confidencial de terceros.</p>
 </div>
-<div className="ms-form-layout">
+{integrated ? <ConsultationWizard apiBase={apiBase}/> : <div className="ms-form-layout">
 <div className="ms-panel">
 <form id="form" action="https://formsubmit.co/conta.conmigo.1234@gmail.com" method="POST">
 <input type="hidden" name="_subject" value="Nueva consulta contable desde la plataforma" />
@@ -205,7 +210,7 @@ export default function App() {
 <hr className="ms-divider" />
 <p className="ms-text ms-text--fine">El formulario utiliza el servicio externo FormSubmit para enviar las consultas al correo del estudio. El destinatario debe activar FormSubmit antes de recibir consultas. No envíes información sensible ni documentación confidencial por este formulario.</p>
 </aside>
-</div>
+</div>}
 </div>
 </section>
 </div>

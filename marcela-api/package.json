@@ -1,1 +1,1 @@
-{"name":"marcela-api","private":true,"type":"module","scripts":{"start":"node server.js","test":"node --test"},"dependencies":{"express":"^5.1.0","pg":"^8.16.3"}}
+{"name":"marcela-api","private":true,"type":"module","scripts":{"start":"node server.js","test":"node --test"},"dependencies":{"express":"^5.1.0","express-rate-limit":"^8.7.2","nodemailer":"^10.3.1","pg":"^8.16.3"}}

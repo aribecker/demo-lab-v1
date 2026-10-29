@@ -1,11 +1,23 @@
 import express from 'express';
 import pg from 'pg';
+import {rateLimit} from 'express-rate-limit';
+import nodemailer from 'nodemailer';
 import {randomUUID, timingSafeEqual, createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import {catalog,procedures,validateRequest} from './catalog.js';
 const app=express();
 app.disable('x-powered-by');
 app.use(express.json({limit:'20kb'}));
+// Optional one-time provisioning; remove BOOTSTRAP_DATABASE_URL after first deploy.
+if(process.env.BOOTSTRAP_DATABASE_URL){
+ const bootstrap=new pg.Client({connectionString:process.env.BOOTSTRAP_DATABASE_URL});await bootstrap.connect();
+ try{const target=new URL(process.env.DATABASE_URL);const user=decodeURIComponent(target.username),password=decodeURIComponent(target.password);
+ if(!/^[a-z_][a-z0-9_]+$/.test(user))throw Error('Nombre de rol inválido');
+ const existing=await bootstrap.query('SELECT 1 FROM pg_roles WHERE rolname=$1',[user]);
+ if(!existing.rowCount)await bootstrap.query(`CREATE ROLE "${user}" LOGIN PASSWORD '${password.replaceAll("'","''")}'`);
+ await bootstrap.query(`CREATE SCHEMA IF NOT EXISTS marcela AUTHORIZATION "${user}"`);
+ }finally{await bootstrap.end();}
+}
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,max:3});
 app.use((req,res,next)=>{res.set('Cache-Control','no-store');const origin=req.get('origin');if(origin && origin!==process.env.FRONTEND_ORIGIN)return res.status(403).json({message:'Origen no autorizado'}); if(origin)res.set('Access-Control-Allow-Origin',origin);res.set('Access-Control-Allow-Headers','Content-Type, Authorization, Idempotency-Key');res.set('Access-Control-Allow-Methods','GET,POST,PATCH,OPTIONS');if(req.method==='OPTIONS')return res.sendStatus(204);next();});
 app.get('/health',async(req,res)=>{await pool.query('SELECT 1');res.json({status:'ok'});});
@@ -13,8 +25,9 @@ const categories=async()=> (await pool.query('SELECT definition FROM marcela.con
 app.get('/api/catalog',async(req,res)=>res.json({categories:await categories(),procedures}));
 const uuid=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 async function transaction(fn){const c=await pool.connect();try{await c.query('BEGIN');const r=await fn(c);await c.query('COMMIT');return r;}catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}}
-app.post('/api/requests',async(req,res)=>{
- let payload;try{payload=validateRequest(req.body,await categories());}catch(e){return res.status(422).json({message:e.message});}
+app.post('/api/requests',rateLimit({windowMs:3600000,limit:15,standardHeaders:'draft-8',legacyHeaders:false}),async(req,res)=>{
+ const availableCategories=await categories();
+ let payload;try{payload=validateRequest(req.body,availableCategories);}catch(e){return res.status(422).json({message:e.message});}
  const key=req.get('Idempotency-Key');if(!uuid(key))return res.status(400).json({message:'Identificador de envío inválido'});
  const result=await transaction(async c=>{
   const id=randomUUID();const inserted=await c.query('INSERT INTO marcela.consultation_requests(id,idempotency_key,payload) VALUES($1,$2,$3) ON CONFLICT(idempotency_key) DO NOTHING RETURNING id,status',[id,key,payload]);
@@ -37,9 +50,24 @@ app.get('/api/admin/requests',async(req,res)=>{
 });
 app.use('/api/admin/requests/:id',(req,res,next)=>uuid(req.params.id)?next():res.status(400).json({message:'Identificador inválido'}));
 app.get('/api/admin/requests/:id',async(req,res)=>{const request=(await pool.query('SELECT * FROM marcela.consultation_requests WHERE id=$1',[req.params.id])).rows[0];if(!request)return res.sendStatus(404);res.json({...request,messages:(await pool.query('SELECT * FROM marcela.consultation_messages WHERE request_id=$1 ORDER BY created_at',[req.params.id])).rows,history:(await pool.query('SELECT * FROM marcela.request_status_history WHERE request_id=$1 ORDER BY created_at',[req.params.id])).rows,notifications:(await pool.query('SELECT id,kind,status,attempts FROM marcela.notification_logs WHERE request_id=$1',[req.params.id])).rows});});
-app.post('/api/admin/requests/:id/notes',async(req,res)=>{const body=req.body.body?.trim();if(!body||body.length>5000)return res.sendStatus(422);await pool.query('INSERT INTO marcela.consultation_messages(id,request_id,kind,body) VALUES($1,$2,$3,$4)',[randomUUID(),req.params.id,'INTERNA',body]);res.sendStatus(201);});
+app.post('/api/admin/requests/:id/notes',async(req,res)=>{const body=typeof req.body.body==='string'?req.body.body.trim():'';if(!body||body.length>5000)return res.sendStatus(422);await pool.query('INSERT INTO marcela.consultation_messages(id,request_id,kind,body) VALUES($1,$2,$3,$4)',[randomUUID(),req.params.id,'INTERNA',body]);res.sendStatus(201);});
 app.patch('/api/admin/requests/:id/status',async(req,res)=>{if(!['RECIBIDA','EN_REVISION','RESPONDIDA'].includes(req.body.status))return res.sendStatus(422);await transaction(async c=>{const row=(await c.query('SELECT status FROM marcela.consultation_requests WHERE id=$1 FOR UPDATE',[req.params.id])).rows[0];if(!row)throw Object.assign(new Error('Solicitud inexistente'),{status:404});await c.query('UPDATE marcela.consultation_requests SET status=$1,updated_at=now() WHERE id=$2',[req.body.status,req.params.id]);await c.query('INSERT INTO marcela.request_status_history(id,request_id,previous_status,status) VALUES($1,$2,$3,$4)',[randomUUID(),req.params.id,row.status,req.body.status]);});res.sendStatus(204);});
+app.post('/api/admin/requests/:id/responses',async(req,res)=>{
+ const body=typeof req.body.body==='string'?req.body.body.trim():'';if(!body||body.length>5000)return res.sendStatus(422);
+ await transaction(async c=>{const row=(await c.query('SELECT payload,status FROM marcela.consultation_requests WHERE id=$1 FOR UPDATE',[req.params.id])).rows[0];if(!row)throw Object.assign(new Error('Solicitud inexistente'),{status:404});
+ await c.query('INSERT INTO marcela.consultation_messages(id,request_id,kind,body) VALUES($1,$2,$3,$4)',[randomUUID(),req.params.id,'RESPUESTA',body]);
+ await c.query('INSERT INTO marcela.notification_logs(id,request_id,recipient,kind,body) VALUES($1,$2,$3,$4,$5)',[randomUUID(),req.params.id,row.payload.email,'RESPUESTA',body]);});res.status(201).json({notification:'PENDIENTE'});
+});
+app.get('/api/admin/config', (req,res)=>res.json({mailConfigured:!!process.env.SMTP_URL}));
 app.use((err,req,res,next)=>res.status(err.status||503).json({message:err.status?err.message:'No pudimos completar la operación. Intentá nuevamente.'}));
 if(!process.env.DATABASE_URL)throw new Error('DATABASE_URL es obligatorio');
 await transaction(async c=>{await c.query(await readFile(new URL('./schema.sql',import.meta.url),'utf8'));for(const category of catalog)await c.query('INSERT INTO marcela.consultation_categories VALUES($1,$2) ON CONFLICT DO NOTHING',[category.id,category]);});
-app.listen(process.env.PORT||3001,'0.0.0.0');
+const server=app.listen(process.env.PORT||3001,'0.0.0.0');
+let sending=false;
+const transport=process.env.SMTP_URL?nodemailer.createTransport(process.env.SMTP_URL):null;
+const timer=setInterval(async()=>{
+ if(!transport||sending)return;sending=true;
+ try{await transaction(async c=>{const rows=(await c.query("SELECT * FROM marcela.notification_logs WHERE status='PENDIENTE' AND attempts<5 ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 10")).rows;
+ for(const row of rows){try{await transport.sendMail({from:process.env.MAIL_FROM,to:row.recipient,subject:'Marcela Schpilberg — solicitud '+row.request_id,text:row.body});await c.query("UPDATE marcela.notification_logs SET status='ENVIADO',attempts=attempts+1 WHERE id=$1",[row.id]);}catch{await c.query("UPDATE marcela.notification_logs SET attempts=attempts+1,status=CASE WHEN attempts>=4 THEN 'FALLIDO' ELSE 'PENDIENTE' END WHERE id=$1",[row.id]);}}});}catch{console.error('No se pudo procesar la cola de notificaciones');}finally{sending=false;}
+},60000);
+process.on('SIGTERM',()=>{clearInterval(timer);server.close(async()=>{await pool.end();process.exit(0);});});
