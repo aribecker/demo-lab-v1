@@ -1,0 +1,6 @@
+import {it,expect,vi} from 'vitest';
+import {render,screen,fireEvent} from '@testing-library/react';
+import ConsultationWizard from './ConsultationWizard';
+const catalog={categories:[{id:'CLASES',label:'Clases y apoyo académico',areas:['Contabilidad','No estoy seguro / Otro'],needs:['Clase individual']}],procedures:['ARCA']};
+it('muestra catálogo recibido del servidor y conserva datos al volver',async()=>{vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>catalog}));render(<ConsultationWizard/>);fireEvent.click(await screen.findByText('Clases y apoyo académico'));fireEvent.change(screen.getByLabelText('Área temática *'),{target:{value:'Contabilidad'}});fireEvent.click(screen.getByText('Continuar'));fireEvent.change(screen.getByLabelText('Nombre y apellido *'),{target:{value:'Persona Prueba'}});fireEvent.click(screen.getByText('Volver'));fireEvent.click(screen.getByText('Continuar'));expect(screen.getByLabelText('Nombre y apellido *')).toHaveValue('Persona Prueba');});
+it('informa error de catálogo sin confirmar recepción',async()=>{vi.stubGlobal('fetch',vi.fn().mockRejectedValue(Error('offline')));render(<ConsultationWizard/>);expect(await screen.findByRole('alert')).toHaveTextContent('No pudimos cargar');expect(screen.queryByText('¡Gracias por tu consulta!')).not.toBeInTheDocument();});
