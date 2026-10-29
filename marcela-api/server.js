@@ -8,16 +8,6 @@ import {catalog,procedures,validateRequest} from './catalog.js';
 const app=express();
 app.disable('x-powered-by');
 app.use(express.json({limit:'20kb'}));
-// Optional one-time provisioning; remove BOOTSTRAP_DATABASE_URL after first deploy.
-if(process.env.BOOTSTRAP_DATABASE_URL){
- const bootstrap=new pg.Client({connectionString:process.env.BOOTSTRAP_DATABASE_URL});await bootstrap.connect();
- try{const target=new URL(process.env.DATABASE_URL);const user=decodeURIComponent(target.username),password=decodeURIComponent(target.password);
- if(!/^[a-z_][a-z0-9_]+$/.test(user))throw Error('Nombre de rol inválido');
- const existing=await bootstrap.query('SELECT 1 FROM pg_roles WHERE rolname=$1',[user]);
- if(!existing.rowCount)await bootstrap.query(`CREATE ROLE "${user}" LOGIN PASSWORD '${password.replaceAll("'","''")}'`);
- await bootstrap.query(`CREATE SCHEMA IF NOT EXISTS marcela AUTHORIZATION "${user}"`);
- }finally{await bootstrap.end();}
-}
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,max:3});
 app.use((req,res,next)=>{res.set('Cache-Control','no-store');const origin=req.get('origin');if(origin && origin!==process.env.FRONTEND_ORIGIN)return res.status(403).json({message:'Origen no autorizado'}); if(origin)res.set('Access-Control-Allow-Origin',origin);res.set('Access-Control-Allow-Headers','Content-Type, Authorization, Idempotency-Key');res.set('Access-Control-Allow-Methods','GET,POST,PATCH,OPTIONS');if(req.method==='OPTIONS')return res.sendStatus(204);next();});
 app.get('/health',async(req,res)=>{await pool.query('SELECT 1');res.json({status:'ok'});});
