@@ -1,0 +1,20 @@
+{
+  "repository": "https://github.com/aribecker/contaconmigo",
+  "branch": "main",
+  "frontend": {
+    "name": "contaconmigo",
+    "buildCommand": "cd frontend && npm ci && npm test && VITE_CONSULTATIONS_API=true VITE_API_URL=https://contaconmigo-api.onrender.com npm run build",
+    "publishPath": "frontend/dist"
+  },
+  "api": {
+    "name": "contaconmigo-api",
+    "buildCommand": "cd api && npm ci && npm test",
+    "startCommand": "cd api && npm start",
+    "region": "oregon",
+    "plan": "free",
+    "frontendOrigin": "https://contaconmigo.onrender.com"
+  },
+  "postgresInstance": "ariel-sdd-people-db",
+  "database": "ariel_sdd_people_db",
+  "schema": "contaconmigo"
+}

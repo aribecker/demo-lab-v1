@@ -1,5 +1,0 @@
-# R45 grounding — before generation
-
-Base integrated branch b73b5436eaf54a74bbdb6af4b072861f8afbcd9e. RateQueryHistory.java owns bounded ID-cursor history pages and durable audit data. Add server-side successful-reading periods using SQL LAG, cumulative boundary sum and grouped MIN/MAX/count in a repeatable-read transaction. Reuse the existing table and indexes; no migration. SimulationService/Controller expose a read-only periods route. Existing H2 and disposable PostgreSQL fixtures verify the same boundary semantics.
-
-RateQueryHistory.jsx currently loads25 rows and supports explicit older paging; extend its request generation/abort protection with all-pages loading and selected view. Add period loader in rateQueryClient.js; preserve existing loader injection for tests and shared-snapshot ownership. Full-history views must not call simulation commands. Extend the existing central bitcoin.css with a toolbar only. Tests cover strict60-second grouping on the server and progressive/cancel/retry/view-switch behavior on the client. Existing deployment targets and global balances stay unchanged.

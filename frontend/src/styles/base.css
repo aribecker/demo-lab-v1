@@ -1,6 +1,0 @@
-:root { font-family: var(--font-sans); color: var(--color-text); background: var(--color-canvas); font-synthesis: none; text-rendering: optimizeLegibility; color-scheme: dark; }
-* { box-sizing: border-box; }
-body { margin:0; min-width: 320px; background: radial-gradient(ellipse at 65% 5%, var(--color-glow), transparent 60%); }
-a { color: var(--color-accent); text-underline-offset: 4px; }
-button, a { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible { outline:var(--focus-width) solid var(--color-focus); outline-offset:var(--focus-offset); }

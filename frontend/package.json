@@ -1,16 +1,16 @@
 {
-  "name": "weather-iteration-2",
+  "name": "contaconmigo",
   "private": true,
-  "version": "2.14.0",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build && node scripts/static-routes.mjs",
+    "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node scripts/check-styles.mjs && vitest run"
+    "test": "vitest run"
   },
   "dependencies": {
     "react": "19.3.1",
