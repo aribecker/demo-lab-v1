@@ -1,0 +1,9 @@
+# Despliegue Marcela — 29 octubre 2026 (Buenos Aires)
+
+Decisión explícita del usuario: aplicaciones de prueba; reutilizar usuario y clave de las otras aplicaciones y separar datos en esquema marcela. Esta decisión sustituye para este entorno el requisito de rol exclusivo en change-request-consultas-integrales.md. El esquema separa objetos, no restringe los permisos del usuario compartido. No se utilizan credenciales de bootstrap ni se crean roles nuevos.
+
+API creada: srv-dbhu9uvb9u1s73b16osg, https://marcela-schpilberg-api.onrender.com, rama marcela-consultas-sdd-fase1, plan free. Deploy dep-dbhu9v7b9u1s73b16qvg live, commit b033cd6854670fb310ce76f125416da7a8851a7a. /health devuelve ok. GET /api/catalog devuelve las tres categorías desde Postgres. Prueba real con email qa@example.invalid: solicitud persistida RECIBIDA, historial inicial, reintento idempotente devuelve el mismo id, dos notificaciones PENDIENTE. SMTP no configurado y ningún email fue enviado.
+
+Frontend existente srv-dbfmuhijnfac73cvbu8g cambiado a rama marcela-consultas-sdd-fase1. Build conserva npm ci y npm test y activa VITE_CONSULTATIONS_API=true, VITE_API_URL=https://marcela-schpilberg-api.onrender.com sólo en npm run build. Deploy frontend dep-dbhuarfb9u1s73b19ckg iniciado; verificar estado terminal antes de afirmar publicación.
+
+Administración: /#administracion, clave privada ADMIN_TOKEN en Environment del servicio API, no publicada en Git. Pendiente configurar SMTP_URL y MAIL_FROM con remitente autorizado. Google no se implementó; no es necesario para el mecanismo inicial. Pendientes de aceptación: envío de correo real, ampliación de filtros y paginación del panel, controles de transición y sesiones de administrador, revisión visual responsive y pruebas de integración más completas. No declarar fase 1 cerrada por estar publicado el backend.
