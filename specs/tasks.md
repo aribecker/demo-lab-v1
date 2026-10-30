@@ -107,3 +107,15 @@
 - [x] Implement durable hash-only sessions, browser persistence, revocation and cross-tab identity updates.
 - [x] Pass local frontend/style/build and Java tests; PostgreSQL tests run in Render's disposable build database.
 - [x] Deploy API then frontend, verify migration/privacy and publish owner activation steps.
+
+
+## R48 — Gómez BTC cycles (parallel branch)
+
+- [x] Publish source-of-truth strategy specification before implementation.
+- [x] Ground changes in the current integrated branch and record the separate Demo Lab repository boundary.
+- [x] Add deterministic BTC sell/rebuy engine, atomic relaunch, configurable polling and deferred cycle stop.
+- [x] Add didactic controls, formulas, BTC results and explicit fee assumptions with the central design system.
+- [x] Run frontend tests and production build.
+- [x] Complete disposable PostgreSQL backend checks and package verification: 114 backend tests, no skips.
+- [x] Publish implementation and validation evidence to the independent branch (docs/gomez-trading-release.md).
+- [ ] Merge/deploy only after a subsequent user instruction.

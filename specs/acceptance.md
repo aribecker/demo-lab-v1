@@ -175,3 +175,8 @@ See `simulator-access.md` for the full matrix. Anonymous direct entry shows a lo
 
 ## R47 acceptance
 Closing/reopening the browser and restarting the API preserve an unrevoked login for up to seven days. Sign out revokes it across tabs and API instances. Expiry/401 clears browser token; temporary failures retain it for retry and fail closed. PostgreSQL stores hashes, not raw tokens; auth_private cannot be browsed. Owner-only simulator access and all existing persisted data are unchanged. See persistent-login.md for the full test and rollout contract.
+
+
+## R48 — Gómez BTC sell/rebuy cycles
+
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.

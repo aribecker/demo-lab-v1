@@ -40,12 +40,13 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
   const started = s.phase !== 'inactive';
   const funded = started;
   const adaptive=s.strategy === 'adaptive';
-  const mode = adaptive ? (s.tracking?.decision ?? 'Waiting for adaptive server tracking') : !started ? 'Ready to start' : !limitsValid ? 'Invalid limits — orders suspended'
+  const gomez=s.strategy === 'gomez', nextGomez=settings.strategy === 'gomez';
+  const mode = gomez ? s.gomez?.decision : adaptive ? (s.tracking?.decision ?? 'Waiting for adaptive server tracking') : !started ? 'Ready to start' : !limitsValid ? 'Invalid limits — orders suspended'
     : s.phase === 'holding_btc' ? 'Holding BTC · waiting for an upward sell crossing'
       : s.previousPrice === null ? 'Holding USDT · waiting for the first reference quote' : 'Holding USDT · waiting for a downward buy crossing';
   return <aside className="panel simulation__panel" aria-labelledby="simulation-title">
     <p className="text__eyebrow">VIRTUAL FUNDS · NO REAL ORDERS</p><h2 id="simulation-title">Trading simulator</h2>
-    <p className="bitcoin__note">{adaptive ? 'Adaptive run: wait for a dip and confirmed rebound, then follow the peak with protective exits. See the decision panel above.' : 'Start holding USDT. Buy only on a downward crossing below the minimum; then sell on an upward crossing above the maximum.'}</p>
+    <p className="bitcoin__note">{gomez ? 'Gómez run: alternate SELL and BUY with the configured delta. A cycle ends after buying Bitcoin back. See the active cycle panel above.' : adaptive ? 'Adaptive run: wait for a dip and confirmed rebound, then follow the peak with protective exits. See the decision panel above.' : 'Start holding USDT. Buy only on a downward crossing below the minimum; then sell on an upward crossing above the maximum.'}</p>
     {shared && <RunMetrics metrics={runMetrics ?? { readingCount: null, startedAt: null, elapsedSeconds: null }} />}
     <div className="simulation__balances">
       <div><span>USDT balance</span><strong data-testid="usdt-balance">{usdt(s.usdt)}</strong></div>
@@ -57,7 +58,7 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
       <div><dt>Simulated trades</dt><dd data-testid="trade-count">{s.tradeCount}</dd></div></dl>
     <p className="simulation__state" aria-live="polite">{mode}</p>
     {strategySettings}
-    <fieldset className="simulation__settings"><legend>Classic live thresholds · USDT per BTC</legend>
+    {!gomez && !nextGomez && <fieldset className="simulation__settings"><legend>Classic live thresholds · USDT per BTC</legend>
       {adaptive && <p className="bitcoin__note">These classic reference lines do not control adaptive entries or exits.</p>}
       <LimitInput label="Buy minimum" value={minimum} setValue={setMinimum} step={Number(step)} onCommit={onCommit && (value => onCommit('minimum', value))} />
       <LimitInput label="Sell maximum" value={maximum} setValue={setMaximum} step={Number(step)} onCommit={onCommit && (value => onCommit('maximum', value))} />
@@ -65,19 +66,20 @@ export default function SimulationPanel({ simulation: s, settings, latest, start
       {!limitsValid && !autoLimits && <p className="text text--negative" role="alert">Enter positive thresholds with minimum below maximum. {shared ? 'Invalid drafts are not saved; the server keeps the saved limits.' : 'Orders are suspended.'}</p>}
       {(!Number.isFinite(Number(step)) || Number(step) <= 0) && <p className="text text--negative" role="alert">Use a positive adjustment step to enable the +/− buttons.</p>}
       <p className="bitcoin__note">Changes apply to the next quote; moving a line alone never executes a trade.</p>
-    </fieldset>
+    </fieldset>}
     <fieldset className="simulation__settings"><legend>Next Start / Reset</legend>
-      <label className="simulation__field">Initial capital · USDT<input className="field" type="number" min="0.01" max="1000000000000" step="100" value={capital} onChange={e => setCapital(e.target.value)} onBlur={e => onCommit?.('capital',e.target.value)} /></label>
+      {(!nextGomez || settings.initialAction === 'BUY') && <label className="simulation__field">Initial capital · USDT<input className="field" type="number" min="0.01" max="1000000000000" step="100" value={capital} onChange={e => setCapital(e.target.value)} onBlur={e => onCommit?.('capital',e.target.value)} /></label>}
       <label className="simulation__field">Trading fee · % per order<input className="field" type="number" min="0" max="5" step="0.01" value={fee} onChange={e => setFee(e.target.value)} onBlur={e => onCommit?.('fee',e.target.value)} /></label>
       {!valid && <p className="text text--negative" role="alert">Use capital above zero (up to 1 trillion USDT) and a fee from 0% to 5%.</p>}
-      <button className="button button--primary simulation__start" type="button" disabled={!valid || (!limitsValid && !autoLimits)} onClick={start}>{started ? 'Reset simulation' : 'Start simulation'}</button>
-      <p className="bitcoin__note">Reset restores the configured USDT, clears BTC, fees, trades and chart, and waits. Adaptive starts indicator warmup; Classic waits for a downward crossing after its first reference.</p>
+      <button className="button button--primary simulation__start" type="button" disabled={!valid || (!nextGomez && !limitsValid && !autoLimits) || (gomez && s.gomez?.pendingSell)} onClick={start}>{started ? 'Reset simulation' : 'Start simulation'}</button>
+      <p className="bitcoin__note">{nextGomez ? `Start / Reset replaces the virtual run with ${settings.initialAction === 'SELL' ? `${settings.initialBtc} BTC` : 'the configured USDT'} and schedules the first ${settings.initialAction} at the next fresh quote. Use Relaunch above to preserve funds.` : 'Reset restores the configured USDT, clears BTC, fees, trades and chart, and waits. Adaptive starts indicator warmup; Classic waits for a downward crossing after its first reference.'}</p>
+      {gomez && s.gomez?.pendingSell && <p className="bitcoin__note">Reset is blocked while a sale awaits its BTC rebuy. Pause, Relaunch or finish this cycle first.</p>}
       {started && <p className="bitcoin__note">Active run: {usdt(s.capital)} initial capital · {s.feePercent}% fee. Capital/fee edits take effect only after Reset.</p>}
     </fieldset>
     <details className="bitcoin__history"><summary>Simulated trades · latest 100</summary><div className="simulation__ledger"><table><caption>Fictitious executions at sampled prices</caption><thead><tr><th scope="col">Order / price</th><th scope="col">Spent → received</th><th scope="col">Fee deducted</th></tr></thead><tbody>
       {s.trades.slice().reverse().map(t => <tr key={t.id}><td>#{t.id} {t.side}<br />{usdt(t.price)}<br /><small>{new Date(t.retrievedAt).toLocaleTimeString('en-GB', { timeZone: 'America/Argentina/Buenos_Aires' })} · {t.reason}</small></td><td>{assetAmount(t.spent, t.spentAsset)}<br />→ {assetAmount(t.received, t.receivedAsset)}</td><td>{assetAmount(t.fee, t.feeAsset)}</td></tr>)}
     </tbody></table></div></details>
-    <p className="bitcoin__note">Fee estimate: <a href="https://www.binance.com/en/fee/trading" target="_blank" rel="noreferrer">Binance standard spot 0.1%</a>, configurable. <a href="https://www.binance.com/en/support/faq/detail/e85d6e703b874674840122196b89780a" target="_blank" rel="noreferrer">Fees are deducted from the received asset</a>. No BNB/VIP discounts, pair promotions, spread, slippage or lot-size rules are modeled. Ten-second sampling can miss crossings. {shared ? 'Shared state is saved on the server; leaving the page changes nothing.' : 'Session data resets when you leave.'}</p>
+    <p className="bitcoin__note">Configurable commission estimate; consult <a href="https://www.binance.com/en/fee/trading" target="_blank" rel="noreferrer">Binance fees</a> for your account. This simulator deducts fees from the received asset. No BNB/VIP discounts, pair promotions, spread, slippage or lot-size rules are modeled. Sampled prices can miss movements between readings. {shared ? 'Shared state is saved on the server; leaving the page changes nothing.' : 'Session data resets when you leave.'}</p>
   </aside>;
 }
 

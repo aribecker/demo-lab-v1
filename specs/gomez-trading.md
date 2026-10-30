@@ -29,7 +29,7 @@ Network, HTTP/rate-limit and malformed-price errors keep the pending leg, target
 
 ## Persistence and API contract
 
-Keep all existing PostgreSQL tables, schema and Flyway migrations unchanged. Add backward-compatible fields to the existing `bitcoin_shared.simulation_state.document` JSON, schemaVersion 1: settings initialBtc, initialAction, delta, deltaUnit, pollSeconds; simulation `gomez` object containing these active parameters plus initialBtcEquivalent, lastFillPrice, nextAction, targetPrice, pendingSell, cycleStartBtc, completedCycles, lastCycleGainBtc, stopAfterCycle and decision. Defaults only affect new runs. Missing gomez data on legacy Classic/Adaptive snapshots cannot change their strategy or balances. The transaction row lock and command replay ledger remain authoritative.
+Keep all existing PostgreSQL tables, schema and Flyway migrations unchanged. Add backward-compatible fields to the existing `bitcoin_shared.simulation_state.document` JSON, schemaVersion 1: settings initialBtc, initialAction, delta, deltaUnit, pollSeconds; simulation `gomez` object containing active delta, deltaUnit and pollSeconds plus initialBtcEquivalent, lastFillPrice, nextAction, targetPrice, pendingSell, cycleStartBtc, completedCycles, lastCycleGainBtc, stopAfterCycle and decision. Defaults only affect new runs. Missing gomez data on legacy Classic/Adaptive snapshots cannot change their strategy or balances. The transaction row lock and command replay ledger remain authoritative.
 
 ## Didactic UI and acceptance
 

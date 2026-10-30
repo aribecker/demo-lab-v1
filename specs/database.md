@@ -68,3 +68,8 @@ Inline history has Latest25, View All and Resumido controls. Latest25 shows the 
 | revoked_at | TIMESTAMP WITH TIME ZONE | NULL until explicit logout |
 
 Index `application_sessions_expiry_idx(expires_at)`. Independent Flyway metadata `auth_private.session_schema_history`, migration directory `db/auth-migration`; V1 creates only the sessions table and index. No changes to existing tables, documents or migration history. Expired rows may be removed on session creation; live revocation survives restart. Authentication schema is excluded from all Database Explorer catalog and row queries. Runtime requires durable storage, with safe 503 on failure and no in-memory fallback.
+
+
+## R48 — Gómez BTC sell/rebuy cycles
+
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.
