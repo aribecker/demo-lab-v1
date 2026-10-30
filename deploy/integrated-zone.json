@@ -104,5 +104,19 @@
     "dockerfilePath": "./Weather-Dockerfile",
     "canonicalDockerfile": "./Weather-Microservice-Dockerfile",
     "databaseRequired": false
+  },
+  "canonicalRepository": "aribecker/demo-lab",
+  "canonicalBranch": "main",
+  "legacyRepository": {
+    "name": "aribecker/0080-prueba-SDD-full-stack",
+    "status": "historical experiment retained for later retirement",
+    "archiveBranchPrefix": "legacy-0080/"
+  },
+  "legacyIntegratedScheduler": {
+    "serviceId": "srv-dbeg1f8ae00c73d1mkrg",
+    "environment": {
+      "SIMULATION_SCHEDULING_ENABLED": "false"
+    },
+    "reason": "Canonical demo-lab-api owns the simulator polling loop; retain legacy service for remaining clients."
   }
 }

@@ -1,0 +1,137 @@
+{
+  "repository": "aribecker/demo-lab",
+  "branch": "main",
+  "legacySourceHeadsPreserved": 18,
+  "legacySourceTag": "legacy-0080/v2.0.1",
+  "tests": {
+    "backend": 123,
+    "frontend": 163,
+    "failures": 0,
+    "skipped": 0
+  },
+  "backendDeploy": {
+    "id": "dep-dbhvig6k1f9s73ec5dr0",
+    "commit": "8c9bc1ee37151b23339c23e8ddb609606e832047",
+    "status": "live"
+  },
+  "frontendDeploy": {
+    "id": "dep-dbhvllgu01pc73aiel3g",
+    "commit": "a0531a6e97e1882725bb2d41d1993bb110119b08",
+    "status": "live"
+  },
+  "legacySchedulerConfigDeploy": {
+    "id": "dep-dbhvk459el5s738kejkg",
+    "status": "live"
+  },
+  "apiChecks": [
+    {
+      "path": "/health",
+      "status": 200,
+      "cors": "https://demo-lab-jeov.onrender.com",
+      "data": {
+        "version": "2.10.0",
+        "status": "UP"
+      }
+    },
+    {
+      "path": "/api/people/health",
+      "status": 200,
+      "cors": "https://demo-lab-jeov.onrender.com",
+      "data": {
+        "database": "PostgreSQL",
+        "status": "UP"
+      }
+    },
+    {
+      "path": "/auth/providers",
+      "status": 200,
+      "cors": "https://demo-lab-jeov.onrender.com",
+      "data": [
+        {
+          "id": "google",
+          "name": "Google",
+          "enabled": false
+        },
+        {
+          "id": "github",
+          "name": "GitHub",
+          "enabled": false
+        },
+        {
+          "id": "microsoft",
+          "name": "Microsoft",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "path": "/api/bitcoin",
+      "status": 200,
+      "cors": "https://demo-lab-jeov.onrender.com",
+      "count": 4888,
+      "rateTotal": 3924
+    },
+    {
+      "path": "/api/access/me",
+      "status": 200,
+      "cors": "https://demo-lab-jeov.onrender.com",
+      "data": {
+        "canUseSimulator": true,
+        "canManageUsers": true,
+        "canManageGroups": true
+      }
+    },
+    {
+      "path": "/api/simulation",
+      "status": 200,
+      "cors": "https://demo-lab-jeov.onrender.com",
+      "phase": "holding_btc",
+      "strategy": "classic",
+      "tradeCount": 1,
+      "newGomezSettings": 120,
+      "execution": {
+        "hostingMode": "free",
+        "schedulingEnabled": true,
+        "pollIntervalMs": 10000,
+        "processStartedAt": "2026-10-30T01:58:39.152990275Z",
+        "lastCycleAt": "2026-10-30T01:59:09.848436522Z",
+        "lastCycleStatus": "ok"
+      }
+    }
+  ],
+  "frontendChecks": {
+    "pages": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/trading-simulator/",
+        "status": 200
+      },
+      {
+        "path": "/users/",
+        "status": 200
+      },
+      {
+        "path": "/groups/",
+        "status": 200
+      },
+      {
+        "path": "/specifications/",
+        "status": 200
+      }
+    ],
+    "asset": "/assets/index-ADj5TuF8.js",
+    "assetStatus": 200,
+    "checks": {
+      "canonicalApi": true,
+      "gomezControls": true,
+      "gomezStrategy": true,
+      "usersAndGroups": true,
+      "oldIntegratedApiAbsent": true
+    }
+  },
+  "googleLogin": "provider credentials not enabled; existing pending setup",
+  "simulationResetPerformed": false
+}

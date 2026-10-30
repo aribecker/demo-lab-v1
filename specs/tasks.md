@@ -118,4 +118,15 @@
 - [x] Run frontend tests and production build.
 - [x] Complete disposable PostgreSQL backend checks and package verification: 114 backend tests, no skips.
 - [x] Publish implementation and validation evidence to the independent branch (docs/gomez-trading-release.md).
-- [ ] Merge/deploy only after a subsequent user instruction.
+- [x] User subsequently authorized consolidation and deployment to demo-lab/main; verified in R50 (docs/demo-lab-consolidation-release.md).
+
+
+## R50 — canonical Demo Lab consolidation completed
+
+- [x] Preserve existing Demo Lab features and merge the full source and Gómez implementation into main.
+- [x] Preserve 18 source heads and the legacy release tag without force-updating target refs.
+- [x] Pass 123 backend PostgreSQL tests and 163 frontend tests; generate both builds.
+- [x] Verify canonical backend and frontend deployments Live, production read-only endpoints, CORS and served assets.
+- [x] Record canonical repository guidance in root AGENTS.md/README and the legacy repository's AGENTS.md.
+- [x] Disable the legacy integrated scheduler after canonical API verification; retain legacy services for later cleanup.
+- [ ] Optional pre-existing setup: supply OAuth provider credentials on demo-lab-api before Google sign-in can work there.
