@@ -72,4 +72,4 @@ Index `application_sessions_expiry_idx(expires_at)`. Independent Flyway metadata
 
 ## R48 — Gómez BTC sell/rebuy cycles
 
-The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. The strategy is integrated into aribecker/demo-lab/main under the completed R50 consolidation. The former feature/gomez-btc-cycles branch is historical provenance, not an active merge/deploy hold. See [bitcoin-trading-integration.md](bitcoin-trading-integration.md) for the reconciled contract and precedence.

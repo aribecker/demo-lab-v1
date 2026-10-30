@@ -151,7 +151,7 @@ Follow specs/database.md for existing and new tables, constraints, indexes, inde
 Implement the R45 contract in specs/database.md. Expose Latest25 / View All / Resumido inside the existing history box. View All retrieves the complete retained query history automatically in bounded pages with progress/cancellation/retry. Resumido groups the full successful-reading history by consecutive gaps strictly below one minute and shows actual From/To and count, with older-period paging. Preserve timestamps/tenths, existing tables, global simulation state and read-only behavior. Specification → grounding → generation/tests → integrated deploy and live verification.
 
 ## R46 — Separate public tracker and owner-only simulator
-`simulator-access.md` is the authoritative R46 contract. It supersedes earlier public-simulator access statements: `/bitcoin` is public market data; `/trading-simulator` and its APIs require the verified Google owner `aribecker2@gmail.com`. Navigation, direct entry, identity lifecycle and the raw database-state access path enforce the same server permission. Existing persisted state and schema are unchanged.
+`simulator-access.md` records the historical R46 contract; `demo-lab-access.md` supersedes its fixed-owner rule with persisted SIMULATOR group permissions, including explicit Everyone grants. It supersedes earlier public-simulator access statements: `/bitcoin` is public market data; `/trading-simulator` and its APIs require the verified Google owner `aribecker2@gmail.com`. Navigation, direct entry, identity lifecycle and the raw database-state access path enforce the same server permission. Existing persisted state and schema are unchanged.
 
 ## R47 — Persistent login
 `persistent-login.md` defines seven-day browser and PostgreSQL session persistence, explicit revocation, cross-tab updates and private authentication tables. It supersedes the old in-memory 30-minute lifetime; R46 owner authorization remains unchanged. No Google configuration change is required.
@@ -159,4 +159,9 @@ Implement the R45 contract in specs/database.md. Expose Latest25 / View All / Re
 
 ## R48 — Gómez BTC sell/rebuy cycles
 
-The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. The strategy is integrated into aribecker/demo-lab/main under the completed R50 consolidation. The former feature/gomez-btc-cycles branch is historical provenance, not an active merge/deploy hold. See [bitcoin-trading-integration.md](bitcoin-trading-integration.md) for the reconciled contract and precedence.
+
+
+## Canonical Bitcoin trading specification integration — 2026-10-30
+
+[bitcoin-trading-integration.md](bitcoin-trading-integration.md) is the entry point for the reconciled tracker/simulator requirements, strategy differences, source provenance and precedence. Existing functional requirements remain; this integration removes obsolete branch holds and disambiguates current access without introducing a new strategy or changing runtime state.

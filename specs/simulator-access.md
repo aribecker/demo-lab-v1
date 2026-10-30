@@ -1,6 +1,8 @@
-# R46 — Separate market tracker and owner-only simulator
+# R46 — Separate market tracker and simulator (historical access baseline)
 
-This specification is authoritative for R46 and supersedes earlier statements in R15–R18, R32 and R35 that simulator access and commands are public. Other feature and database contracts remain in force.
+Current precedence: [demo-lab-access.md](demo-lab-access.md) supersedes this document's fixed owner-only identity and mandatory-login rules. Persisted SIMULATOR memberships, including Everyone, govern access on canonical main. [bitcoin-trading-integration.md](bitcoin-trading-integration.md) provides the consolidated map. The owner-only clauses below describe the historical R46 baseline; route separation, public market projection and API/data protection still apply with the current permission decision.
+
+This specification superseded earlier statements in R15–R18, R32 and R35 that all simulator access and commands were public. Other feature and database contracts remain in force.
 
 ## Navigation and views
 - `/bitcoin` remains the public **Bitcoin Tracker** menu destination. Show the server's market prices, chart, successful readings and durable market-query history (Latest 25, View All, Resumido). Do not mount the simulation panel, adaptive decisions, balances, settings or simulator commands. Its polling is read-only and does not start/stop/reset the engine.
