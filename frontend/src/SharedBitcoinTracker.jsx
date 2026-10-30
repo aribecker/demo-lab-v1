@@ -43,7 +43,7 @@ export default function SharedBitcoinTracker({ api }) {
       <h1 className="page-intro__title" id="page-heading" tabIndex={-1}>Trading <span>Simulator.</span></h1>
       <p className="page-intro__subtitle">The same saved balances, controls and run state on every device. Opening this page never restarts the simulation.</p></section>
     <p className="bitcoin__note"><a className="text__link" href="/login">Open login demo →</a> · Access follows the configured group memberships, including Everyone when enabled. Login and logout do not reset its saved state.</p>
-    <aside className="notice"><strong>Owner-only demo · virtual funds.</strong> Quotes, thresholds and virtual orders are processed on the server. Closing this page does not pause the engine.
+    <aside className="notice"><strong>Shared simulator · virtual funds.</strong> Quotes, thresholds and virtual orders are processed on the server. Closing this page does not pause the engine.
       {data?.execution?.hostingMode === 'always-on'
         ? ' Always-on hosting is configured. The engine works without open browsers while the service and database are available.'
         : ' This deployment uses sleep-capable hosting: Render Free stops processing after idle suspension. Continuous unattended operation requires an always-on plan.'}
