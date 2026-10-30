@@ -18,3 +18,7 @@ Canonical repository: aribecker/demo-lab, main. Existing destination baseline: 5
 ## Verification
 
 Run the destination's complete frontend tests/style contract/build and Java package with disposable PostgreSQL. Verify that source features and destination access/navigation regressions pass together. Publish a normal merge to main without force, deploy both canonical services, verify deployed SHAs, health, market data, CORS, protected controls and served Gómez assets/specification. Use read-only production checks, no trading Reset. Record deploy IDs and any remaining hosting/login prerequisites honestly.
+
+### CI timer verification
+
+The gallery route-exit regression must assert cancellation of its own 900 ms preview timer. Do not assert that the entire React/router/test environment has zero timers: unrelated runtime scheduling differs between Node versions and execution speed. Retain the assertion that the gallery never calls the live weather loader. This is test isolation, not removal of the cleanup requirement.

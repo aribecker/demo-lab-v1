@@ -139,19 +139,23 @@ describe('routed demo application', () => {
 
   it('simulates preview refresh locally and clears its timer on route exit', async () => {
     vi.useFakeTimers();
+    const scheduled = vi.spyOn(globalThis, 'setTimeout');
+    const cancelled = vi.spyOn(globalThis, 'clearTimeout');
     const { loader } = open('/components');
     fireEvent.click(screen.getByRole('button', { name: 'Get weather' }));
     expect(screen.getByRole('button', { name: 'Getting weather…' })).toBeDisabled();
     act(() => vi.advanceTimersByTime(900));
     expect(screen.getByRole('status')).toHaveTextContent('Sample preview ready');
     fireEvent.click(screen.getByRole('button', { name: 'Get weather' }));
-    expect(vi.getTimerCount()).toBe(1);
+    const previewCall = scheduled.mock.calls.findLastIndex(([, delay]) => delay === 900);
+    const previewTimer = scheduled.mock.results[previewCall].value;
     const homeLink = menuLink('Home');
     await act(async () => { fireEvent.click(homeLink); });
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Small features.');
     await act(async () => { await vi.advanceTimersByTimeAsync(0); });
-    expect(vi.getTimerCount()).toBe(0);
+    expect(cancelled).toHaveBeenCalledWith(previewTimer);
     expect(loader).not.toHaveBeenCalled();
+    scheduled.mockRestore(); cancelled.mockRestore();
   });
 
   it('renders a useful not-found route', () => {
