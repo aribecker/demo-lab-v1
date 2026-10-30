@@ -55,3 +55,8 @@ Use centralized CSS tokens/BEM and the current turquoise design system. Preserve
 ## Verification boundary
 
 For this documentation-only integration: verify source coverage and link targets, review the diff for unintended runtime changes, run existing Specifications viewer coverage and build the frontend to confirm the new catalog entry is bundled. No backend behavior changed, so no new algorithm tests or production trading commands are required. A future functional change must follow the algorithm-specific acceptance suites and normal SDD implementation/deployment workflow.
+
+
+## Implementation follow-through — 2026-10-30
+
+The user requests code grounding and completion against this reconciled contract. Audit the current canonical implementation before generating replacements: retain already implemented strategies and durable data. Simulator-facing text must describe configured group permissions, including Everyone when granted, rather than claim fixed owner-only access. Validate the complete frontend suite/style contract/build and backend package against disposable loopback PostgreSQL, then record source mapping, corrections and remaining limitations. This follow-through supersedes the earlier documentation-only verification boundary for the present implementation task.
