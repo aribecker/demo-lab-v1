@@ -24,7 +24,7 @@ public class SimulationController {
     private ResponseEntity<JsonNode> ok(SharedState state) {
         ObjectNode snapshot = json.valueToTree(state);
         snapshot.set("rateQueries", json.valueToTree(service.rateSummary()));
-        snapshot.set("execution", json.valueToTree(service.execution()));
+        snapshot.set("execution", json.valueToTree(service.execution(state)));
         snapshot.set("runMetrics", json.valueToTree(service.runMetrics(state)));
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(snapshot);
     }
@@ -36,6 +36,6 @@ public class SimulationController {
         .body(Map.of("code","SIMULATION_CONFLICT","message",error.getMessage())); }
     @ExceptionHandler({IllegalArgumentException.class,org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class})
     ResponseEntity<?> invalid(Exception error) { return ResponseEntity.badRequest().cacheControl(CacheControl.noStore())
-        .body(Map.of("code","INVALID_SIMULATION_COMMAND","message","Use valid simulation settings, a positive history cursor and a page size from 1 to 100.")); }
+        .body(Map.of("code","INVALID_SIMULATION_COMMAND","message", error instanceof IllegalArgumentException ? error.getMessage() : "Use valid simulation settings, a positive history cursor and a page size from 1 to 100.")); }
 }
 

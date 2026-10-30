@@ -120,3 +120,8 @@ Source: simulator-access.md. Grounding: docs/simulator-access-grounding.md. Serv
 
 ## R47 mapping
 persistent-login.md + database.md → docs/persistent-login-grounding.md → AuthSessionStore, db/auth-migration/V1, DemoSessions, AuthStorageErrors, authClient, AuthContext and Login. Verification: AuthSessionStoreTest (including disposable PostgreSQL), DemoSessionsTest, AuthApiTest, OAuthBoundaryTest, SimulatorAccessTest, authClient.test.js and SimulatorAccess.test.jsx. All prior frontend/backend regressions remain required.
+
+
+## R48 — Gómez BTC sell/rebuy cycles
+
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.

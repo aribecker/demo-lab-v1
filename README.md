@@ -1,4 +1,8 @@
-# Integrated Demo Lab v2.10.0
+# Demo Lab v2.15.0
+
+Canonical repository: **https://github.com/aribecker/demo-lab**, branch **main**.
+
+`aribecker/0080-prueba-SDD-full-stack` is a legacy experiment retained temporarily; all new Demo Lab work starts here. See AGENTS.md and specs/demo-lab-consolidation.md.
 
 Current frontend: https://demo-lab-jeov.onrender.com
 Application backend: https://demo-lab-api.onrender.com
@@ -12,7 +16,7 @@ Frontend VITE_BACKEND_API_URL is the integrated backend origin. VITE_WEATHER_API
 Canonical configuration: deploy/integrated-zone.json, applied through Render connector operations. The obsolete root render.yaml describing NEXT was retired so it cannot accidentally recreate those services. Deployment provenance and pending/confirmed cleanup are recorded in docs/weather-separation-release.md.
 
 ## Source layout and local execution
-- frontend/: React v2.9.0; npm ci, npm test, npm run dev.
+- frontend/: React v2.15.0; npm ci, npm test, npm run dev.
 - weather-service/: integrated Java backend (historical directory name), no weather endpoint. Run mvn -f weather-service/pom.xml spring-boot:run on8080.
 - weather-microservice/: independent Java weather provider. Run mvn -f weather-microservice/pom.xml spring-boot:run on8081. Vite routes local /api/weather to8081 and all other /api and /auth to8080.
 - Weather-Dockerfile: integrated backend, including disposable PostgreSQL build tests.

@@ -43,7 +43,7 @@ export function BitcoinWidget({ tracker, minimum, maximum, rateHistory, readOnly
     </figure>
     <p role="status" className="bitcoin__status">{error ? `${error}${latest ? ' Showing the last successful quote — stale.' : ' No quote available yet.'}`
       : !running ? 'Tracking paused. Resume to get a fresh quote.' : !visible ? 'Automatic updates pause while this tab is hidden.'
-        : pending ? 'Retrieving a Binance quote…' : tracker.shared ? 'Server checks Binance every 10 seconds while running and awake.' : 'Automatic refresh every 10 seconds while this page is visible.'}</p>
+        : pending ? 'Retrieving a Binance quote…' : tracker.shared ? 'Server checks Binance at its configured interval while running and awake.' : 'Automatic refresh every 10 seconds while this page is visible.'}</p>
     {!readOnly && <div className="bitcoin__actions"><button className="button" onClick={toggle}>{running ? 'Pause tracking' : 'Resume tracking'}</button>
       <button className="button" onClick={refresh} disabled={pending || !running || !visible}>Refresh now</button></div>}
     <p className="bitcoin__note">Source: <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noreferrer">Binance BTC/USDT spot price</a>. Retrieval time is {tracker.shared ? 'the server retrieval time' : "your browser's time"}, not an exchange timestamp. Prices may repeat; provider caching can delay updates.</p>

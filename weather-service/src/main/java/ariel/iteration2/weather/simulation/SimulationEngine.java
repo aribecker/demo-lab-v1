@@ -6,8 +6,12 @@ import java.time.Instant;
 public final class SimulationEngine {
     private SimulationEngine() {}
     public static void validate(Settings s) {
-        if (!java.util.Set.of("classic","adaptive").contains(s.strategy==null?"":s.strategy))
-            throw new IllegalArgumentException("Choose classic or adaptive strategy.");
+        if (!java.util.Set.of("classic","adaptive","gomez").contains(s.strategy==null?"":s.strategy))
+            throw new IllegalArgumentException("Choose classic, adaptive or gomez strategy.");
+        GomezTrading.validate(s.delta, s.deltaUnit, s.pollSeconds);
+        if (!Double.isFinite(s.initialBtc) || s.initialBtc <= 0 || s.initialBtc > 1e6
+            || !java.util.Set.of("BUY", "SELL").contains(s.initialAction == null ? "" : s.initialAction))
+            throw new IllegalArgumentException("Choose BUY or SELL and a positive initial BTC amount up to 1 million.");
         for(double value:new double[]{s.dipAtr,s.reboundAtr,s.trailAtr,s.lossAtr})
             if(!Double.isFinite(value)||value<0.1||value>20) throw new IllegalArgumentException("ATR multiples must be between 0.1 and 20.");
         if(!Double.isFinite(s.minimumMovePercent)||s.minimumMovePercent<0.01||s.minimumMovePercent>10)
@@ -20,6 +24,8 @@ public final class SimulationEngine {
             || s.minimum <= 0 || s.maximum <= s.minimum || s.maximum > 1e12) throw new IllegalArgumentException("Minimum must be positive and below maximum.");
     }
     public static void reset(SharedState s) {
+        if (s.simulation.strategy.equals("gomez") && s.simulation.gomez.pendingSell)
+            throw new IllegalArgumentException("Finish the pending BTC rebuy before Reset. Pause or Relaunch to retain this cycle.");
         validate(s.settings);
         s.simulation = new Simulation();
         var sim=s.simulation;
@@ -31,6 +37,7 @@ public final class SimulationEngine {
         s.simulation.capital = s.settings.capital;
         s.simulation.feePercent = s.settings.feePercent;
         s.simulation.usdt = s.settings.capital;
+        if (sim.strategy.equals("gomez")) GomezTrading.start(s);
         s.samples.clear(); s.count = 0; s.baseline = null; s.range = null;
         s.running = true; s.error = ""; s.lastPollAt = 0; s.nextPollAt = 0;
     }
@@ -56,7 +63,15 @@ public final class SimulationEngine {
             if (sim.startedAt != null) sim.readingCount++;
             Double previous = sim.previousPrice;
             sim.previousPrice = price; sim.lastSequence = s.count;
-            if (sim.strategy.equals("adaptive")) {
+            if (sim.strategy.equals("gomez")) {
+                if (GomezTrading.ready(sim,price)) {
+                    boolean buy = sim.gomez.nextAction.equals("BUY");
+                    if (!buy) { sim.gomez.cycleStartBtc = sim.btc; sim.gomez.pendingSell = true; }
+                    trade(s,q,buy,"Gomez " + (sim.gomez.lastFillPrice == null ? "first fresh quote" : "delta target reached"));
+                    GomezTrading.filled(s,price,buy);
+                }
+            }
+            else if (sim.strategy.equals("adaptive")) {
                 String reason=AdaptiveTrading.evaluate(sim,price,now);
                 if(reason!=null) {
                     boolean buy=sim.phase.equals("holding_usdt");

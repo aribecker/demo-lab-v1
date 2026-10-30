@@ -23,6 +23,12 @@ public class SimulationService {
     public Execution execution() {
         return new Execution(hostingMode, scheduling, 10000, processStartedAt, lastCycleAt, lastCycleStatus);
     }
+    public Execution execution(SharedState state) {
+        return new Execution(hostingMode, scheduling, pollInterval(state), processStartedAt, lastCycleAt, lastCycleStatus);
+    }
+    private long pollInterval(SharedState state) {
+        return state.simulation.strategy.equals("gomez") ? state.simulation.gomez.pollSeconds * 1000L : 10000;
+    }
     private final SimulationStore store;
     private final HttpClient http;
     private final Clock clock;
@@ -73,7 +79,7 @@ public class SimulationService {
     public RateQueryHistory.PeriodPage ratePeriods(Long before,int limit) { return store.history().periods(before,limit); }
     private void poll(SharedState s) {
         Instant now = clock.instant();
-        s.nextPollAt = now.toEpochMilli() + 10000;
+        s.nextPollAt = now.toEpochMilli() + pollInterval(s);
         // Reserve durably before any network call. Storage failure means no unaudited request.
         long attempt = store.history().begin(now);
         java.math.BigDecimal rate = null;
@@ -120,11 +126,34 @@ public class SimulationService {
         if (!command.path("expectedControlRevision").isIntegralNumber() || !command.path("expectedControlRevision").canConvertToLong() || command.path("expectedControlRevision").asLong()<0)
             throw new IllegalArgumentException("Control revision is required.");
         String type=command.path("type").asText();
-        if (!java.util.Set.of("settings","reset","running","refresh").contains(type)) throw new IllegalArgumentException("Unknown command.");
+        if (!java.util.Set.of("settings","reset","running","refresh","relaunch","finish-cycle").contains(type)) throw new IllegalArgumentException("Unknown command.");
         return store.locked(s -> {
             if (s.commandIds.contains(id)) return s;
             if (s.controlRevision != command.path("expectedControlRevision").asLong()) throw new Conflict();
             switch(type) {
+                case "relaunch" -> {
+                    if (!s.simulation.strategy.equals("gomez") || s.simulation.phase.equals("inactive"))
+                        throw new IllegalArgumentException("Start a Gomez run before relaunching.");
+                    JsonNode changes = command.path("changes");
+                    if (!changes.isObject() || changes.isEmpty()) throw new IllegalArgumentException("Relaunch parameters are required.");
+                    var names = changes.fieldNames();
+                    while (names.hasNext()) if (!java.util.Set.of("delta","deltaUnit","pollSeconds").contains(names.next()))
+                        throw new IllegalArgumentException("Relaunch only accepts delta, deltaUnit and pollSeconds.");
+                    var g = s.simulation.gomez;
+                    // Start with active values, independent of next-run drafts.
+                    var active = new SharedState.Settings();
+                    active.delta = g.delta; active.deltaUnit = g.deltaUnit; active.pollSeconds = g.pollSeconds;
+                    var temporary = new SharedState(); temporary.settings = active;
+                    settings(temporary, changes);
+                    g.delta = active.delta; g.deltaUnit = active.deltaUnit; g.pollSeconds = active.pollSeconds;
+                    GomezTrading.updateTarget(s.simulation);
+                    s.running = true; s.nextPollAt = clock.millis() + pollInterval(s);
+                }
+                case "finish-cycle" -> {
+                    if (!s.simulation.strategy.equals("gomez") || !command.path("enabled").isBoolean())
+                        throw new IllegalArgumentException("Use a boolean cycle-stop flag on an active Gomez run.");
+                    s.simulation.gomez.stopAfterCycle = command.path("enabled").asBoolean();
+                }
                 case "settings" -> settings(s,command.path("changes"));
                 case "reset" -> {
                     if (command.has("changes")) settings(s,command.get("changes"));
@@ -153,13 +182,25 @@ public class SimulationService {
         var fields=changes.fields();
         while(fields.hasNext()) {
             var field=fields.next();
-            if(field.getKey().equals("strategy")) {
+            if(java.util.Set.of("strategy","initialAction","deltaUnit").contains(field.getKey())) {
                 if(!field.getValue().isTextual()) throw new IllegalArgumentException("Strategy must be text.");
-                s.settings.strategy=field.getValue().asText();continue;
+                switch(field.getKey()) {
+                    case "strategy" -> s.settings.strategy=field.getValue().asText();
+                    case "initialAction" -> s.settings.initialAction=field.getValue().asText();
+                    case "deltaUnit" -> s.settings.deltaUnit=field.getValue().asText();
+                }
+                continue;
             }
             if (!field.getValue().isNumber() || !Double.isFinite(field.getValue().asDouble())) throw new IllegalArgumentException("Settings must be finite numbers.");
             double value=field.getValue().asDouble();
             switch(field.getKey()) {
+                case "initialBtc" -> s.settings.initialBtc=value;
+                case "delta" -> s.settings.delta=value;
+                case "pollSeconds" -> {
+                    if (value != Math.rint(value) || value < 10 || value > 3600)
+                        throw new IllegalArgumentException("Polling seconds must be an integer from 10 to 3600.");
+                    s.settings.pollSeconds=(int)value;
+                }
                 case "capital" -> s.settings.capital=value;
                 case "feePercent" -> s.settings.feePercent=value;
                 case "minimum" -> s.settings.minimum=value;

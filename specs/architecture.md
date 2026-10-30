@@ -112,3 +112,8 @@ See `simulator-access.md`. AuthProvider shares server identity/capabilities acro
 
 ## R47 — Durable authentication
 AuthSessionStore uses JDBC and its own Flyway stream in auth_private. DemoSessions retains only short-lived exchange tickets in memory; token hashes, validated profiles and absolute expiry/revocation persist in PostgreSQL. Frontend localStorage holds only the opaque application token; sessionStorage retains PKCE verifier. AuthProvider validates on startup and listens for token storage events. auth_private is excluded by the Database Explorer shared catalog/target query. See persistent-login.md and database.md.
+
+
+## R48 — Gómez BTC sell/rebuy cycles
+
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.

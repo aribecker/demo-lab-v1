@@ -19,3 +19,8 @@ Grounding: frontend/src/backendConfig.js, frontend/src/authClient.js, weather-se
 ## Explicit Spring database mapping
 
 After SIMULATION_DATABASE_URL was saved, the first deployment still reported unavailable storage. Setting SPRING_APPLICATION_JSON to {"simulation":{"database-url":"${SIMULATION_DATABASE_URL}"}} explicitly maps the environment secret to the property consumed by repositories, without duplicating credentials. Both variables must remain configured in Render. No secret value belongs in source or this specification. This is a verified deployment workaround; the exact reason the original mapping did not take effect was not established.
+
+
+## Canonical repository continuity — R50
+
+All current Demo Lab development, including Gómez BTC cycles, belongs to aribecker/demo-lab/main. Preserve destination authorization, schemas, theme and UI fixes when consolidating legacy source. 0080 is historical and retained for later cleanup. See demo-lab-consolidation.md and root AGENTS.md.

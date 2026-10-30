@@ -155,3 +155,8 @@ Implement the R45 contract in specs/database.md. Expose Latest25 / View All / Re
 
 ## R47 — Persistent login
 `persistent-login.md` defines seven-day browser and PostgreSQL session persistence, explicit revocation, cross-tab updates and private authentication tables. It supersedes the old in-memory 30-minute lifetime; R46 owner authorization remains unchanged. No Google configuration change is required.
+
+
+## R48 — Gómez BTC sell/rebuy cycles
+
+The authoritative optional strategy and acceptance contract is [gomez-trading.md](gomez-trading.md). Additive JSON fields in bitcoin_shared.simulation_state.document retain the existing table structure and migration history. Existing active strategies and balances are unchanged. Implementation and validation are isolated on feature/gomez-btc-cycles; merge and deploy await a later user instruction.

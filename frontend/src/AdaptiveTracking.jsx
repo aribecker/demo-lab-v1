@@ -17,6 +17,7 @@ export function AdaptiveSettings({ draft, edit, commit, pending }) {
     <label className="simulation__field">Next strategy<select className="field simulation__select" value={draft.strategy} disabled={pending}
       onChange={event => { edit('strategy')(event.target.value); commit('strategy', event.target.value); }}>
       <option value="adaptive">Adaptive rebound + trailing exit</option><option value="classic">Classic minimum / maximum</option>
+      <option value="gomez">Gómez · Bitcoin sell / rebuy cycles</option>
     </select></label>
     <p className="bitcoin__note">Saving these settings does not change the active run. Start / Reset applies them and clears virtual balances and history.</p>
     {draft.strategy === 'adaptive' && adaptiveFields.map(([key, label, explanation]) => <label className="simulation__field" key={key}>{label}

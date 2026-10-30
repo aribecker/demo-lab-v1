@@ -39,3 +39,27 @@ conservando sus URLs y configuración de OAuth/CORS actuales.
 En el momento de este commit la publicación y verificación siguen en curso;
 las pruebas locales no sustituyen la comprobación del deploy específico y sus
 logs. La verificación autenticada del usuario requiere que inicie sesión.
+
+## Despliegue verificado
+
+Render confirmó LIVE para backend db22fbccfc95ebb6020341ea10f860dc943e3bfb
+(deploy dep-dbg169vbhrrc73cmv8u0) y frontend
+4427ab5ce1e530d259851a0b85d206fd2cc7971a
+(deploy dep-dbg16efb9u1s73fpddk0), sobre sus ramas y servicios originales.
+El backend terminó 103 pruebas con cero fallos, errores u omisiones y BUILD
+SUCCESS. En runtime Flyway aplicó únicamente V3 sobre treasury, previamente
+V2, y registró esquema listo. No se recreó la base ni se ejecutaron escrituras
+manuales de asientos.
+
+El primer build falló por una prueba de respaldo con cantidad fija de tablas,
+y quedó retenido hasta agotar su timeout. La prueba corregida verifica nombres
+y cantidad contra el catálogo, además de restaurar proveedores y permisos.
+Este commit agrega trap de cierre del PostgreSQL desechable y redirige su log
+para que un futuro fallo no retenga el build. Render volverá a ejecutar las
+pruebas antes de reemplazar la versión activa.
+
+La cuenta Google propietaria autorizada queda configurada mediante
+TREASURY_BOOTSTRAP_OWNER_EMAIL. El alta de grants requiere su login real y
+email verificado. No se simuló una identidad ni se obtuvo una sesión del usuario
+para la verificación autenticada; ese recorrido no se declara probado en vivo.
+El alcance funcional sigue siendo el avance parcial descrito arriba.
